@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_job_card_form" model="ir.ui.view">
+        <field name="name">job.card.form</field>
+        <field name="model">job.card</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_approve_job_card" string="Approve Job Card" type="object" invisible="state not in ['draft']"/>
+                    <button name="action_create_requisition" string="Requisition" type="object" invisible="state not in ['approved']"/>
+                    <button name="action_finalize_job_card" string="Finalize Job Card" type="object" invisible="state not in ['requisition_started']"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group col="1" string="Job Card Details">
+                        <label for="name" string="Job Card Number"/>
+                        <field name="name" nolabel="1" readonly="1"/>
+                        <label for="estimate_id" string="Estimate Reference"/>
+                        <field name="estimate_id" nolabel="1" readonly="1"/>
+                        <label for="customer_id" string="Customer"/>
+                        <field name="customer_id" nolabel="1"/>
+                        <label for="vehicle_id" string="Vehicle"/>
+                        <field name="vehicle_id" nolabel="1"/>
+                        <label for="vehicle_name" string="Vehicle Name"/>
+                        <field name="vehicle_name" nolabel="1" readonly="1"/>
+                        <label for="vehicle_model" string="Vehicle Model"/>
+                        <field name="vehicle_model" nolabel="1" readonly="1"/>
+                        <label for="analytic_account_id" string="Analytic Account"/>
+                        <field name="analytic_account_id" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Order Lines" name="order_lines">
+                            <field name="job_card_lines" nolabel="1">
+                                <list editable="bottom" string="Job Card Lines">
+                                    <control>
+                                        <create name="add_product_control" string="Add a product"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                        <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
+                                    </control>
+                                    <field name="display_type" column_invisible="True"/>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" string="Product" required="not display_type" context="{'default_uom_id': product_uom_id}" attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                                    <field name="name" string="Section / Note" attrs="{'invisible': [('display_type', '=', False)]}"/>
+                                    <field name="quantity" string="Quantity" attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                                    <field name="product_uom_id" string="UoM" required="not display_type" attrs="{'invisible': [('display_type', '!=', False)]}" groups="uom.group_uom" width="80px"/>
+                                    <field name="unit_price" string="Unit Price" attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                                    <field name="tax_ids" string="Taxes" widget="many2many_tags" attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                                    <field name="discount" string="Disc.%" width="60px" attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                                    <field name="price_subtotal" string="Subtotal" attrs="{'invisible': [('display_type', '!=', False)]}" readonly="1"/>
+                                    <field name="price_total" string="Amount" attrs="{'invisible': [('display_type', '!=', False)]}" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Other Info" name="other_info">
+                            <group col="1">
+                                <field name="second_customer_id"/>
+                                <field name="excess_value"/>
+                                <field name="insurance_percentage" readonly="1"/>
+                                <field name="total_amount" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_job_card_list" model="ir.ui.view">
+        <field name="name">job.card.list</field>
+        <field name="model">job.card</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="vehicle_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_job_card" model="ir.actions.act_window">
+        <field name="name">Job Cards</field>
+        <field name="res_model">job.card</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

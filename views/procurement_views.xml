@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_procurement_form" model="ir.ui.view">
+        <field name="name">procurement.form</field>
+        <field name="model">procurement</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit_for_approval" string="Submit for Approval" type="object" invisible="state not in ['draft']"/>
+                    <button name="action_approve_requisition" string="Approve Requisition" type="object" invisible="state not in ['submitted_for_approval']"/>
+                    <button name="action_create_purchase_order" string="Create Purchase Order" type="object" invisible="state not in ['approved']"/>
+                    <button name="action_create_grv" string="Create GRV" type="object" invisible="state not in ['purchase_order_created']"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <field name="name"/>
+                    <field name="job_card_id"/>
+                    <group string="Procurement Lines">
+                        <field name="procurement_lines">
+                            <list>
+                                <field name="product_id"/>
+                                <field name="quantity"/>
+                                <field name="type"/>
+                                <field name="vendor_id" readonly="procurement_id.state != 'approved'" invisible="type == 'internal_transfer'"/>
+                                <field name="receipt_status" readonly="1"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_procurement_list" model="ir.ui.view">
+        <field name="name">procurement.list</field>
+        <field name="model">procurement</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="job_card_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_procurement" model="ir.actions.act_window">
+        <field name="name">Procurement</field>
+        <field name="res_model">procurement</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

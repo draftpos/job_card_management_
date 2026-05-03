@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_estimate_form" model="ir.ui.view">
+        <field name="name">estimate.form</field>
+        <field name="model">estimate</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit for Approval" type="object" invisible="state not in ['draft']"/>
+                    <button name="action_approve" string="Approve" type="object" invisible="state not in ['submitted']"/>
+                    <button name="action_open_job_card" string="Open Job Card" type="object" invisible="state not in ['approved'] or has_job_card"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group col="1" string="Estimate Details">
+                        <field name="name" nolabel="1"/>
+                        <label for="customer_id" string="Customer"/>
+                        <field name="customer_id" nolabel="1"/>
+                        <label for="vehicle_id" string="Vehicle"/>
+                        <field name="vehicle_id" nolabel="1"/>
+                        <label for="vehicle_name" string="Vehicle Name"/>
+                        <field name="vehicle_name" nolabel="1" readonly="1"/>
+                        <label for="vehicle_model" string="Vehicle Model"/>
+                        <field name="vehicle_model" nolabel="1" readonly="1"/>
+                        <label for="analytic_account_id" string="Analytic Account"/>
+                        <field name="analytic_account_id" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Order Lines" name="order_lines">
+                            <field
+                                name="estimate_lines"
+                                nolabel="1"
+                            >
+                                <list editable="bottom" string="Estimate Lines">
+                                    <control>
+                                        <create name="add_product_control" string="Add a product"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                        <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
+                                    </control>
+                                    <field name="display_type" column_invisible="True"/>
+                                    <field name="sequence" widget="handle"/>
+                                    <field 
+                                        name="product_id"
+                                        string="Product"
+                                        required="not display_type"
+                                        context="{'default_uom_id': product_uom_id}"
+                                        attrs="{'invisible': [('display_type', '!=', False)], 'readonly': [('display_type', '!=', False)]}"/>
+                                    <field 
+                                        name="name"
+                                        string="Section/Note"
+                                        attrs="{'invisible': [('display_type', '=', False)]}"/>
+                                    <field 
+                                        name="quantity"
+                                        string="Quantity"
+                                        attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                                    <field 
+                                        name="product_uom_id"
+                                        string="UoM"
+                                        required="not display_type"
+                                        attrs="{'invisible': [('display_type', '!=', False)]}"
+                                        groups="uom.group_uom"
+                                        width="80px"/>
+                                    <field 
+                                        name="unit_price"
+                                        string="Unit Price"
+                                        attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                                    <field 
+                                        name="tax_ids"
+                                        string="Taxes"
+                                        widget="many2many_tags"
+                                        attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                                    <field 
+                                        name="discount"
+                                        string="Disc.%"
+                                        width="60px"
+                                        attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                                    <field 
+                                        name="price_subtotal"
+                                        string="Subtotal"
+                                        attrs="{'invisible': [('display_type', '!=', False)]}"
+                                        readonly="1"/>
+                                    <field 
+                                        name="price_total"
+                                        string="Amount"
+                                        attrs="{'invisible': [('display_type', '!=', False)]}"
+                                        readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Other Info" name="other_info">
+                            <group>
+                                <group string="Customer Signature">
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                    <table class="float-end">
+                        <tbody>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_tax_total_label">Untaxed Amount</label>
+                                </td>
+                                <td class="o_list_monetary">
+                                    <span class="fw-bold">
+                                        <field name="amount_untaxed" widget="monetary" readonly="1"/>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_tax_total_label">Total</label>
+                                </td>
+                                <td class="o_list_monetary">
+                                    <span class="fw-bold" style="font-size: 1.3em;">
+                                        <field name="amount_total" widget="monetary" readonly="1"/>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_estimate_list" model="ir.ui.view">
+        <field name="name">estimate.list</field>
+        <field name="model">estimate</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="vehicle_name"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_estimate" model="ir.actions.act_window">
+        <field name="name">Estimates</field>
+        <field name="res_model">estimate</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

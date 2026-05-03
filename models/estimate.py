@@ -1,0 +1,182 @@
+import random
+import string
+
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
+
+class Estimate(models.Model):
+    _name = 'estimate'
+    _description = 'Estimate / Quote'
+    _order = 'id desc'
+
+    def _default_name(self):
+        random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        return 'EST-%s-TEX' % random_part
+
+    name = fields.Char(string='Estimate Number', required=True, default=_default_name, help='Unique reference for this estimate')
+    customer_id = fields.Many2one('customer', string='Customer', required=True, help='Select the customer for this estimate')
+    vehicle_id = fields.Many2one('vehicle', string='Vehicle Details', required=True, domain="[('customer_id', '=', customer_id)]", help='Pick a vehicle owned by the selected customer')
+    vehicle_name = fields.Char(related='vehicle_id.name', string='Vehicle Name', readonly=True, help='The name of the selected vehicle')
+    vehicle_model = fields.Char(related='vehicle_id.model', string='Vehicle Model', readonly=True, help='The model of the selected vehicle')
+    analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', help='Optional analytic account for this estimate')
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('converted', 'Converted')
+    ], default='draft')
+    has_job_card = fields.Boolean(string='Job Card Opened', default=False)
+    job_card_id = fields.Many2one('job.card', string='Linked Job Card')
+
+    estimate_lines = fields.One2many('estimate.line', 'estimate_id', string='Lines')
+
+    @api.model
+    def create(self, vals):
+        if isinstance(vals, list):
+            for v in vals:
+                if not v.get('name') or v.get('name') == 'New':
+                    v['name'] = self._default_name()
+        else:
+            if not vals.get('name') or vals.get('name') == 'New':
+                vals['name'] = self._default_name()
+        return super().create(vals)
+
+    @api.depends('estimate_lines.price_subtotal', 'estimate_lines.price_total')
+    def _compute_totals(self):
+        for estimate in self:
+            estimate.amount_untaxed = sum(line.price_subtotal for line in estimate.estimate_lines if not line.display_type)
+            estimate.amount_tax = sum(line.price_total - line.price_subtotal for line in estimate.estimate_lines if not line.display_type)
+            estimate.amount_total = estimate.amount_untaxed + estimate.amount_tax
+
+    amount_untaxed = fields.Float(string='Untaxed Amount', compute='_compute_totals', store=False)
+    amount_tax = fields.Float(string='Tax Amount', compute='_compute_totals', store=False)
+    amount_total = fields.Float(string='Total', compute='_compute_totals', store=False)
+
+    @api.onchange('customer_id')
+    def _onchange_customer_id(self):
+        self.vehicle_id = False
+
+    def action_submit(self):
+        self.state = 'submitted'
+
+    def action_approve(self):
+        if not self.env.user.has_group('job_card_management.group_can_approve_estimate'):
+            raise UserError(_('You are not allowed to approve estimates.'))
+        self.state = 'approved'
+        
+        # Create Quotation in Odoo using linked partner
+        if self.customer_id.partner_id:
+            sale_order = self.env['sale.order'].create({
+                'partner_id': self.customer_id.partner_id.id,
+                'origin': self.name,
+            })
+            for line in self.estimate_lines.filtered(lambda l: not l.display_type):
+                line_vals = {
+                    'order_id': sale_order.id,
+                    'name': line.name or (line.product_id.name if line.product_id else ''),
+                    'product_uom_qty': line.quantity,
+                    'price_unit': line.unit_price,
+                }
+                if line.product_id:
+                    line_vals['product_id'] = line.product_id.id
+                if line.product_uom_id:
+                    line_vals['product_uom_id'] = line.product_uom_id.id
+                if line.tax_ids:
+                    line_vals['tax_ids'] = [(6, 0, line.tax_ids.ids)]
+                if line.discount:
+                    line_vals['discount'] = line.discount
+                self.env['sale.order.line'].create(line_vals)
+            sale_order.action_confirm()
+        else:
+            raise UserError(_('Customer has no linked partner. Please save the customer again.'))
+
+    def action_open_job_card(self):
+        if not self.env.user.has_group('job_card_management.group_can_open_job_card'):
+            raise UserError(_('You are not allowed to open a job.'))
+        if self.has_job_card:
+            raise UserError(_('Job card already opened for this estimate.'))
+        
+        job_card = self.env['job.card'].create({
+            'estimate_id': self.id,
+            'customer_id': self.customer_id.id,
+            'vehicle_id': self.vehicle_id.id,
+            'analytic_account_id': self.analytic_account_id.id,
+        })
+        for line in self.estimate_lines:
+            line_vals = {
+                'job_card_id': job_card.id,
+                'sequence': line.sequence,
+                'display_type': line.display_type,
+                'name': line.name,
+                'product_id': line.product_id.id if line.product_id else False,
+                'product_uom_id': line.product_uom_id.id if line.product_uom_id else False,
+                'quantity': line.quantity,
+                'unit_price': line.unit_price,
+                'discount': line.discount,
+            }
+            if line.tax_ids:
+                line_vals['tax_ids'] = [(6, 0, line.tax_ids.ids)]
+            self.env['job.card.line'].create(line_vals)
+        self.write({
+            'has_job_card': True,
+            'job_card_id': job_card.id,
+            'state': 'converted'
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'job.card',
+            'res_id': job_card.id,
+            'view_mode': 'form',
+        }
+
+class EstimateLine(models.Model):
+    _name = 'estimate.line'
+    _description = 'Estimate Line'
+    _order = 'sequence, id'
+
+    estimate_id = fields.Many2one('estimate', string='Estimate', ondelete='cascade')
+    sequence = fields.Integer(string='Sequence', default=10)
+    display_type = fields.Selection([
+        ('line_section', 'Section'),
+        ('line_note', 'Note'),
+    ], string='Line Type', help='Choose section or note line to add headers and descriptions.')
+    name = fields.Text(string='Description')
+    product_id = fields.Many2one('product.product', string='Product')
+    product_uom_id = fields.Many2one('uom.uom', string='Unit of Measure')
+    quantity = fields.Float(string='Quantity', default=1.0)
+    unit_price = fields.Float(string='Unit Price')
+    tax_ids = fields.Many2many('account.tax', string='Taxes')
+    discount = fields.Float(string='Discount (%)', default=0.0)
+    
+    @api.depends('quantity', 'unit_price', 'discount', 'tax_ids')
+    def _compute_amount(self):
+        for line in self:
+            if line.display_type:
+                line.price_subtotal = 0
+                line.price_total = 0
+            else:
+                # Calculate subtotal with discount applied
+                subtotal = line.quantity * line.unit_price
+                if line.discount:
+                    subtotal = subtotal * (1 - line.discount / 100.0)
+                line.price_subtotal = subtotal
+                
+                # Calculate total with taxes
+                if line.tax_ids:
+                    taxes_data = line.tax_ids.compute_all(
+                        line.unit_price,
+                        None,
+                        line.quantity,
+                        line.product_id
+                    )
+                    # Apply discount to tax calculation
+                    if line.discount:
+                        for key in ['total_included', 'total_excluded']:
+                            if key in taxes_data:
+                                taxes_data[key] = taxes_data[key] * (1 - line.discount / 100.0)
+                    line.price_total = taxes_data.get('total_included', subtotal)
+                else:
+                    line.price_total = subtotal
+    
+    price_subtotal = fields.Float(string='Subtotal', compute='_compute_amount', store=False)
+    price_total = fields.Float(string='Amount', compute='_compute_amount', store=False)

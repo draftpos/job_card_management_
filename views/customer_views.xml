@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_customer_list" model="ir.ui.view">
+        <field name="name">customer.list</field>
+        <field name="model">customer</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="customer_type"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="city"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_customer_form" model="ir.ui.view">
+        <field name="name">customer.form</field>
+        <field name="model">customer</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group string="Customer Information">
+                        <field name="name"/>
+                        <field name="customer_type"/>
+                        <field name="partner_id" invisible="1"/>
+                    </group>
+                    
+                    <group string="Contact Details">
+                        <field name="email"/>
+                        <field name="phone"/>
+                        <field name="website"/>
+                    </group>
+                    
+                    <group string="Address">
+                        <field name="street"/>
+                        <field name="street2"/>
+                        <field name="city"/>
+                        <field name="state"/>
+                        <field name="zip_code"/>
+                        <field name="country"/>
+                    </group>
+                    
+                    <group string="Tax &amp; Registration">
+                        <field name="vat_number"/>
+                        <field name="registration_number"/>
+                    </group>
+                    
+                    <group string="Insurance Company Details" invisible="customer_type != 'insurance'">
+                        <field name="insurance_company_reg_no"/>
+                        <field name="claims_contact_person"/>
+                        <field name="claims_phone"/>
+                        <field name="claims_email"/>
+                    </group>
+                    
+                    <group string="Banking">
+                        <field name="bank_name"/>
+                        <field name="bank_account_number"/>
+                        <field name="bank_routing_number"/>
+                    </group>
+                    
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                    
+                    <group string="Owned Vehicles">
+                        <field name="vehicle_ids">
+                            <list>
+                                <field name="name"/>
+                                <field name="registration_number"/>
+                                <field name="make"/>
+                                <field name="model"/>
+                                <field name="year_of_manufacture"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_customer" model="ir.actions.act_window">
+        <field name="name">Customers</field>
+        <field name="res_model">customer</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first customer or insurance company
+            </p>
+        </field>
+    </record>
+
+</odoo>
