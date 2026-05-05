@@ -72,43 +72,184 @@
                                 <span t-field="doc.second_customer_id.name"/> -->
                             </div>
                         </div>
-                        <div class="row mt-4">
+                        <div class="row mt-4" id="details" style="page-break-inside: auto;">
                             <div class="col-12">
                                 <h3>Job Card Lines</h3>
-                                <table class="table table-bordered">
+                                <div name="sol_table" class="table-responsive">
+                                    <table class="table table-sm" id="sales_order_table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-start" id="product_name_header"><strong>Products</strong></th>
+                                                <th class="text-end" id="product_qty_header"><strong>Quantity</strong></th>
+                                                <th id="product_unit_price_header" class="text-end d-none d-sm-table-cell"><strong>Unit Price</strong></th>
+                                                <!-- <th id="taxes_header" class="text-end d-none d-md-table-cell"><strong>Taxes</strong></th> -->
+                                                <th class="text-end" id="subtotal_header"><strong>Amount</strong></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="sale_tbody">
+                                            <t t-foreach="doc.job_card_lines" t-as="line">
+                                                <tr t-if="line.display_type == 'line_section'" class="o_line_section">
+                                                    <td colspan="5"><strong t-field="line.name"/></td>
+                                                </tr>
+                                                <tr t-elif="line.display_type == 'line_note'" class="o_line_note">
+                                                    <td colspan="5"><em t-field="line.name"/></td>
+                                                </tr>
+                                                <tr t-else="" name="tr_product">
+                                                    <td name="td_product_name" class="">
+                                                        <span name="span_product_name" t-field="line.product_id.name"/>
+                                                    </td>
+                                                    <td name="td_product_quantity" class="text-end">
+                                                        <div>
+                                                            <span t-esc="'{:.2f}'.format(line.quantity)"/>
+                                                            <span> </span>
+                                                            <span t-field="line.product_uom_id.name"/>
+                                                        </div>
+                                                    </td>
+                                                    <td name="td_product_priceunit" class="text-end d-none d-sm-table-cell">
+                                                        <div class="text-end">
+                                                            <span t-esc="'$ {:.2f}'.format(line.unit_price)"/>
+                                                        </div>
+                                                    </td>
+                                                    <!-- <td name="td_product_taxes" class="text-end d-none d-md-table-cell">
+                                                        <t t-foreach="line.tax_ids" t-as="tax">
+                                                            <span t-field="tax.amount"/>%<br t-if="not tax_last"/>
+                                                        </t>
+                                                    </td> -->
+                                                    <td name="td_product_subtotal" class="text-end">
+                                                        <span t-esc="'$ {:.2f}'.format(line.price_total)"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div id="total" name="total" style="page-break-inside: avoid;">
+                                    <div class="col-xs-7 col-md-5 ms-auto">
+                                        <table class="table table-sm" name="sale_order_totals_table">
+                                            <tbody>
+                                                <t t-set="taxes_total" t-value="doc.total_amount * 0.15"/>
+                                                <!-- <tr class="o_subtotal">
+                                                    <td><span>Untaxed Amount</span></td>
+                                                    <td class="text-end"><span t-esc="'$ {:.2f}'.format(doc.total_amount)"/></td>
+                                                </tr>
+                                                <tr class="o_taxes">
+                                                    <td style="max-width: 200px;"><span>Tax 15%</span></td>
+                                                    <td class="text-end o_price_total"><span class="text-nowrap"><t t-esc="'$ {:.2f}'.format(taxes_total)"/></span></td>
+                                                </tr> -->
+                                                <tr class="o_total">
+                                                    <td><strong>Total</strong></td>
+                                                    <td class="text-end"><strong><span t-esc="'$ {:.2f}'.format((doc.total_amount or 0.0) + (taxes_total or 0.0))"/></strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="report_job_card_pick_slip" model="ir.actions.report">
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+        <field name="name">Pick Slip</field>
+        <field name="model">job.card</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">job_card_management.report_job_card_pick_slip_template</field>
+        <field name="report_file">job_card_management.report_job_card_pick_slip_template</field>
+        <field name="print_report_name">Pick Slip - %(object.name)s</field>
+    </record>
+
+    <template id="report_job_card_pick_slip_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row">
+                            <div class="col-12">
+                                <h1>Pick Slip</h1>
+                                <h2 t-field="doc.name"/>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <strong>Estimate Reference:</strong>
+                                <span t-field="doc.estimate_id.name"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Customer:</strong>
+                                <span t-field="doc.customer_id.name"/>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <strong>Vehicle:</strong>
+                                <span t-field="doc.vehicle_name"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Vehicle Model:</strong>
+                                <span t-field="doc.vehicle_model"/>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <strong>Analytic Account:</strong>
+                                <span t-field="doc.analytic_account_id.name"/>
+                            </div>
+                            <div class="col-6">
+                                <!-- <strong>State:</strong>
+                                <span t-field="doc.state"/> -->
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h3>Items</h3>
+                                <style>
+                                    .table-no-borders {
+                                        border-collapse: collapse;
+                                        width: 100%;
+                                    }
+                                    .table-no-borders thead {
+                                        border-bottom: 1px solid #000;
+                                    }
+                                    .table-no-borders tbody tr {
+                                        border-bottom: 1px solid #000;
+                                    }
+                                    .table-no-borders th, .table-no-borders td {
+                                        padding: 8px;
+                                        text-align: left;
+                                    }
+                                    .table-no-borders th {
+                                        font-weight: bold;
+                                    }
+                                    .text-right {
+                                        text-align: right;
+                                    }
+                                </style>
+                                <table class="table-no-borders">
                                     <thead>
                                         <tr>
-                                            <th>Description</th>
-                                            <th>Product</th>
-                                            <th>Quantity</th>
+                                            <th>Products</th>
+                                            <th class="text-right">Quantity</th>
                                             <th>UoM</th>
-                                            <th>Unit Price</th>
-                                            <th>Discount</th>
-                                            <th>Subtotal</th>
-                                            <th>Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <t t-foreach="doc.job_card_lines" t-as="line">
                                             <tr t-if="line.display_type == 'line_section'">
-                                                <td colspan="8">
-                                                    <strong t-field="line.name"></strong> 
-                                                </td>
+                                                <td colspan="3"><strong t-field="line.name"></strong></td>
                                             </tr>
                                             <tr t-elif="line.display_type == 'line_note'">
-                                                <td colspan="8">
-                                                    <em t-field="line.name"></em>
-                                                </td>
+                                                <td colspan="3"><em t-field="line.name"></em></td>
                                             </tr>
                                             <tr t-else="">
-                                                <td><span t-field="line.name"/></td>
                                                 <td><span t-field="line.product_id.name"/></td>
-                                                <td><span t-field="line.quantity"/></td>
+                                                <td class="text-right"><span t-field="line.quantity"/></td>
                                                 <td><span t-field="line.product_uom_id.name"/></td>
-                                                <td><span t-field="line.unit_price"/></td>
-                                                <td><span t-field="line.discount"/>%</td>
-                                                <td><span t-field="line.price_subtotal"/></td>
-                                                <td><span t-field="line.price_total"/></td>
                                             </tr>
                                         </t>
                                     </tbody>

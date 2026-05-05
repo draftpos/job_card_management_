@@ -22,7 +22,10 @@ class JobCard(models.Model):
     vehicle_id = fields.Many2one('vehicle', string='Vehicle', required=True)  # Changed
     vehicle_name = fields.Char(related='vehicle_id.name', string='Vehicle Name', readonly=True)
     vehicle_model = fields.Char(related='vehicle_id.model', string='Vehicle Model', readonly=True)
+    vehicle_display = fields.Char(string='Vehicle', compute='_compute_vehicle_display')
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account')
+    start_date = fields.Date(string='Start Date Expected')
+    end_date = fields.Date(string='End Date Expected')
     job_card_lines = fields.One2many('job.card.line', 'job_card_id', string='Job Card Lines')
 
     @api.model
@@ -50,6 +53,14 @@ class JobCard(models.Model):
     def _compute_insurance_pct(self):
         for rec in self:
             rec.insurance_percentage = 100 - rec.excess_percentage if rec.excess_percentage else 0.0
+
+    @api.depends('vehicle_id')
+    def _compute_vehicle_display(self):
+        for rec in self:
+            if rec.vehicle_id:
+                rec.vehicle_display = f"[{rec.vehicle_id.registration_number}] {rec.vehicle_id.name}"
+            else:
+                rec.vehicle_display = ""
 
     @api.depends('job_card_lines.price_total')
     def _compute_total(self):

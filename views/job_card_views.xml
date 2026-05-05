@@ -11,7 +11,8 @@
                     <button name="action_create_requisition" string="Requisition" type="object" invisible="state not in ['approved']"/>
                     <button name="action_finalize_job_card" string="Finalize Job Card" type="object" invisible="state not in ['in_progress', 'requisition_started']"/>
                     <button name="%(job_card_management.report_job_card)d" string="Print Job Card" type="action" class="btn-secondary"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,in_progress,delivered" invisible="state == 'requisition_started'"/>
+                    <button name="%(job_card_management.report_job_card_pick_slip)d" string="Pick Slip" type="action" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,in_progress,completed,delivered" invisible="state == 'requisition_started'"/>
                 </header>
                 <sheet>
                     <group col="2">
@@ -23,12 +24,16 @@
                             <field name="estimate_id" nolabel="1" readonly="1"/>
                             <label for="customer_id" string="Customer"/>
                             <field name="customer_id" nolabel="1"/>
-                            <label for="vehicle_id" string="Vehicle"/>
-                            <field name="vehicle_id" nolabel="1"/>
+                            <label for="vehicle_display" string="Vehicle"/>
+                            <field name="vehicle_display" nolabel="1" readonly="1"/>
                             <label for="vehicle_name" string="Vehicle Name"/>
                             <field name="vehicle_name" nolabel="1" readonly="1"/>
                             <label for="vehicle_model" string="Vehicle Model"/>
                             <field name="vehicle_model" nolabel="1" readonly="1"/>
+                            <label for="start_date" string="Start Date Expected"/>
+                            <field name="start_date" nolabel="1"/>
+                            <label for="end_date" string="End Date Expected"/>
+                            <field name="end_date" nolabel="1"/>
                             <label for="analytic_account_id" string="Analytic Account"/>
                             <field name="analytic_account_id" nolabel="1"/>
                         </group>
@@ -88,75 +93,6 @@
         <field name="name">Job Cards</field>
         <field name="res_model">job.card</field>
         <field name="view_mode">list,form</field>
-    </record>
-
-    <!-- Job Card Report Template - SIMPLE VERSION WITH NO WIDGETS -->
-    <template id="report_job_card">
-        <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="doc">
-                <t t-call="web.basic_layout">
-                    <div class="page">
-                        <h2>Job Card Report</h2>
-                        <p><strong>Job Card Number:</strong> <span t-field="doc.name"/></p>
-                        <p><strong>Date:</strong> <span t-field="doc.create_date"/></p>
-                        <p><strong>Status:</strong> <span t-field="doc.state"/></p>
-                        <p><strong>Customer:</strong> <span t-field="doc.customer_id.name"/></p>
-                        <p><strong>Vehicle:</strong> <span t-field="doc.vehicle_id.name"/></p>
-                        <p><strong>Vehicle Name:</strong> <span t-field="doc.vehicle_name"/></p>
-                        <p><strong>Vehicle Model:</strong> <span t-field="doc.vehicle_model"/></p>
-                        <p><strong>Total Amount:</strong> <span t-field="doc.total_amount"/></p>
-                        
-                        <h3>Job Card Lines</h3>
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Quantity</th>
-                                    <th>Unit Price</th>
-                                    <th>Subtotal</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <t t-foreach="doc.job_card_lines" t-as="line">
-                                    <t t-if="line.display_type == 'line_section'">
-                                        <tr>
-                                            <td colspan="5"><strong t-field="line.name"/></td>
-                                        </tr>
-                                    </t>
-                                    <t t-elif="line.display_type == 'line_note'">
-                                        <tr>
-                                            <td colspan="5"><em t-field="line.name"/></td>
-                                        </tr>
-                                    </t>
-                                    <t t-else="">
-                                        <tr>
-                                            <td><span t-field="line.product_id.name"/></td>
-                                            <td><span t-field="line.quantity"/></td>
-                                            <td><span t-field="line.unit_price"/></td>
-                                            <td><span t-field="line.price_subtotal"/></td>
-                                            <td><span t-field="line.price_total"/></td>
-                                        </tr>
-                                    </t>
-                                </t>
-                            </tbody>
-                        </table>
-                    </div>
-                </t>
-            </t>
-        </t>
-    </template>
-
-    <!-- Report Action -->
-    <record id="report_job_card" model="ir.actions.report">
-        <field name="name">Job Card Report</field>
-        <field name="model">job.card</field>
-        <field name="report_type">qweb-pdf</field>
-        <field name="report_name">job_card_management.report_job_card</field>
-        <field name="report_file">job_card_management.report_job_card</field>
-        <field name="print_report_name">'Job Card - %s' % (object.name)</field>
-        <field name="binding_model_id" ref="job_card_management.model_job_card"/>
-        <field name="binding_type">report</field>
     </record>
 
 </odoo>
