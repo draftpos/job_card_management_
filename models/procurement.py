@@ -89,7 +89,7 @@ class Procurement(models.Model):
                 ])
                 total_received = 0.0
                 for po_line in po_lines:
-                    received = sum(po_line.move_ids.filtered(lambda m: m.state == 'done').mapped('quantity_done'))
+                    received = sum(po_line.move_ids.filtered(lambda m: m.state == 'done').mapped('move_line_ids.qty_done'))
                     total_received += received
                 if total_received >= line.quantity:
                     line.receipt_status = 'delivered'
