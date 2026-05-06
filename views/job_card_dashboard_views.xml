@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_job_card_dashboard" model="ir.ui.view">
+        <field name="name">job.card.dashboard</field>
+        <field name="model">job.card</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <kanban class="o_job_card_dashboard" js_class="job_card_dashboard">
+                <templates>
+                    <t t-name="kanban-box">
+                        <!-- Empty for now - dashboard is rendered by JS -->
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="action_job_card_dashboard" model="ir.actions.act_window">
+        <field name="name">Job Card Dashboard</field>
+        <field name="res_model">job.card</field>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_job_card_dashboard"/>
+    </record>
+
+    <menuitem id="menu_job_card_dashboard"
+              name="Dashboard"
+              parent="menu_job_card_root"
+              action="action_job_card_dashboard"
+              sequence="5"/>
+</odoo>
