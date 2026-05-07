@@ -107,7 +107,7 @@ def create_access_rights(env):
                         'perm_read': True,
                         'perm_write': True,
                         'perm_create': True,
-                        'perm_unlock': True,
+                        'perm_unlink': True,
                     })
                 else:
                     env['ir.model.access'].create({

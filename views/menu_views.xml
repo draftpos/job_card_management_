@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem id="menu_job_card_root" name="Job Card" sequence="10"/>
-    
     <menuitem id="menu_customer" name="Customers" parent="menu_job_card_root" sequence="10" action="action_customer"/>
     <menuitem id="menu_vehicle" name="Vehicles" parent="menu_job_card_root" sequence="20" action="action_vehicle"/>
     <menuitem id="menu_estimate" name="Estimates" parent="menu_job_card_root" sequence="30" action="action_estimate"/>
     <menuitem id="menu_job_card" name="Job Cards" parent="menu_job_card_root" sequence="40" action="action_job_card"/>
     <menuitem id="menu_procurement" name="Procurement" parent="menu_job_card_root" sequence="50"/>
+    <menuitem id="menu_procurement_procurements" name="Procurements" parent="menu_procurement" sequence="5" action="action_procurement"/>
     <menuitem id="menu_procurement_requisitions" name="Requisitions" parent="menu_procurement" sequence="10" action="purchase_requisition.action_purchase_requisition"/>
     <menuitem id="menu_procurement_grv" name="GRV" parent="menu_procurement" sequence="20" action="stock.action_picking_tree_incoming"/>
     <menuitem id="menu_procurement_purchase_orders" name="Purchase Orders" parent="menu_procurement" sequence="30" action="purchase.purchase_form_action"/>

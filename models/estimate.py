@@ -10,7 +10,14 @@ class Estimate(models.Model):
     _order = 'id desc'
     
     def _default_name(self):
-        return 'JOB-1%03d' % (int(self.search([], order='name desc', limit=1).name[4:] or 0) + 1 if self.search([], order='name desc', limit=1) and self.search([], order='name desc', limit=1).name and self.search([], order='name desc', limit=1).name.startswith('JOB-1') else 1)
+        last = self.search([], order='name desc', limit=1)
+        if last and last.name and last.name.startswith('JOB-'):
+            last_num = int(last.name[4:])  # Get everything after 'JOB-'
+            new_num = last_num + 1
+        else:
+            new_num = 1001  
+
+        return f'JOB-{new_num}' 
 
     name = fields.Char(string='Estimate Number', required=True, default=_default_name, help='Unique reference for this estimate')
     customer_id = fields.Many2one('customer', string='Customer', required=True, help='Select the customer for this estimate')

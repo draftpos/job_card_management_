@@ -1,5 +1,15 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_job_card_user,Access Job Card,model_job_card,base.group_user,1,1,1,1
-access_job_card_line_user,Access Job Card Line,model_job_card_line,base.group_user,1,1,1,1
+access_customer_user,customer.user.access,model_customer,base.group_user,1,1,1,1
+access_vehicle_user,vehicle.user.access,model_vehicle,base.group_user,1,1,1,1
+access_estimate_user,estimate.user.access,model_estimate,base.group_user,1,1,1,1
+access_estimate_line_user,estimate.line.user.access,model_estimate_line,base.group_user,1,1,1,1
+access_job_card_user,job.card.user.access,model_job_card,base.group_user,1,1,1,1
+access_job_card_line_user,job.card.line.user.access,model_job_card_line,base.group_user,1,1,1,1
+access_procurement_user,procurement.user.access,model_procurement,base.group_user,1,1,1,1
+access_procurement_line_user,procurement.line.user.access,model_procurement_line,base.group_user,1,1,1,1
+access_job_card_open,Job Card Opener,model_job_card,group_can_open_job_card,1,1,1,1
+access_job_card_line_open,Job Card Line Opener,model_job_card_line,group_can_open_job_card,1,1,1,1
+access_estimate_approve,Estimate Approver,model_estimate,group_can_approve_estimate,1,1,1,1
+access_procurement_approve,Procurement Approver,model_procurement,group_can_approve_procurement,1,1,1,1
 access_job_card_profitability_user,Access Job Card Profitability,model_job_card_profitability,base.group_user,1,0,0,0
 access_job_technician_user,Access Job Technician,model_job_technician,base.group_user,1,1,1,1

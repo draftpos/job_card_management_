@@ -10,8 +10,15 @@ class Procurement(models.Model):
     _order = 'id desc'
 
     def _default_name(self):
-        return 'JOB-1%03d' % (int(self.search([], order='name desc', limit=1).name[4:] or 0) + 1 if self.search([], order='name desc', limit=1) and self.search([], order='name desc', limit=1).name and self.search([], order='name desc', limit=1).name.startswith('JOB-') else 1)
+        last = self.search([], order='name desc', limit=1)
+        if last and last.name and last.name.startswith('JOB-'):
+            last_num = int(last.name[4:])  # Get everything after 'JOB-'
+            new_num = last_num + 1
+        else:
+            new_num = 1001  # Starting point
 
+        return f'JOB-{new_num}'  # No zero-padding, just the number
+    
     name = fields.Char(string='Requisition Number', required=True, default=_default_name)
     job_card_id = fields.Many2one('job.card', string='Job Card', required=True)
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account')

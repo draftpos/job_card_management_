@@ -7,6 +7,7 @@
         'security/job_card_groups.xml',
         'security/ir.model.access.csv',
         'reports/job_card_report.xml',
+        'views/menu_root_views.xml',
         'views/technician_views.xml',
         'views/customer_views.xml',
         'views/vehicle_views.xml',
@@ -15,7 +16,15 @@
         'views/procurement_views.xml',
         'views/job_card_profitability_views.xml',
         'views/menu_views.xml',
+        'views/job_card_dashboard_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'job_card_management/static/src/scss/job_card_dashboard.scss',
+            'job_card_management/static/src/js/job_card_dashboard.js',
+            'job_card_management/static/src/xml/job_card_dashboard.xml',
+        ],
+    },
     'installable': True,
     'application': True,
     'post_init_hook': 'create_access_rights',

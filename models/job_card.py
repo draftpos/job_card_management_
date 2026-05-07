@@ -13,7 +13,14 @@ class JobCard(models.Model):
     _order = 'id desc'
 
     def _default_name(self):
-        return 'JOB-1%03d' % (int(self.search([], order='name desc', limit=1).name[4:] or 0) + 1 if self.search([], order='name desc', limit=1) and self.search([], order='name desc', limit=1).name and self.search([], order='name desc', limit=1).name.startswith('JOB-') else 1)
+        last = self.search([], order='name desc', limit=1)
+        if last and last.name and last.name.startswith('JOB-'):
+            last_num = int(last.name[4:])  # Get everything after 'JOB-'
+            new_num = last_num + 1
+        else:
+            new_num = 1001  # Starting point
+
+        return f'JOB-{new_num}'  # No zero-padding, just the number
 
     # def _default_name(self):
     #     random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
@@ -333,6 +340,22 @@ class JobCard(models.Model):
         self._create_invoices()
         
         return self.action_view_invoices()
+    
+    @api.model
+    def get_dashboard_data(self, user_id=None, date_from=None, date_to=None):
+        """Return all dashboard statistics - called from JS"""
+        dashboard = self.env['job.card.dashboard']
+        return dashboard.get_dashboard_data(
+            user_id=user_id, date_from=date_from, date_to=date_to
+        )
+
+    @api.model
+    def get_overdue_jobs(self, user_id=None, date_from=None, date_to=None):
+        """Return overdue job cards - called from JS"""
+        dashboard = self.env['job.card.dashboard']
+        return dashboard.get_overdue_jobs(
+            user_id=user_id, date_from=date_from, date_to=date_to
+        )
 
 
 class JobCardLine(models.Model):

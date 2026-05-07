@@ -176,7 +176,7 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">job_card_management.report_job_card_pick_slip_template</field>
         <field name="report_file">job_card_management.report_job_card_pick_slip_template</field>
-        <field name="print_report_name">Pick Slip - %(object.name)s</field>
+        <field name="print_report_name">'Pick Slip - '+ object.name</field>
     </record>
 
     <template id="report_job_card_pick_slip_template">

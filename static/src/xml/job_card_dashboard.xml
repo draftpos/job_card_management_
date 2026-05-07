@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="job_card_management.JobCardDashboard" owl="1">
+        <div class="o_job_card_dashboard">
+            
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-3 dashboard-header">
+                <div>
+                    <h2 class="mb-1">Job Card Dashboard</h2>
+                    <p class="mb-0">Overview of all job cards and activities</p>
+                </div>
+                <button class="btn-refresh" t-on-click="loadData">
+                    <i class="fa fa-refresh"/> Refresh
+                </button>
+            </div>
+
+            <!-- FILTERS - Live Search, No Apply Button -->
+            <div class="filter-bar">
+                <div class="row g-2 align-items-end">
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <label class="filter-label">USER</label>
+                        <select class="filter-input" t-model="state.filters.user_id" t-on-change="loadData">
+                            <option value="0">All Users</option>
+                            <t t-foreach="state.users" t-as="user" t-key="user.id">
+                                <option t-att-value="user.id" t-out="user.name"/>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <label class="filter-label">DATE FILTER</label>
+                        <select class="filter-input" t-model="state.filters.date_range" t-on-change="onDateRangeChange">
+                            <option value="">All Dates</option>
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="this_week">Current Week</option>
+                            <option value="last_week">Previous Week</option>
+                            <option value="this_month">Current Month</option>
+                            <option value="last_month">Previous Month</option>
+                            <option value="this_year">Current Year</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-4" t-if="state.filters.date_range == 'custom'">
+                        <label class="filter-label">FROM</label>
+                        <input type="date" class="filter-input" t-model="state.filters.date_from" t-on-change="loadData"/>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-4" t-if="state.filters.date_range == 'custom'">
+                        <label class="filter-label">TO</label>
+                        <input type="date" class="filter-input" t-model="state.filters.date_to" t-on-change="loadData"/>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-6" t-if="state.filters.date_range != 'custom'">
+                        <label class="filter-label">STATUS</label>
+                        <select class="filter-input" t-model="state.filters.status" t-on-change="loadData">
+                            <option value="">All Statuses</option>
+                            <option value="draft">Draft</option>
+                            <option value="approved">Approved</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="delivered">Delivered</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STATS - 4 per row -->
+            <div class="row g-2 mb-2">
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-blue">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="state.data.total_estimates or 0"/><div class="stat-label">Total Estimates</div></div>
+                            <div class="stat-icon"><i class="fa fa-file-text-o"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-green">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="state.data.estimates_converted or 0"/><div class="stat-label">Estimates Converted</div></div>
+                            <div class="stat-icon"><i class="fa fa-check-circle"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-yellow">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="state.data.jobs_in_progress or 0"/><div class="stat-label">Jobs In Progress</div></div>
+                            <div class="stat-icon"><i class="fa fa-spinner"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-cyan">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="state.data.reqs_in_progress or 0"/><div class="stat-label">Requisitions In Progress</div></div>
+                            <div class="stat-icon"><i class="fa fa-shopping-cart"/></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2 mb-2">
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-purple">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="state.data.total_invoices_done or 0"/><div class="stat-label">Total Invoices Done</div></div>
+                            <div class="stat-icon"><i class="fa fa-file-text"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-green">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="state.formattedPayments"/><div class="stat-label">Total Payments Done</div></div>
+                            <div class="stat-icon"><i class="fa fa-money"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-blue">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="state.formattedJobValue"/><div class="stat-label">Total Job Value</div></div>
+                            <div class="stat-icon"><i class="fa fa-bar-chart"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-teal">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="state.data.jobs_completed or 0"/><div class="stat-label">Jobs Completed</div></div>
+                            <div class="stat-icon"><i class="fa fa-flag-checkered"/></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2 mb-3">
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-green">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="state.data.jobs_delivered or 0"/><div class="stat-label">Jobs Delivered</div></div>
+                            <div class="stat-icon"><i class="fa fa-truck"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-red">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value text-danger" t-out="state.data.jobs_overdue or 0"/><div class="stat-label">Jobs Overdue</div></div>
+                            <div class="stat-icon"><i class="fa fa-exclamation-triangle"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-gray">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="(state.overdueJobs or []).length"/><div class="stat-label">Overdue Details Below</div></div>
+                            <div class="stat-icon"><i class="fa fa-list-alt"/></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="stat-card stat-purple">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div><div class="stat-value" t-out="state.formattedProfitability"/><div class="stat-label">Total Profitability</div></div>
+                            <div class="stat-icon"><i class="fa fa-line-chart"/></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OVERDUE TABLE -->
+            <div class="overdue-card">
+                <div class="overdue-header">
+                    <h5><i class="fa fa-clock-o text-danger me-2"/>Jobs Overdue</h5>
+                    <span class="badge-overdue" t-out="(state.overdueJobs or []).length"/>
+                </div>
+                <t t-if="state.overdueJobs and state.overdueJobs.length > 0">
+                    <table class="table mb-0">
+                        <thead><tr><th>Job Card #</th><th>Customer</th><th>Vehicle</th><th>End Date</th><th>Status</th><th class="text-end">Total</th><th class="text-center">View</th></tr></thead>
+                        <tbody>
+                            <t t-foreach="state.overdueJobs" t-as="job" t-key="job.id">
+                                <tr>
+                                    <td><strong t-out="job.name"/></td>
+                                    <td t-out="job.customer"/>
+                                    <td t-out="job.vehicle"/>
+                                    <td class="text-danger fw-bold" t-out="job.end_date"/>
+                                    <td><span class="stat-badge stat-warning" t-out="job.state"/></td>
+                                    <td class="text-end fw-bold" t-out="state.formattedJobAmounts[job.id]"/>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill" t-on-click="() => openJobCard(job.id)"><i class="fa fa-eye"/> View</button>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-else="">
+                    <div class="empty-state">
+                        <i class="fa fa-check-circle text-success fa-3x"/>
+                        <h5>No Overdue Jobs!</h5>
+                        <p>All job cards are on schedule.</p>
+                    </div>
+                </t>
+            </div>
+
+        </div>
+    </t>
+</templates>
