@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem id="menu_job_card_root" name="Job Card" sequence="10"/>
-    
     <menuitem id="menu_customer" name="Customers" parent="menu_job_card_root" sequence="10" action="action_customer"/>
     <menuitem id="menu_vehicle" name="Vehicles" parent="menu_job_card_root" sequence="20" action="action_vehicle"/>
     <menuitem id="menu_estimate" name="Estimates" parent="menu_job_card_root" sequence="30" action="action_estimate"/>

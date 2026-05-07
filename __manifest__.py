@@ -7,6 +7,7 @@
         'security/job_card_groups.xml',
         'security/ir.model.access.csv',
         'reports/job_card_report.xml',
+        'views/menu_root_views.xml',
         'views/technician_views.xml',
         'views/customer_views.xml',
         'views/vehicle_views.xml',
