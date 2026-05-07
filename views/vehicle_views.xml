@@ -31,53 +31,45 @@
     <record id="view_vehicle_form" model="ir.ui.view">
         <field name="name">vehicle.form</field>
         <field name="model">vehicle</field>
+        <field name="priority">100</field>
         <field name="arch" type="xml">
             <form>
                 <header>
                     <button name="job_card_management.action_report_vehicle_history" string="Print Vehicle History" type="action" class="btn-secondary"/>
                 </header>
                 <sheet>
-                    <group string="Vehicle Identification">
-                        <field name="name"/>
-                        <field name="registration_number"/>
-                        <field name="chassis_number"/>
-                        <field name="engine_number"/>
-                        <field name="make"/>
-                        <field name="model"/>
-                        <field name="year_of_manufacture"/>
+                    <group>
+                        <group string="Vehicle Identification">
+                            <field name="name"/>
+                            <field name="registration_number"/>
+                            <field name="chassis_number"/>
+                            <field name="engine_number"/>
+                            <field name="make"/>
+                            <field name="model"/>
+                            <field name="year_of_manufacture"/>
+                        </group>
+                        <group string="Vehicle Specifications">
+                            <field name="engine_type_code"/>
+                            <field name="transmission"/>
+                            <field name="drive_type"/>
+                            <field name="fuel_type"/>
+                            <field name="odometer_reading"/>
+                        </group>
                     </group>
-                    
-                    <separator/>
-                    
-                    <group string="Vehicle Specifications">
-                        <field name="engine_type_code"/>
-                        <field name="transmission"/>
-                        <field name="drive_type"/>
-                        <field name="fuel_type"/>
-                        <field name="odometer_reading"/>
-                    </group>
-                    
-                    <separator/>
-                    
-                    <group string="Service Specifics">
-                        <field name="reason_for_service" nolabel="1"/>
-                        <field name="last_service_date"/>
-                        <field name="last_service_mileage"/>
-                        <field name="known_repairs" nolabel="1"/>
-                        <field name="specific_concerns" nolabel="1"/>
-                    </group>
-                    
-                    <separator/>
-                    
-                    <group string="Customer Links">
-                        <field name="customer_id"/>
-                        <field name="insurance_customer_id"/>
+                    <group col="2" string="Service &amp; Customer Details">
+                        <group string="Service Specifics">
+                            <field name="reason_for_service" nolabel="1" colspan="2"/>
+                            <field name="last_service_date"/>
+                            <field name="last_service_mileage"/>
+                            <field name="known_repairs" nolabel="1" colspan="2"/>
+                            <field name="specific_concerns" nolabel="1" colspan="2"/>
+                        </group>
+                        <group string="Customer Links">
+                            <field name="customer_id"/>
+                            <field name="insurance_customer_id"/>
+                        </group>
                     </group>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_ids" widget="mail_thread"/>
-                    <field name="activity_ids" widget="mail_activity"/>
-                </div>
             </form>
         </field>
     </record>
@@ -93,8 +85,6 @@
             </p>
         </field>
     </record>
-
-    
 
     <template id="vehicle_history_report">
     <t t-call="web.html_container">
