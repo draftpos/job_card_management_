@@ -43,6 +43,8 @@
                             <field name="total_amount" readonly="1"/>
                             <label for="analytic_account_id" string="Analytic Account"/>
                             <field name="analytic_account_id" nolabel="1"/>
+                            <field name="technician_ids" widget="many2many_tags"/>
+                            <field name="supervisor_ids" widget="many2many_tags"/>
                             <label for="end_date" string="End Date Expected"/>
                             <field name="end_date" nolabel="1"/>
                         </group>

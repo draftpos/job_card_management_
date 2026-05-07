@@ -30,6 +30,21 @@ class JobCard(models.Model):
     vehicle_model = fields.Char(related='vehicle_id.model', string='Vehicle Model', readonly=True)
     vehicle_display = fields.Char(string='Vehicle', compute='_compute_vehicle_display')
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account')
+    technician_ids = fields.Many2many(
+        'job.technician',
+        'job_card_technician_rel',
+        'job_card_id',
+        'technician_id',
+        string='Technicians',
+    )
+    supervisor_ids = fields.Many2many(
+        'job.technician',
+        'job_card_supervisor_rel',
+        'job_card_id',
+        'technician_id',
+        string='Supervisors',
+        domain=[('is_supervisor', '=', True)],
+    )
     start_date = fields.Date(string='Start Date Expected')
     end_date = fields.Date(string='End Date Expected')
     job_card_lines = fields.One2many('job.card.line', 'job_card_id', string='Job Card Lines')
