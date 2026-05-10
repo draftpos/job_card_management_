@@ -29,6 +29,9 @@
           
          
         ],
+        # 'web.report_assets_common': [
+        #     'job_card_management/static/src/scss/report_estimates.scss',
+        # ],
    
     },
     'installable': True,

@@ -1,0 +1,117 @@
+// Odoo 19 Report Styles - Borderless tables matching Sales Order PDF
+.o_report_table {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+    
+    td, th {
+        border: none !important;
+        border-top: none !important;
+        border-bottom: none !important;
+        padding: 6px 8px !important;
+        vertical-align: middle;
+    }
+    
+    thead {
+        display: table-header-group;
+        
+        tr {
+            border-bottom: 2px solid #dee2e6 !important;
+        }
+        
+        th {
+            font-weight: bold;
+            font-size: 13px;
+            color: #333;
+            padding: 8px !important;
+        }
+    }
+    
+    tbody {
+        tr {
+            border-bottom: 1px solid #e9ecef !important;
+            
+            &.o_line_section {
+                background-color: #f8f9fa;
+                font-size: 14px;
+                
+                td {
+                    padding: 10px 8px !important;
+                }
+            }
+            
+            &.o_line_note {
+                td {
+                    font-style: italic;
+                    color: #666;
+                    font-size: 13px;
+                }
+            }
+        }
+    }
+    
+    .text-end {
+        text-align: right !important;
+    }
+    
+    .text-start {
+        text-align: left !important;
+    }
+    
+    .o_price_total {
+        font-weight: bold;
+    }
+    
+    .oe_currency_value {
+        font-weight: normal;
+    }
+}
+
+// Totals table
+table[name="estimate_totals_table"] {
+    width: 100%;
+    border-collapse: collapse;
+    border-top: 1px solid #dee2e6 !important;
+    
+    td, th {
+        border: none !important;
+        padding: 6px 8px !important;
+    }
+    
+    td:last-child {
+        text-align: right !important;
+    }
+    
+    .o_subtotal td {
+        font-size: 14px;
+    }
+    
+    .o_taxes td {
+        font-size: 14px;
+        max-width: 200px;
+    }
+    
+    .o_total td {
+        font-size: 16px;
+        font-weight: bold;
+    }
+}
+
+// Hide columns on smaller screens (but show in PDF)
+.d-none {
+    display: none;
+}
+
+.d-sm-table-cell {
+    display: table-cell;
+}
+
+.d-md-table-cell {
+    display: table-cell;
+}
+
+// Product name cell
+td.px-2 {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}

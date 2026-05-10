@@ -5,90 +5,126 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
-                    <div class="page">
+                    <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; letter-spacing: 0.4px; color: #333;">
+                        
+                        <div class="oe_structure"/>
+                        
+                        <!-- Title -->
+                        <h2 style="color: #1a1a2e; font-size: 24px; font-weight: 700; letter-spacing: 0.6px; margin-bottom: 25px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                            <span t-field="doc.name"/>
+                        </h2>
 
-                        <!-- Header -->
-                        <div style="background-color: #1a1a2e; padding: 30px 40px; font-family: Arial, sans-serif; margin: -20px -20px 0 -20px;">
-                            <div style="color: #ffffff; font-size: 13px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">Estimate Report</div>
-                            <div style="color: #e0e4f0; font-size: 20px; font-weight: bold;" t-field="doc.name"/> 
-                        </div>
-
-                        <!-- Info Section -->
-                        <div style="padding: 28px 40px; background-color: #f8f9fb; margin: 0 -20px;">
-                            <table style="width: 100%; border: none; border-collapse: collapse;">
-                                <tr>
-                                    <td style="border: none; padding: 14px 20px; width: 50%; vertical-align: top;">
-                                        <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 6px;">Customer</div>
-                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.customer_id.name"/> 
-                                    </td>
-                                    <td style="border: none; padding: 14px 20px; width: 50%; vertical-align: top;">
-                                        <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 6px;">Date</div>
-                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.create_date"/> 
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="border: none; padding: 14px 20px; vertical-align: top;">
-                                        <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 6px;">Vehicle</div>
-                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.vehicle_id.name"/> 
-                                    </td>
-                                    <td style="border: none; padding: 14px 20px; vertical-align: top;">
-                                        <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 6px;">Vehicle Model</div>
-                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.vehicle_model"/> 
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="border: none; padding: 14px 20px; vertical-align: top;">
-                                        <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 6px;">Vehicle ID</div>
-                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.vehicle_id.registration_number"/> 
-                                    </td>
-                                    <td style="border: none; padding: 14px 20px; vertical-align: top;">
-                                        <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 6px;">Estimator</div>
-                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="env.user.name"/> 
-                                    </td>
-                                </tr>
-                            </table>
+                        <!-- Customer & Vehicle Info -->
+                        <div class="row mt-4 mb-4">
+                            <div t-if="doc.customer_id" class="col-7" style="font-size: 15px;">
+                                <div style="font-weight: 700; font-size: 16px; color: #1a1a2e; margin-bottom: 6px; letter-spacing: 0.5px;">Customer Name:</div>
+                                <div style="font-size: 16px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;" t-field="doc.customer_id.name"/>
+                                <div t-if="doc.customer_id.phone" style="color: #555; margin-top: 4px; font-size: 14px;">
+                                    Phone: <span t-field="doc.customer_id.phone"/>
+                                </div>
+                                <div t-if="doc.customer_id.email" style="color: #555; font-size: 14px;">
+                                    Email: <span t-field="doc.customer_id.email"/>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <table class="table table-sm table-borderless" style="border: none;">
+                                    <tr>
+                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Vehicle:</td>
+                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
+                                            <span t-field="doc.vehicle_id.name"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="doc.vehicle_model">
+                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Model:</td>
+                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
+                                            <span t-field="doc.vehicle_model"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="doc.vehicle_id.registration_number">
+                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Vehicle ID:</td>
+                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
+                                            <span t-field="doc.vehicle_id.registration_number"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="doc.create_date">
+                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Date:</td>
+                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
+                                            <span t-field="doc.create_date"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
 
                         <!-- Lines Table -->
-                        <div style="padding: 30px 40px;">
-                            <h3 style="font-size: 13px; font-weight: bold; color: #1a1a2e; margin: 0 0 20px 0; padding-bottom: 10px; border-bottom: 4px solid #1a1a2e; text-transform: uppercase; letter-spacing: 2px;">Estimate Lines</h3>
+                        <table class="table o_main_table table-borderless mb-0" id="estimate_table" style="border: none; width: 100%;">
+                            <thead>
+                                <tr style="border-bottom: 3px solid #000 !important;">
+                                    <th name="th_description" class="text-start" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Description</th>
+                                    <th name="th_quantity" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Quantity</th>
+                                    <th name="th_priceunit" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Unit Price</th>
+                                    <th name="th_subtotal" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="estimate_tbody">
+                                <t t-foreach="doc.estimate_lines" t-as="line">
+                                    <tr t-if="line.display_type == 'line_section'" class="o_line_section">
+                                        <td colspan="4" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-elif="line.display_type == 'line_note'" class="o_line_note">
+                                        <td colspan="4" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-else="">
+                                        <td style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
+                                            <span t-field="line.product_id.name"/>
+                                        </td>
+                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
+                                            <span t-esc="'{:.2f}'.format(line.quantity)"/>
+                                            <span> </span>
+                                            <span t-field="line.product_uom_id.name"/>
+                                        </td>
+                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
+                                            $ <span t-esc="'{:.2f}'.format(line.unit_price)"/>
+                                        </td>
+                                        <td class="text-end o_price_total" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.4px;">
+                                            $ <span t-esc="'{:.2f}'.format(line.price_total)"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
 
-                            <table style="width: 100%; border: none; border-collapse: collapse;">
-                                <thead>
-                                    <tr style="background-color: #1a1a2e;">
-                                        <th style="border: none; padding: 16px 20px; text-align: left; font-size: 12px; color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; background-color: #1a1a2e; width: 35%;">Products</th>
-                                        <th style="border: none; padding: 16px 20px; text-align: right; font-size: 12px; color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; background-color: #1a1a2e; width: 20%;">Quantity</th>
-                                        <th style="border: none; padding: 16px 20px; text-align: right; font-size: 12px; color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; background-color: #1a1a2e; width: 12%;">Discount</th>
-                                        <th style="border: none; padding: 16px 20px; text-align: right; font-size: 12px; color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; background-color: #1a1a2e; width: 15%;">Subtotal</th>
-                                        <th style="border: none; padding: 16px 20px; text-align: right; font-size: 12px; color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; background-color: #1a1a2e; width: 18%;">Amount</th>
+                        <!-- Totals -->
+                        <div class="row mt-3">
+                            <div class="col-7"/>
+                            <div class="col-5">
+                                <table class="table table-sm table-borderless" style="border: none; border-top: 3px solid #000;">
+                                    <tr class="o_subtotal">
+                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Untaxed Amount</td>
+                                        <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
+                                            $ <span t-esc="'{:.2f}'.format(doc.amount_untaxed)"/>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-foreach="doc.estimate_lines" t-as="line">
-                                        <tr t-if="line.display_type == 'line_section'" style="background-color: #f1f3f5;">
-                                            <td colspan="5" style="border: none; padding: 16px 20px; font-size: 18px; font-weight: bold; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px;"><t t-out="line.name"/></td>
-                                        </tr>
-                                        <tr t-elif="line.display_type == 'line_note'" style="background-color: #ffffff;">
-                                            <td colspan="5" style="border: none; padding: 16px 20px; font-size: 16px; color: #bbbbbb; font-style: italic;"><t t-out="line.name"/></td>
-                                        </tr>
-                                        <tr t-else="" style="background-color: #ffffff;">
-                                            <td style="border: none; padding: 16px 20px; font-size: 18px; color: #1a1a2e; font-weight: bold;"><span t-field="line.product_id.name"/></td>
-                                            <td style="border: none; padding: 16px 20px; font-size: 16px; color: #555; text-align: right;"><span t-esc="line.quantity"/> <span style="color: #aaa; font-size: 13px;" t-field="line.product_uom_id.name"/></td>
-                                            <td style="border: none; padding: 16px 20px; font-size: 16px; color: #555; text-align: right;"><t t-if="line.discount"><span t-esc="line.discount"/>%</t><t t-else="">—</t></td>
-                                            <td style="border: none; padding: 16px 20px; font-size: 18px; color: #555; text-align: right;"><span t-esc="'$ {:.2f}'.format(line.price_subtotal)"/></td>
-                                            <td style="border: none; padding: 16px 20px; font-size: 18px; color: #1a1a2e; text-align: right; font-weight: bold;"><span t-esc="'$ {:.2f}'.format(line.price_total)"/></td>
-                                        </tr>
-                                    </t>
-                                </tbody>
-                                <tfoot>
-                                    <tr style="background-color: #f1f3f5;">
-                                        <td colspan="4" style="border: none; padding: 20px 20px; font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: right; text-transform: uppercase; letter-spacing: 1px;">Total</td>
-                                        <td style="border: none; padding: 20px 20px; font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: right;"><span t-esc="'$ {:.2f}'.format(doc.amount_total)"/></td>
+                                    <tr t-if="doc.amount_tax" class="o_taxes">
+                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Tax Amount</td>
+                                        <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
+                                            $ <span t-esc="'{:.2f}'.format(doc.amount_tax)"/>
+                                        </td>
                                     </tr>
-                                </tfoot>
-                            </table>
+                                    <tr class="o_total">
+                                        <td style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;"><strong>Total</strong></td>
+                                        <td class="text-end" style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;">
+                                            <strong>$ <span t-esc="'{:.2f}'.format(doc.amount_total)"/></strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
-                        
+
                     </div>
                 </t>
             </t>
@@ -96,12 +132,12 @@
     </template>
 
     <record id="action_report_estimate" model="ir.actions.report">
-        <field name="name">Estimate Report PDF</field>
+        <field name="name">Estimate Report</field>
         <field name="model">estimate</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">job_card_management.estimates_report</field>
         <field name="report_file">job_card_management.estimates_report</field>
-        <field name="print_report_name">'Estimate Report - %s' % object.name</field>
+        <field name="print_report_name">'Estimate - %s' % object.name</field>
     </record>
 
     <record id="action_estimate" model="ir.actions.act_window">
@@ -123,17 +159,17 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                <group col="2">
-                    <group col="1" string="Estimate Details">
-                        <field name="name" nolabel="1"/>
-                        <field name="customer_id" nolabel="1"/>
+                    <group col="2">
+                        <group string="Estimate Details">
+                            <field name="name"/>
+                            <field name="customer_id"/>
+                        </group>
+                        <group string="Vehicle Details">
+                            <field name="vehicle_id"/>
+                            <field name="vehicle_name" readonly="1"/>
+                            <field name="vehicle_model" readonly="1"/>
+                        </group>
                     </group>
-                    <group col="1" string="Vehicle Details">
-                        <field name="vehicle_id" nolabel="1"/>
-                        <field name="vehicle_name" nolabel="1" readonly="1"/>
-                        <field name="vehicle_model" nolabel="1" readonly="1"/>
-                    </group>
-                </group>
                     <notebook>
                         <page string="Order Lines" name="order_lines">
                             <field name="estimate_lines" widget="section_and_note_one2many" nolabel="1">
