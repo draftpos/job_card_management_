@@ -156,6 +156,9 @@
                     <button name="action_approve" string="Approve" type="object" invisible="state not in ['submitted']"/>
                     <button name="action_open_job_card" string="Open Job Card" type="object" invisible="state not in ['approved'] or has_job_card"/>
                     <button name="action_preview_estimate" string="Print Estimate" type="object" class="btn-secondary"/>
+                      <!-- NEW BUTTONS -->
+                    <button name="action_send_whatsapp" string="Send WhatsApp" type="object" class="btn-secondary" icon="fa-whatsapp" style="background-color: #25D366; color: white;"/>
+                    <button name="action_send_email" string="Email Estimate" type="object" class="btn-secondary" icon="fa-envelope"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>

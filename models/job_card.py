@@ -222,6 +222,14 @@ class JobCard(models.Model):
     ], default='draft')
     total_amount = fields.Float(string='Total Amount', compute='_compute_total', store=True)
 
+# Workflow actions with validations - function to reopen job card added at the end
+    def action_reopen(self):
+        """Reopen a completed or delivered job card back to draft"""
+        for rec in self:
+            if rec.state not in ('completed', 'delivered'):
+                raise UserError(_('Only completed or delivered job cards can be reopened.'))
+            rec.state = 'draft'
+
     @api.depends('excess_percentage')
     def _compute_insurance_pct(self):
         for rec in self:

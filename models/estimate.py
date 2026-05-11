@@ -4,6 +4,7 @@ import string
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
+
 class Estimate(models.Model):
     _name = 'estimate'
     _description = 'Estimate / Quote'
@@ -12,7 +13,7 @@ class Estimate(models.Model):
     def _default_name(self):
         last = self.search([], order='name desc', limit=1)
         if last and last.name and last.name.startswith('JOB-'):
-            last_num = int(last.name[4:])  # Get everything after 'JOB-'
+            last_num = int(last.name[4:])
             new_num = last_num + 1
         else:
             new_num = 1001  
@@ -71,7 +72,6 @@ class Estimate(models.Model):
             raise UserError(_('You are not allowed to approve estimates.'))
         self.state = 'approved'
         
-        # Create Quotation in Odoo using linked partner
         if self.customer_id.partner_id:
             sale_order = self.env['sale.order'].create({
                 'partner_id': self.customer_id.partner_id.id,
@@ -82,12 +82,10 @@ class Estimate(models.Model):
                 line_vals = {
                     'order_id': sale_order.id,
                 }
-                # Handle section and note lines
                 if line.display_type:
                     line_vals['display_type'] = line.display_type
                     line_vals['name'] = line.name
                 else:
-                    # Handle product lines
                     line_vals['name'] = line.name or (line.product_id.name if line.product_id else '')
                     line_vals['product_uom_qty'] = line.quantity
                     line_vals['price_unit'] = line.unit_price
@@ -150,6 +148,88 @@ class Estimate(models.Model):
             'url': f'/job_card_management/report/view/estimate/{self.id}/job_card_management.action_report_estimate/Estimate%20Report',
             'target': 'self',
         }
+
+    # ============================================================
+    # NEW: WhatsApp Share
+    # ============================================================
+    def action_send_whatsapp(self):
+        """Show notification that WhatsApp module is not installed"""
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('WhatsApp PDF Module Not Installed'),
+                'message': _('module is not installed.'),
+                'type': 'warning',
+                'sticky': False,
+            }
+        }
+
+    # ============================================================
+    # NEW: Email Estimate
+    def action_send_email(self):
+        """Open the email compose wizard with estimate PDF attached"""
+        self.ensure_one()
+        
+        # Get the report
+        report = self.env.ref('job_card_management.action_report_estimate', raise_if_not_found=False)
+        if not report:
+            raise UserError('Estimate report not found.')
+        
+        # Generate PDF
+        pdf_content, _ = self.env['ir.actions.report']._render_qweb_pdf(
+            report.report_name, [self.id]
+        )
+        
+        # Create attachment
+        attachment = self.env['ir.attachment'].create({
+            'name': f'{self.name}.pdf',
+            'raw': pdf_content,
+            'res_model': 'estimate',
+            'res_id': self.id,
+            'mimetype': 'application/pdf',
+        })
+        
+        # Get customer email
+        customer_email = self.customer_id.email
+        if not customer_email:
+            raise UserError('Customer does not have an email address. Please add an email to the customer record.')
+        
+        # Build email body
+        body = f"""
+        <p>Dear {self.customer_id.name},</p>
+        <p>Please find attached the estimate <strong>{self.name}</strong> for your vehicle <strong>{self.vehicle_name}</strong> ({self.vehicle_model}).</p>
+        <p>Total Amount: <strong>${self.amount_total:,.2f}</strong></p>
+        <p>If you have any questions, please don't hesitate to contact us.</p>
+        <p>Best regards,</p>
+        """
+        
+        # Open mail compose wizard
+        compose_ctx = {
+            'default_model': 'estimate',
+            'default_res_ids': [self.id],
+            'default_use_template': False,
+            'default_composition_mode': 'comment',
+            'default_email_layout_xmlid': 'mail.mail_notification_layout',
+            'default_attachment_ids': [(4, attachment.id)],
+            'default_subject': f'Estimate {self.name} for {self.vehicle_name}',
+            'default_body': body,
+        }
+        
+        # Add customer email if available
+        if customer_email:
+            compose_ctx['default_email_to'] = customer_email
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Send Estimate by Email',
+            'res_model': 'mail.compose.message',
+            'view_mode': 'form',
+            'view_id': self.env.ref('mail.email_compose_message_wizard_form').id,
+            'target': 'new',
+            'context': compose_ctx,
+        }
+
 class EstimateLine(models.Model):
     _name = 'estimate.line'
     _description = 'Estimate Line'
@@ -176,13 +256,11 @@ class EstimateLine(models.Model):
                 line.price_subtotal = 0
                 line.price_total = 0
             else:
-                # Calculate subtotal with discount applied
                 subtotal = line.quantity * line.unit_price
                 if line.discount:
                     subtotal = subtotal * (1 - line.discount / 100.0)
                 line.price_subtotal = subtotal
                 
-                # Calculate total with taxes
                 if line.tax_ids:
                     taxes_data = line.tax_ids.compute_all(
                         line.unit_price,
@@ -190,7 +268,6 @@ class EstimateLine(models.Model):
                         line.quantity,
                         line.product_id
                     )
-                    # Apply discount to tax calculation
                     if line.discount:
                         for key in ['total_included', 'total_excluded']:
                             if key in taxes_data:

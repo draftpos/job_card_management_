@@ -237,40 +237,58 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <!-- Draft state buttons -->
                     <button name="action_approve_job_card" string="Approve Job Card" type="object" invisible="state not in ['draft']"/>
-                    <button name="action_create_requisition" string="Requisition" type="object" invisible="state not in ['approved']"/>
+                    
+                    <!-- Approved state buttons -->
+                    <button name="action_start_job" string="Start Job" type="object" invisible="state not in ['approved']"/>
+                    <button name="action_create_requisition" string="Requisition" type="object" invisible="state not in ['approved', 'in_progress']"/>
+                    
+                    <!-- In Progress state buttons -->
                     <button name="action_finalize_job_card" string="Finalize Job Card" type="object" invisible="state not in ['in_progress', 'requisition_started']"/>
+                    
+                    <!-- Completed/Delivered state buttons - REOPEN -->
+                    <button name="action_reopen" string="Reopen" type="object" icon="fa-undo" class="btn-warning" invisible="state not in ('completed', 'delivered')" confirm="Are you sure you want to reopen this job card? It will be moved back to draft."/>
+                    
+                    <!-- Print buttons - always visible -->
                     <button name="action_preview_job_card" string="Print Job Card" type="object" class="btn-secondary"/>
                     <button name="action_preview_pick_slip" string="Pick Slip" type="object" class="btn-secondary"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,in_progress,completed,delivered" invisible="state == 'requisition_started'"/>
+                    
+                    <!-- Statusbar -->
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,in_progress,completed,delivered"/>
                 </header>
                 <sheet>
+                    <!-- LOCK BADGE when completed/delivered -->
+                    <div class="badge rounded-pill text-bg-warning float-end fs-6 border-0" invisible="state not in ('completed', 'delivered')">
+                        <i class="fa fa-lock"/> Locked - Click Reopen to edit
+                    </div>
+                    
                     <group col="3">
                         <group string="Job Card Details">
                             <field name="name" readonly="1"/>
-                            <field name="estimate_id" readonly="1"/>
-                            <field name="customer_id"/>
+                            <field name="estimate_id" readonly="state in ('completed', 'delivered')"/>
+                            <field name="customer_id" readonly="state in ('completed', 'delivered')"/>
                             <field name="vehicle_display" readonly="1"/>
                             <field name="vehicle_name" readonly="1"/>
                             <field name="vehicle_model" readonly="1"/>
-                            <field name="start_date"/>
-                            <field name="end_date"/>
+                            <field name="start_date" readonly="state in ('completed', 'delivered')"/>
+                            <field name="end_date" readonly="state in ('completed', 'delivered')"/>
                         </group>
                         <group string="Financial Details">
-                            <field name="second_customer_id"/>
-                            <field name="excess_percentage"/>
+                            <field name="second_customer_id" readonly="state in ('completed', 'delivered')"/>
+                            <field name="excess_percentage" readonly="state in ('completed', 'delivered')"/>
                             <field name="insurance_percentage" readonly="1"/>
                             <field name="total_amount" readonly="1"/>
-                            <field name="analytic_account_id"/>
+                            <field name="analytic_account_id" readonly="state in ('completed', 'delivered')"/>
                         </group>
                         <group string="Team">
-                            <field name="technician_ids" widget="many2many_tags"/>
-                            <field name="supervisor_ids" widget="many2many_tags"/>
+                            <field name="technician_ids" widget="many2many_tags" readonly="state in ('completed', 'delivered')"/>
+                            <field name="supervisor_ids" widget="many2many_tags" readonly="state in ('completed', 'delivered')"/>
                         </group>
                     </group>
                     <notebook>
-                         <page string="Order Lines" name="order_lines">
-                            <field name="job_card_lines" widget="section_and_note_one2many" nolabel="1">
+                        <page string="Order Lines" name="order_lines">
+                            <field name="job_card_lines" widget="section_and_note_one2many" nolabel="1" readonly="state in ('completed', 'delivered')">
                                 <list editable="bottom" string="Job Card Lines">
                                     <control>
                                         <create name="add_product_control" string="Add a product"/>
