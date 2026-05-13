@@ -154,28 +154,38 @@
                 <header>
                     <button name="action_submit" string="Submit for Approval" type="object" invisible="state not in ['draft']"/>
                     <button name="action_approve" string="Approve" type="object" invisible="state not in ['submitted']"/>
+                    <button name="action_redo" string="Redo" type="object" class="btn-warning" 
+                            invisible="state not in ['approved', 'converted']" 
+                            confirm="Are you sure you want to redo this estimate? The linked quotation will be cancelled."/>
                     <button name="action_open_job_card" string="Open Job Card" type="object" invisible="state not in ['approved'] or has_job_card"/>
-                    <button name="action_preview_estimate" string="Print Estimate" type="object" class="btn-secondary"/>
-                      <!-- NEW BUTTONS -->
-                    <button name="action_send_whatsapp" string="Send WhatsApp" type="object" class="btn-secondary" icon="fa-whatsapp" style="background-color: #25D366; color: white;"/>
-                    <button name="action_send_email" string="Email Estimate" type="object" class="btn-secondary" icon="fa-envelope"/>
+                    
+                    <!-- Preview buttons -->
+                    <button name="action_preview_portal" string="Preview" type="object" class="btn-secondary"/>
+                    <button name="action_preview_estimate" string="Print" type="object" class="btn-secondary"/>
+                    
+                    <!-- Send buttons -->
+                    <button name="action_send_whatsapp" string="Send WhatsApp" type="object" class="btn-secondary" 
+                            icon="fa-whatsapp"/>
+                    <button name="action_send_email" string="Email" type="object" class="btn-secondary" icon="fa-envelope"/>
+                    
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <group col="2">
                         <group string="Estimate Details">
                             <field name="name"/>
-                            <field name="customer_id"/>
+                            <field name="customer_id" readonly="state in ('approved', 'converted')"/>
                         </group>
                         <group string="Vehicle Details">
-                            <field name="vehicle_id"/>
+                            <field name="vehicle_id" readonly="state in ('approved', 'converted')"/>
                             <field name="vehicle_name" readonly="1"/>
                             <field name="vehicle_model" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Order Lines" name="order_lines">
-                            <field name="estimate_lines" widget="section_and_note_one2many" nolabel="1">
+                            <field name="estimate_lines" widget="section_and_note_one2many" nolabel="1" 
+                                readonly="state in ('approved', 'converted')">
                                 <list editable="bottom" string="Estimate Lines">
                                     <control>
                                         <create name="add_product_control" string="Add a product"/>

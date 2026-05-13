@@ -1,6 +1,9 @@
 import random
 import string
 import logging
+import uuid 
+from odoo.http import request, route as http_route
+from odoo.addons.portal.controllers.portal import CustomerPortal
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -62,6 +65,55 @@ class JobCard(models.Model):
     insurance_invoice_id = fields.Many2one('account.move', string='Insurance Invoice')
     auto_create_invoices = fields.Boolean(string='Auto Create Invoices', default=True, 
                                           help='Automatically create invoices when job card is created')
+    
+    # Add this field
+    access_token = fields.Char('Access Token', copy=False)
+
+    # In the JobCard class, replace the _generate_access_token method:
+    def _generate_access_token(self):
+        """Generate a unique access token for portal access"""
+        if not self.access_token:
+            self.access_token = str(uuid.uuid4())
+
+    def get_portal_url(self, suffix=None, report_type=None):
+        """Get the portal URL for this job card"""
+        self.ensure_one()
+        if not self.access_token:
+            self._generate_access_token()
+        url = f'/my/jobcards/{self.id}?access_token={self.access_token}'
+        if suffix:
+            url += f'/{suffix}'
+        if report_type:
+            url += f'&report_type={report_type}'
+        return url
+
+    # Replace the existing preview methods:
+    def action_preview_job_card(self):
+        """Open browser print preview for Job Card PDF"""
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/report/pdf/job_card_management.report_job_card/{self.id}',
+            'target': 'new',
+        }
+
+    def action_preview_portal(self):
+        """Open the portal preview page"""
+        self.ensure_one()
+        if not self.access_token:
+            self._generate_access_token()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': self.get_portal_url(),
+            'target': 'self',
+        }
+
+    def action_preview_pick_slip(self):
+        """Open browser print preview for Pick Slip PDF"""
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/report/pdf/job_card_management.report_job_card_pick_slip/{self.id}',
+            'target': 'new',
+        }
 
     @api.model
     def create(self, vals):
@@ -228,6 +280,10 @@ class JobCard(models.Model):
         for rec in self:
             if rec.state not in ('completed', 'delivered'):
                 raise UserError(_('Only completed or delivered job cards can be reopened.'))
+            if rec.estimate_id and rec.estimate_id.sale_order_id:
+                sale_order = rec.estimate_id.sale_order_id
+                if sale_order.state not in ('cancel', 'done'):
+                    sale_order.action_cancel()
             rec.state = 'draft'
 
     @api.depends('excess_percentage')
@@ -249,7 +305,11 @@ class JobCard(models.Model):
             rec.total_amount = sum(rec.job_card_lines.filtered(lambda l: not l.display_type).mapped('price_total'))
 
     def action_approve_job_card(self):
-        self.state = 'approved'
+
+        for rec in self:
+            rec.state = 'approved'
+            if not rec.access_token:
+                rec._generate_access_token()
 
     def action_start_job(self):
         """Start job with validation for start and end dates"""
@@ -364,19 +424,7 @@ class JobCard(models.Model):
         return dashboard.get_overdue_jobs(
             user_id=user_id, date_from=date_from, date_to=date_to
         )
-    def action_preview_job_card(self):
-        return {
-            'type': 'ir.actions.act_url',
-            'url': f'/job_card_management/report/view/job.card/{self.id}/job_card_management.report_job_card/Job%20Card',
-            'target': 'self',
-        }
-
-    def action_preview_pick_slip(self):
-        return {
-            'type': 'ir.actions.act_url',
-            'url': f'/job_card_management/report/view/job.card/{self.id}/job_card_management.report_job_card_pick_slip/Pick%20Slip',
-            'target': 'self',
-        }
+    
 
 class JobCardLine(models.Model):
     _name = 'job.card.line'
@@ -420,3 +468,34 @@ class JobCardLine(models.Model):
 
     price_subtotal = fields.Float(string='Subtotal', compute='_compute_amount', store=False)
     price_total = fields.Float(string='Amount', compute='_compute_amount', store=False)
+
+
+
+class JobCardPortal(CustomerPortal):
+    
+    def _prepare_home_portal_values(self, counters):
+        values = super()._prepare_home_portal_values(counters)
+        if 'job_card_count' in counters:
+            values['job_card_count'] = request.env['job.card'].search_count([])
+        return values
+    
+    @http_route(['/my/jobcards', '/my/jobcards/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_jobcards(self, page=1, **kw):
+        job_cards = request.env['job.card'].search([])
+        return request.render('job_card_management.portal_my_jobcards', {
+            'job_cards': job_cards,
+            'page_name': 'jobcards',
+        })
+    
+    @http_route(['/my/jobcards/<int:job_card_id>'], type='http', auth="public", website=True)
+    def portal_jobcard_detail(self, job_card_id, access_token=None, **kw):
+        job_card = request.env['job.card'].sudo().browse(job_card_id)
+        if not job_card.exists():
+            return request.not_found()
+        # If access_token is provided, validate it
+        if access_token and job_card.access_token != access_token:
+            return request.not_found()
+        return request.render('job_card_management.portal_jobcard_detail', {
+            'job_card': job_card,
+            'page_name': 'jobcard',
+        })

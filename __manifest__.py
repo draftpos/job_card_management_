@@ -2,10 +2,13 @@
     'name': 'Job Card Management',
     'version': '1.0',
     'category': 'Services',
+    'author': 'Odoo Development Team',
+    'license': 'LGPL-3',
     'depends': ['sale', 'purchase', 'purchase_requisition', 'stock', 'account', 'hr', 'hr_expense', 'mail'],
     'data': [
-        'security/job_card_groups.xml',
-        'security/ir.model.access.csv',
+        'static/security/job_card_groups.xml',
+        'static/security/ir.model.access.csv',
+        'static/security/job_card_dashboard_access.xml',
         'reports/job_card_report.xml',
         'views/menu_root_views.xml',
         'views/technician_views.xml',
@@ -13,11 +16,13 @@
         'views/vehicle_views.xml',
         'views/estimate_views.xml',
         'views/job_card_views.xml',
+        'views/job_card_portal_templates.xml', 
         'views/procurement_views.xml',
         'views/job_card_profitability_views.xml',
         'views/menu_views.xml',
         'views/job_card_dashboard_views.xml',
         'views/report_preview_template.xml',
+        'views/estimate_portal_templates.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -25,14 +30,11 @@
             'job_card_management/static/src/js/job_card_dashboard.js',
             'job_card_management/static/src/xml/job_card_dashboard.xml',
             'job_card_management/static/src/scss/report_preview.scss',
-          
-          
-         
         ],
-        # 'web.report_assets_common': [
-        #     'job_card_management/static/src/scss/report_estimates.scss',
-        # ],
-   
+        'web.assets_frontend_lazy': [
+            'job_card_management/static/src/js/sale_update_line_button_guard.js',
+        ],
+    
     },
     'installable': True,
     'application': True,

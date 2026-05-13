@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_estimates" name="My Estimates">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Estimates</t>
+            </t>
+            <div t-if="not estimates" class="alert alert-warning" role="alert">
+                There are currently no estimates.
+            </div>
+            <t t-if="estimates" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Estimate #</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th class="text-end">Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="estimates" t-as="estimate">
+                        <tr>
+                            <td><a t-att-href="f'/my/estimates/{estimate.id}?access_token={estimate.access_token}'"><t t-esc="estimate.name"/></a></td>
+                            <td><t t-esc="estimate.customer_id.name"/></td>
+                            <td><t t-esc="estimate.vehicle_name"/></td>
+                            <td class="text-end">$ <t t-esc="'{:.2f}'.format(estimate.amount_total)"/></td>
+                            <td><span class="badge rounded-pill text-bg-info" t-esc="estimate.state"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <!-- Estimate Portal Detail - EXACT copy of Sale Order portal structure -->
+    <template id="portal_estimate_detail" name="Estimate Detail">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Estimate <t t-esc="estimate.name"/></t>
+            </t>
+
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-lg-4 col-xxl-3 d-print-none">
+                    <h4 t-if="estimate.state == 'approved'" class="mb-2">Approved</h4>
+                    <h2 t-esc="'$ {:.2f}'.format(estimate.amount_total)" class="mb-0 text-break"/>
+                    
+                    <div class="d-flex flex-column gap-4 mt-3">
+                        <div class="d-flex flex-column gap-2" id="estimate_sidebar_button">
+                            <a role="button" class="btn btn-primary" t-att-href="f'/report/pdf/job_card_management.action_report_estimate/{estimate.id}'" target="_blank">
+                                <i class="fa fa-print me-1"/> Print
+                            </a>
+                            <div class="o_download_pdf d-flex gap-2 flex-lg-column flex-xl-row flex-wrap">
+                                <a class="btn btn-light flex-grow-1" t-att-href="f'/report/pdf/job_card_management.action_report_estimate/{estimate.id}?download=1'">
+                                    <i class="fa fa-download me-1"/> Download PDF
+                                </a>
+                            </div>
+                            <a class="btn btn-light" t-att-href="f'/web#id={estimate.id}&amp;model=estimate&amp;view_type=form'">
+                                <i class="fa fa-arrow-left me-1"/> Edit in Odoo
+                            </a>
+                        </div>
+
+                        <div t-if="estimate.job_card_id" class="mt-2">
+                            <h6><small class="text-muted">Related Job Card</small></h6>
+                            <a role="button" class="btn btn-outline-primary w-100" 
+                            t-att-href="f'/my/jobcards/{estimate.job_card_id.id}?access_token={estimate.job_card_id.access_token}'">
+                                <i class="fa fa-wrench me-1"/> View Job Card <t t-esc="estimate.job_card_id.name"/>
+                            </a>
+                        </div>
+
+                        <div class="navspy flex-grow-1 ps-0" t-ignore="true" role="complementary">
+                            <ul class="nav flex-column bs-sidenav"></ul>
+                        </div>
+
+                        <div t-if="estimate.customer_id">
+                            <h6><small class="text-muted">Customer</small></h6>
+                            <div class="d-flex align-items-center gap-2">
+                                <strong t-esc="estimate.customer_id.name"/>
+                            </div>
+                            <div t-if="estimate.customer_id.phone" class="small text-muted mt-1">
+                                <i class="fa fa-phone"/> <t t-esc="estimate.customer_id.phone"/>
+                            </div>
+                            <div t-if="estimate.customer_id.email" class="small text-muted">
+                                <i class="fa fa-envelope"/> <t t-esc="estimate.customer_id.email"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page content - exactly matching -->
+                <div id="quote_content" class="col-12 col-lg-8 col-xxl-9 mt-5 mt-lg-0">
+
+                    <!-- Status messages -->
+                    <div t-if="estimate.state == 'draft'" class="alert alert-info alert-dismissible d-print-none" role="status">
+                        <strong>Draft</strong> - This estimate has not been submitted yet.
+                    </div>
+                    <div t-if="estimate.state == 'submitted'" class="alert alert-warning alert-dismissible d-print-none" role="status">
+                        <strong>Submitted</strong> - This estimate is awaiting approval.
+                    </div>
+                    <div t-if="estimate.state == 'approved'" class="alert alert-success alert-dismissible d-print-none" role="status">
+                        <strong>Approved</strong> - This estimate has been approved.
+                    </div>
+
+                    <!-- main content -->
+                    <div class="pb-5">
+                        <!-- Intro -->
+                        <div id="introduction" class="border-bottom-0 pt-0 pb-3">
+                            <div class="d-flex gap-2" id="intro_row">
+                                <h2>Estimate - <em t-esc="estimate.name"/></h2>
+                            </div>
+                        </div>
+                        
+                        <div id="content">
+                            <div id="informations" class="row">
+                                <!-- Estimate Info -->
+                                <div id="estimate_info" class="col-12 col-lg-6 mb-4">
+                                    <span id="estimate_info_title">
+                                        <h5 class="mb-1">Estimate Information</h5>
+                                        <hr class="mt-1 mb-2"/>
+                                    </span>
+                                    <table class="table table-borderless table-sm">
+                                        <tbody style="white-space:nowrap" id="estimate_info_table">
+                                            <tr>
+                                                <th class="ps-0 pb-0">Customer:</th>
+                                                <td class="w-100 pb-0 text-wrap"><t t-esc="estimate.customer_id.name"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 pb-0">Vehicle:</th>
+                                                <td class="w-100 pb-0 text-wrap"><t t-esc="estimate.vehicle_name"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 pb-0">Model:</th>
+                                                <td class="w-100 pb-0 text-wrap"><t t-esc="estimate.vehicle_model"/></td>
+                                            </tr>
+                                            <tr t-if="estimate.vehicle_id.registration_number">
+                                                <th class="ps-0 pb-0">Reg. Number:</th>
+                                                <td class="w-100 pb-0 text-wrap"><t t-esc="estimate.vehicle_id.registration_number"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 pb-0">Date:</th>
+                                                <td class="w-100 pb-0 text-wrap"><span t-field="estimate.create_date" t-options='{"widget": "date"}'/></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 pb-0">Status:</th>
+                                                <td class="w-100 pb-0 text-wrap">
+                                                    <span class="badge rounded-pill text-bg-success" t-if="estimate.state == 'approved'">Approved</span>
+                                                    <span class="badge rounded-pill text-bg-info" t-elif="estimate.state == 'draft'">Draft</span>
+                                                    <span class="badge rounded-pill text-bg-warning" t-elif="estimate.state == 'submitted'">Submitted</span>
+                                                    <span class="badge rounded-pill text-bg-secondary" t-else="" t-esc="estimate.state"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Customer Info -->
+                                <div id="customer_info" class="col-12 col-lg-6 mb-4">
+                                    <h5 class="mb-1">Customer Details</h5>
+                                    <hr class="mt-1 mb-2"/>
+                                    <address>
+                                        <strong t-esc="estimate.customer_id.name"/><br/>
+                                        <t t-if="estimate.customer_id.street"><t t-esc="estimate.customer_id.street"/><br/></t>
+                                        <t t-if="estimate.customer_id.city"><t t-esc="estimate.customer_id.city"/><t t-if="estimate.customer_id.country">, <t t-esc="estimate.customer_id.country"/></t><br/></t>
+                                        <t t-if="estimate.customer_id.phone"><i class="fa fa-phone"/> <t t-esc="estimate.customer_id.phone"/><br/></t>
+                                        <t t-if="estimate.customer_id.email"><i class="fa fa-envelope"/> <t t-esc="estimate.customer_id.email"/></t>
+                                    </address>
+                                </div>
+                            </div>
+
+                            <!-- Products Table -->
+                            <section id="details" style="page-break-inside: auto;">
+                                <div name="sol_table" class="table-responsive">
+                                    <table class="table table-sm" id="estimate_table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-start" id="product_name_header">Products</th>
+                                                <th class="text-end" id="product_qty_header">Quantity</th>
+                                                <th class="text-end d-none d-sm-table-cell" id="product_unit_price_header">Unit Price</th>
+                                                <th class="text-end" id="subtotal_header">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="estimate_tbody">
+                                            <t t-foreach="estimate.estimate_lines" t-as="line">
+                                                <tr t-if="line.display_type == 'line_section'" class="fw-bolder o_line_section">
+                                                    <td colspan="99" class="ps-3"><t t-esc="line.name"/></td>
+                                                </tr>
+                                                <tr t-elif="line.display_type == 'line_note'" class="fst-italic o_line_note">
+                                                    <td colspan="99" class="ps-3 text-muted"><t t-esc="line.name"/></td>
+                                                </tr>
+                                                <tr t-else="">
+                                                    <td><t t-esc="line.product_id.name or line.name"/></td>
+                                                    <td class="text-end">
+                                                        <t t-esc="'{:.2f}'.format(line.quantity)"/>
+                                                        <span> </span>
+                                                        <t t-esc="line.product_uom_id.name"/>
+                                                    </td>
+                                                    <td class="text-end d-none d-sm-table-cell">$ <t t-esc="'{:.2f}'.format(line.unit_price)"/></td>
+                                                    <td class="text-end o_price_total">$ <t t-esc="'{:.2f}'.format(line.price_total)"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Totals -->
+                                <div id="total" name="total" style="page-break-inside: avoid;">
+                                    <div class="col-xs-7 col-md-5 ms-auto">
+                                        <table class="table table-sm" name="estimate_totals_table">
+                                            <tr class="o_subtotal">
+                                                <td>Untaxed Amount</td>
+                                                <td class="text-end">$ <t t-esc="'{:.2f}'.format(estimate.amount_untaxed)"/></td>
+                                            </tr>
+                                            <tr t-if="estimate.amount_tax" class="o_taxes">
+                                                <td>Tax Amount</td>
+                                                <td class="text-end">$ <t t-esc="'{:.2f}'.format(estimate.amount_tax)"/></td>
+                                            </tr>
+                                            <tr class="o_total">
+                                                <td><strong>Total</strong></td>
+                                                <td class="text-end"><strong>$ <t t-esc="'{:.2f}'.format(estimate.amount_total)"/></strong></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
