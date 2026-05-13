@@ -297,7 +297,7 @@
                     <button name="action_finalize_job_card" string="Finalize Job Card" type="object" invisible="state not in ['in_progress', 'requisition_started']"/>
                     
                     <!-- Completed/Delivered state buttons - REOPEN -->
-                    <button name="action_reopen" string="Reopen" type="object" icon="fa-undo" class="btn-warning" invisible="state not in ('completed', 'delivered')" confirm="Are you sure you want to reopen this job card? It will be moved back to draft."/>
+                    <button name="action_reopen" string="Reopen" type="object" icon="fa-undo" class="btn-warning" invisible="state not in ('completed', 'delivered')" confirm="Are you sure you want to reopen this job card? It will be moved back to draft." groups="job_card_management.group_can_reopen_job_card"/>
                     
                     <!-- Portal Preview button -->
                     <button name="action_preview_portal" string="Preview" type="object" class="btn-secondary"/>

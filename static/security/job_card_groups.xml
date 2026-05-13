@@ -11,4 +11,14 @@
     <record id="group_can_approve_procurement" model="res.groups">
         <field name="name">Can Approve Procurement</field>
     </record>
+
+    <!-- NEW: Can Reopen Job Cards -->
+    <record id="group_can_reopen_job_card" model="res.groups">
+        <field name="name">Can Reopen Job Cards</field>
+    </record>
+
+    <!-- NEW: Can Redo Estimates -->
+    <record id="group_can_redo_estimate" model="res.groups">
+        <field name="name">Can Redo Estimates</field>
+    </record>
 </odoo>
