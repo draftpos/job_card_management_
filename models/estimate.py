@@ -128,6 +128,10 @@ class Estimate(models.Model):
 
     def action_redo(self):
         """Redo an approved/converted estimate - cancel sale order and set back to draft"""
+        # Check permission
+        if not self.env.user.has_group('job_card_management.group_can_redo_estimate'):
+            raise UserError(_('You do not have permission to redo estimates. Please contact your administrator.'))
+        
         for estimate in self:
             if estimate.state not in ('approved', 'converted'):
                 raise UserError(_('Only approved or converted estimates can be redone.'))

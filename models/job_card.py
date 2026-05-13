@@ -277,6 +277,10 @@ class JobCard(models.Model):
 # Workflow actions with validations - function to reopen job card added at the end
     def action_reopen(self):
         """Reopen a completed or delivered job card back to draft"""
+        # Check permission
+        if not self.env.user.has_group('job_card_management.group_can_reopen_job_card'):
+            raise UserError(_('You do not have permission to reopen job cards. Please contact your administrator.'))
+        
         for rec in self:
             if rec.state not in ('completed', 'delivered'):
                 raise UserError(_('Only completed or delivered job cards can be reopened.'))

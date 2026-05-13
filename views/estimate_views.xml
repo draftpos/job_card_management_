@@ -156,7 +156,7 @@
                     <button name="action_approve" string="Approve" type="object" invisible="state not in ['submitted']"/>
                     <button name="action_redo" string="Redo" type="object" class="btn-warning" 
                             invisible="state not in ['approved', 'converted']" 
-                            confirm="Are you sure you want to redo this estimate? The linked quotation will be cancelled."/>
+                            confirm="Are you sure you want to redo this estimate? The linked quotation will be cancelled." groups="job_card_management.group_can_redo_estimate"/>
                     <button name="action_open_job_card" string="Open Job Card" type="object" invisible="state not in ['approved'] or has_job_card"/>
                     
                     <!-- Preview buttons -->
