@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- ============================================================ -->
+    <!-- JOB CARD PORTAL - LIST VIEW -->
+    <!-- ============================================================ -->
+    <template id="portal_my_jobcards" name="My Job Cards">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Job Cards</t>
+            </t>
+            <div t-if="not job_cards" class="alert alert-warning" role="alert">
+                There are currently no job cards.
+            </div>
+            <t t-if="job_cards" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Job Card #</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Estimate</th>
+                        <th class="text-end">Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="job_cards" t-as="job_card">
+                        <tr>
+                            <td>
+                                <a t-att-href="f'/my/jobcards/{job_card.id}?access_token={job_card.access_token}'">
+                                    <t t-esc="job_card.name"/>
+                                </a>
+                            </td>
+                            <td><t t-esc="job_card.customer_id.name"/></td>
+                            <td><t t-esc="job_card.vehicle_name"/></td>
+                            <td>
+                                <t t-if="job_card.estimate_id">
+                                    <t t-esc="job_card.estimate_id.name"/>
+                                </t>
+                                <t t-else="">
+                                    <span class="text-muted">N/A</span>
+                                </t>
+                            </td>
+                            <td class="text-end">$ <t t-esc="'{:.2f}'.format(job_card.total_amount)"/></td>
+                            <td>
+                                <span class="badge rounded-pill text-bg-secondary" t-if="job_card.state == 'draft'" t-esc="job_card.state"/>
+                                <span class="badge rounded-pill text-bg-info" t-elif="job_card.state == 'approved'" t-esc="job_card.state"/>
+                                <span class="badge rounded-pill text-bg-warning" t-elif="job_card.state == 'in_progress'" t-esc="job_card.state"/>
+                                <span class="badge rounded-pill text-bg-primary" t-elif="job_card.state == 'requisition_started'" t-esc="job_card.state"/>
+                                <span class="badge rounded-pill text-bg-success" t-elif="job_card.state in ('completed', 'delivered')" t-esc="job_card.state"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- JOB CARD PORTAL - DETAIL VIEW -->
+    <!-- ============================================================ -->
+    <template id="portal_jobcard_detail" name="Job Card Detail">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Job Card <t t-esc="job_card.name"/></t>
+            </t>
+
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-lg-4 col-xxl-3 d-print-none">
+                    <h4 t-if="job_card.state == 'delivered'" class="mb-2">Delivered</h4>
+                    <h4 t-elif="job_card.state == 'completed'" class="mb-2">Completed</h4>
+                    <h4 t-elif="job_card.state == 'in_progress'" class="mb-2">In Progress</h4>
+                    <h2 t-esc="'$ {:.2f}'.format(job_card.total_amount)" class="mb-0 text-break"/>
+                    
+                    <div class="d-flex flex-column gap-4 mt-3">
+                        <!-- Action Buttons -->
+                        <div class="d-flex flex-column gap-2" id="jobcard_sidebar_button">
+                            <!-- Print Job Card -->
+                            <a role="button" class="btn btn-primary" t-att-href="f'/report/pdf/job_card_management.report_job_card/{job_card.id}'" target="_blank">
+                                <i class="fa fa-print me-1"/> Print Job Card
+                            </a>
+                            
+                            <!-- Download Job Card PDF -->
+                            <div class="o_download_pdf d-flex gap-2 flex-lg-column flex-xl-row flex-wrap">
+                                <a class="btn btn-light flex-grow-1" t-att-href="f'/report/pdf/job_card_management.report_job_card/{job_card.id}?download=1'">
+                                    <i class="fa fa-download me-1"/> Download PDF
+                                </a>
+                            </div>
+                            
+                            <!-- Print Pick Slip -->
+                            <a role="button" class="btn btn-outline-secondary" t-att-href="f'/report/pdf/job_card_management.report_job_card_pick_slip/{job_card.id}'" target="_blank">
+                                <i class="fa fa-clipboard me-1"/> Print Pick Slip
+                            </a>
+                            
+                            <!-- Edit in Odoo (visible only for logged-in users) -->
+                            <a class="btn btn-light" t-att-href="f'/web#id={job_card.id}&amp;model=job.card&amp;view_type=form'">
+                                <i class="fa fa-arrow-left me-1"/> Edit in Odoo
+                            </a>
+                        </div>
+
+                        <!-- Customer Information -->
+                        <div t-if="job_card.customer_id">
+                            <h6><small class="text-muted">Customer</small></h6>
+                            <div class="d-flex align-items-center gap-2">
+                                <strong t-esc="job_card.customer_id.name"/>
+                            </div>
+                            <div t-if="job_card.customer_id.phone" class="small text-muted mt-1">
+                                <i class="fa fa-phone"/> <t t-esc="job_card.customer_id.phone"/>
+                            </div>
+                            <div t-if="job_card.customer_id.email" class="small text-muted">
+                                <i class="fa fa-envelope"/> <t t-esc="job_card.customer_id.email"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Insurance Company (if present) -->
+                        <div t-if="job_card.second_customer_id">
+                            <h6><small class="text-muted">Insurance Company</small></h6>
+                            <div class="d-flex align-items-center gap-2">
+                                <strong t-esc="job_card.second_customer_id.name"/>
+                            </div>
+                            <div class="small text-muted mt-1">
+                                Excess: <strong><t t-esc="job_card.excess_percentage"/>%</strong>
+                            </div>
+                            <div class="small text-muted">
+                                Insurance: <strong><t t-esc="job_card.insurance_percentage"/>%</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page content -->
+                <div id="quote_content" class="col-12 col-lg-8 col-xxl-9 mt-5 mt-lg-0">
+
+                    <!-- Status messages -->
+                    <div t-if="job_card.state == 'draft'" class="alert alert-info alert-dismissible d-print-none" role="status">
+                        <strong>Draft</strong> - This job card is being prepared.
+                    </div>
+                    <div t-if="job_card.state == 'approved'" class="alert alert-primary alert-dismissible d-print-none" role="status">
+                        <strong>Approved</strong> - This job card has been approved and is ready to start.
+                    </div>
+                    <div t-if="job_card.state == 'in_progress'" class="alert alert-warning alert-dismissible d-print-none" role="status">
+                        <strong>In Progress</strong> - Work is currently being performed.
+                    </div>
+                    <div t-if="job_card.state == 'requisition_started'" class="alert alert-warning alert-dismissible d-print-none" role="status">
+                        <strong>Requisition Started</strong> - Parts are being ordered for this job.
+                    </div>
+                    <div t-if="job_card.state == 'completed'" class="alert alert-success alert-dismissible d-print-none" role="status">
+                        <strong>Completed</strong> - Work has been completed.
+                    </div>
+                    <div t-if="job_card.state == 'delivered'" class="alert alert-success alert-dismissible d-print-none" role="status">
+                        <strong>Delivered</strong> - Vehicle has been delivered to customer.
+                    </div>
+
+                    <!-- Main content -->
+                    <div class="pb-5">
+                        <!-- Intro -->
+                        <div id="introduction" class="border-bottom-0 pt-0 pb-3">
+                            <div class="d-flex gap-2" id="intro_row">
+                                <h2>Job Card - <em t-esc="job_card.name"/></h2>
+                            </div>
+                        </div>
+                        
+                        <div id="content">
+                            <div id="informations" class="row">
+                                <!-- Job Card Info -->
+                                <div id="jobcard_info" class="col-12 col-lg-6 mb-4">
+                                    <span id="jobcard_info_title">
+                                        <h5 class="mb-1">Job Card Information</h5>
+                                        <hr class="mt-1 mb-2"/>
+                                    </span>
+                                    <table class="table table-borderless table-sm">
+                                        <tbody style="white-space:nowrap" id="jobcard_info_table">
+                                            <tr>
+                                                <th class="ps-0 pb-0">Job Card #:</th>
+                                                <td class="w-100 pb-0 text-wrap"><strong><t t-esc="job_card.name"/></strong></td>
+                                            </tr>
+                                            <tr t-if="job_card.estimate_id">
+                                                <th class="ps-0 pb-0">Estimate:</th>
+                                                <td class="w-100 pb-0 text-wrap">
+                                                    <a t-att-href="f'/my/estimates/{job_card.estimate_id.id}?access_token={job_card.estimate_id.access_token}'">
+                                                        <t t-esc="job_card.estimate_id.name"/>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 pb-0">Customer:</th>
+                                                <td class="w-100 pb-0 text-wrap"><t t-esc="job_card.customer_id.name"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 pb-0">Vehicle:</th>
+                                                <td class="w-100 pb-0 text-wrap"><t t-esc="job_card.vehicle_name"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 pb-0">Model:</th>
+                                                <td class="w-100 pb-0 text-wrap"><t t-esc="job_card.vehicle_model"/></td>
+                                            </tr>
+                                            <tr t-if="job_card.vehicle_id.registration_number">
+                                                <th class="ps-0 pb-0">Reg. Number:</th>
+                                                <td class="w-100 pb-0 text-wrap"><t t-esc="job_card.vehicle_id.registration_number"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 pb-0">Created Date:</th>
+                                                <td class="w-100 pb-0 text-wrap"><span t-field="job_card.create_date" t-options='{"widget": "date"}'/></td>
+                                            </tr>
+                                            <tr t-if="job_card.start_date">
+                                                <th class="ps-0 pb-0">Start Date:</th>
+                                                <td class="w-100 pb-0 text-wrap"><span t-field="job_card.start_date"/></td>
+                                            </tr>
+                                            <tr t-if="job_card.end_date">
+                                                <th class="ps-0 pb-0">Expected End:</th>
+                                                <td class="w-100 pb-0 text-wrap"><span t-field="job_card.end_date"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 pb-0">Status:</th>
+                                                <td class="w-100 pb-0 text-wrap">
+                                                    <span class="badge rounded-pill text-bg-secondary" t-if="job_card.state == 'draft'" t-esc="job_card.state"/>
+                                                    <span class="badge rounded-pill text-bg-primary" t-elif="job_card.state == 'approved'" t-esc="job_card.state"/>
+                                                    <span class="badge rounded-pill text-bg-warning" t-elif="job_card.state == 'in_progress'" t-esc="job_card.state"/>
+                                                    <span class="badge rounded-pill text-bg-info" t-elif="job_card.state == 'requisition_started'" t-esc="job_card.state"/>
+                                                    <span class="badge rounded-pill text-bg-success" t-elif="job_card.state == 'completed'" t-esc="job_card.state"/>
+                                                    <span class="badge rounded-pill text-bg-success" t-elif="job_card.state == 'delivered'" t-esc="job_card.state"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Customer Info -->
+                                <div id="customer_info" class="col-12 col-lg-6 mb-4">
+                                    <h5 class="mb-1">Customer Details</h5>
+                                    <hr class="mt-1 mb-2"/>
+                                    <address>
+                                        <strong t-esc="job_card.customer_id.name"/><br/>
+                                        <t t-if="job_card.customer_id.street"><t t-esc="job_card.customer_id.street"/><br/></t>
+                                        <t t-if="job_card.customer_id.city"><t t-esc="job_card.customer_id.city"/><t t-if="job_card.customer_id.country">, <t t-esc="job_card.customer_id.country"/></t><br/></t>
+                                        <t t-if="job_card.customer_id.phone"><i class="fa fa-phone"/> <t t-esc="job_card.customer_id.phone"/><br/></t>
+                                        <t t-if="job_card.customer_id.email"><i class="fa fa-envelope"/> <t t-esc="job_card.customer_id.email"/></t>
+                                    </address>
+                                    
+                                    <!-- Technicians -->
+                                    <div t-if="job_card.technician_ids" class="mt-3">
+                                        <h6><small class="text-muted">Assigned Technicians</small></h6>
+                                        <div t-foreach="job_card.technician_ids" t-as="tech" class="badge bg-light text-dark me-1 mb-1">
+                                            <t t-esc="tech.name"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Supervisors -->
+                                    <div t-if="job_card.supervisor_ids" class="mt-2">
+                                        <h6><small class="text-muted">Supervisors</small></h6>
+                                        <div t-foreach="job_card.supervisor_ids" t-as="supervisor" class="badge bg-light text-dark me-1 mb-1">
+                                            <t t-esc="supervisor.name"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Products/Services Table -->
+                            <section id="details" style="page-break-inside: auto;">
+                                <div name="sol_table" class="table-responsive">
+                                    <table class="table table-sm" id="jobcard_table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-start" id="product_name_header">Products/Services</th>
+                                                <th class="text-end" id="product_qty_header">Quantity</th>
+                                                <th class="text-end d-none d-sm-table-cell" id="product_unit_price_header">Unit Price</th>
+                                                <th class="text-end" id="subtotal_header">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="jobcard_tbody">
+                                            <t t-foreach="job_card.job_card_lines" t-as="line">
+                                                <tr t-if="line.display_type == 'line_section'" class="fw-bolder o_line_section">
+                                                    <td colspan="99" class="ps-3"><t t-esc="line.name"/></td>
+                                                </tr>
+                                                <tr t-elif="line.display_type == 'line_note'" class="fst-italic o_line_note">
+                                                    <td colspan="99" class="ps-3 text-muted"><t t-esc="line.name"/></td>
+                                                </tr>
+                                                <tr t-else="">
+                                                    <td><t t-esc="line.product_id.name or line.name"/></td>
+                                                    <td class="text-end">
+                                                        <t t-esc="'{:.2f}'.format(line.quantity)"/>
+                                                        <span> </span>
+                                                        <t t-esc="line.product_uom_id.name"/>
+                                                    </td>
+                                                    <td class="text-end d-none d-sm-table-cell">$ <t t-esc="'{:.2f}'.format(line.unit_price)"/></td>
+                                                    <td class="text-end o_price_total">$ <t t-esc="'{:.2f}'.format(line.price_total)"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Totals -->
+                                <div id="total" name="total" style="page-break-inside: avoid;">
+                                    <div class="col-xs-7 col-md-5 ms-auto">
+                                        <table class="table table-sm" name="jobcard_totals_table">
+                                            <!-- Calculate subtotal and tax the same way as estimate -->
+                                            <tr class="o_subtotal">
+                                                <td>Untaxed Amount</td>
+                                                <td class="text-end">$ <t t-esc="'{:.2f}'.format(sum(line.price_subtotal for line in job_card.job_card_lines if not line.display_type))"/></td>
+                                            </tr>
+                                            <tr t-if="sum(line.price_total - line.price_subtotal for line in job_card.job_card_lines if not line.display_type) > 0" class="o_taxes">
+                                                <td>Tax Amount</td>
+                                                <td class="text-end">$ <t t-esc="'{:.2f}'.format(sum(line.price_total - line.price_subtotal for line in job_card.job_card_lines if not line.display_type))"/></td>
+                                            </tr>
+                                            <tr class="o_total">
+                                                <td><strong>Total</strong></td>
+                                                <td class="text-end"><strong>$ <t t-esc="'{:.2f}'.format(job_card.total_amount)"/></strong></td>
+                                            </tr>
+                                            
+                                            <!-- Insurance split (if applicable) -->
+                                            <t t-if="job_card.second_customer_id and job_card.excess_percentage">
+                                                <tr class="border-top">
+                                                    <td><small class="text-muted">Customer Portion (<t t-esc="job_card.excess_percentage"/>%)</small></td>
+                                                    <td class="text-end"><small class="text-muted">$ <t t-esc="'{:.2f}'.format(job_card.total_amount * job_card.excess_percentage / 100)"/></small></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><small class="text-muted">Insurance Portion (<t t-esc="job_card.insurance_percentage"/>%)</small></td>
+                                                    <td class="text-end"><small class="text-muted">$ <t t-esc="'{:.2f}'.format(job_card.total_amount * job_card.insurance_percentage / 100)"/></small></td>
+                                                </tr>
+                                            </t>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                            
+                            <!-- Invoices Section (if created) -->
+                            <div t-if="job_card.invoice_created" class="mt-4">
+                                <h5>Invoices</h5>
+                                <hr class="mt-1 mb-3"/>
+                                <div class="d-flex gap-2">
+                                    <t t-if="job_card.customer_invoice_id">
+                                        <div class="flex-grow-1">
+                                            <strong>Customer Invoice:</strong>
+                                            <a t-att-href="f'/my/invoices/{job_card.customer_invoice_id.id}'" class="ms-2">
+                                                <t t-esc="job_card.customer_invoice_id.name"/>
+                                            </a>
+                                        </div>
+                                    </t>
+                                    <t t-if="job_card.insurance_invoice_id">
+                                        <div class="flex-grow-1">
+                                            <strong>Insurance Invoice:</strong>
+                                            <a t-att-href="f'/my/invoices/{job_card.insurance_invoice_id.id}'" class="ms-2">
+                                                <t t-esc="job_card.insurance_invoice_id.name"/>
+                                            </a>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
