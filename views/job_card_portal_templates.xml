@@ -33,7 +33,7 @@
                                 </a>
                             </td>
                             <td><t t-esc="job_card.customer_id.name"/></td>
-                            <td><t t-esc="job_card.vehicle_name"/></td>
+                            <td><t t-esc="job_card.vehicle_reg_number"/></td>
                             <td>
                                 <t t-if="job_card.estimate_id">
                                     <t t-esc="job_card.estimate_id.name"/>
@@ -96,8 +96,8 @@
                             </a>
                             
                             <!-- Edit in Odoo (visible only for logged-in users) -->
-                            <a class="btn btn-light" t-att-href="f'/web#id={job_card.id}&amp;model=job.card&amp;view_type=form'">
-                                <i class="fa fa-arrow-left me-1"/> Edit in Odoo
+                            <a class="btn btn-light" t-if="job_card.backend_form_url" t-att-href="job_card.backend_form_url">
+                                <i class="fa fa-arrow-left me-1"/> Back to Edit
                             </a>
                         </div>
 
@@ -191,7 +191,7 @@
                                             </tr>
                                             <tr>
                                                 <th class="ps-0 pb-0">Vehicle:</th>
-                                                <td class="w-100 pb-0 text-wrap"><t t-esc="job_card.vehicle_name"/></td>
+                                                <td class="w-100 pb-0 text-wrap"><t t-esc="job_card.vehicle_reg_number"/></td>
                                             </tr>
                                             <tr>
                                                 <th class="ps-0 pb-0">Model:</th>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Makes -->
+    <record id="make_toyota" model="vehicle.make"><field name="name">Toyota</field></record>
+    <record id="make_honda" model="vehicle.make"><field name="name">Honda</field></record>
+    <record id="make_nissan" model="vehicle.make"><field name="name">Nissan</field></record>
+    <record id="make_mazda" model="vehicle.make"><field name="name">Mazda</field></record>
+    <record id="make_suzuki" model="vehicle.make"><field name="name">Suzuki</field></record>
+    <record id="make_mitsubishi" model="vehicle.make"><field name="name">Mitsubishi</field></record>
+    <record id="make_isuzu" model="vehicle.make"><field name="name">Isuzu</field></record>
+    <record id="make_ford" model="vehicle.make"><field name="name">Ford</field></record>
+    <record id="make_chevrolet" model="vehicle.make"><field name="name">Chevrolet</field></record>
+    <record id="make_bmw" model="vehicle.make"><field name="name">BMW</field></record>
+    <record id="make_mercedes" model="vehicle.make"><field name="name">Mercedes-Benz</field></record>
+    <record id="make_volkswagen" model="vehicle.make"><field name="name">Volkswagen</field></record>
+    <record id="make_hyundai" model="vehicle.make"><field name="name">Hyundai</field></record>
+    <record id="make_kia" model="vehicle.make"><field name="name">Kia</field></record>
+    <record id="make_subaru" model="vehicle.make"><field name="name">Subaru</field></record>
+    <record id="make_land_rover" model="vehicle.make"><field name="name">Land Rover</field></record>
+    <record id="make_peugeot" model="vehicle.make"><field name="name">Peugeot</field></record>
+    <record id="make_renault" model="vehicle.make"><field name="name">Renault</field></record>
+    <record id="make_audi" model="vehicle.make"><field name="name">Audi</field></record>
+
+    <!-- Toyota -->
+    <record id="model_toyota_hilux_gd6" model="vehicle.model"><field name="name">Hilux GD6</field><field name="make_id" ref="make_toyota"/><field name="year_from">2016</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+    <record id="model_toyota_hilux_d4d" model="vehicle.model"><field name="name">Hilux D4D</field><field name="make_id" ref="make_toyota"/><field name="year_from">2005</field><field name="year_to">2015</field><field name="fuel_type">diesel</field></record>
+    <record id="model_toyota_hilux" model="vehicle.model"><field name="name">Hilux</field><field name="make_id" ref="make_toyota"/><field name="year_from">2000</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+    <record id="model_toyota_aqua" model="vehicle.model"><field name="name">Aqua</field><field name="make_id" ref="make_toyota"/><field name="year_from">2012</field><field name="year_to">2026</field><field name="fuel_type">hybrid</field></record>
+    <record id="model_toyota_prius" model="vehicle.model"><field name="name">Prius</field><field name="make_id" ref="make_toyota"/><field name="year_from">2010</field><field name="year_to">2026</field><field name="fuel_type">hybrid</field></record>
+    <record id="model_toyota_corolla" model="vehicle.model"><field name="name">Corolla</field><field name="make_id" ref="make_toyota"/><field name="year_from">2008</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_toyota_hiace" model="vehicle.model"><field name="name">Hiace</field><field name="make_id" ref="make_toyota"/><field name="year_from">2005</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+    <record id="model_toyota_quantum" model="vehicle.model"><field name="name">Quantum</field><field name="make_id" ref="make_toyota"/><field name="year_from">2008</field><field name="year_to">2020</field><field name="fuel_type">diesel</field></record>
+    <record id="model_toyota_fortuner" model="vehicle.model"><field name="name">Fortuner</field><field name="make_id" ref="make_toyota"/><field name="year_from">2016</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+    <record id="model_toyota_rav4" model="vehicle.model"><field name="name">RAV4</field><field name="make_id" ref="make_toyota"/><field name="year_from">2013</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_toyota_yaris" model="vehicle.model"><field name="name">Yaris</field><field name="make_id" ref="make_toyota"/><field name="year_from">2012</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_toyota_landcruiser" model="vehicle.model"><field name="name">Land Cruiser</field><field name="make_id" ref="make_toyota"/><field name="year_from">2008</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+
+    <!-- Honda -->
+    <record id="model_honda_fit" model="vehicle.model"><field name="name">Fit</field><field name="make_id" ref="make_honda"/><field name="year_from">2008</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_honda_vezel" model="vehicle.model"><field name="name">Vezel</field><field name="make_id" ref="make_honda"/><field name="year_from">2014</field><field name="year_to">2026</field><field name="fuel_type">hybrid</field></record>
+    <record id="model_honda_crv" model="vehicle.model"><field name="name">CR-V</field><field name="make_id" ref="make_honda"/><field name="year_from">2012</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_honda_civic" model="vehicle.model"><field name="name">Civic</field><field name="make_id" ref="make_honda"/><field name="year_from">2012</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_honda_shuttle" model="vehicle.model"><field name="name">Shuttle</field><field name="make_id" ref="make_honda"/><field name="year_from">2015</field><field name="year_to">2026</field><field name="fuel_type">hybrid</field></record>
+    <record id="model_honda_accord" model="vehicle.model"><field name="name">Accord</field><field name="make_id" ref="make_honda"/><field name="year_from">2008</field><field name="year_to">2020</field><field name="fuel_type">petrol</field></record>
+
+    <!-- Nissan -->
+    <record id="model_nissan_navara" model="vehicle.model"><field name="name">Navara</field><field name="make_id" ref="make_nissan"/><field name="year_from">2015</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+    <record id="model_nissan_xtrail" model="vehicle.model"><field name="name">X-Trail</field><field name="make_id" ref="make_nissan"/><field name="year_from">2014</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+    <record id="model_nissan_qashqai" model="vehicle.model"><field name="name">Qashqai</field><field name="make_id" ref="make_nissan"/><field name="year_from">2014</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_nissan_np300" model="vehicle.model"><field name="name">NP300</field><field name="make_id" ref="make_nissan"/><field name="year_from">2012</field><field name="year_to">2020</field><field name="fuel_type">diesel</field></record>
+
+    <!-- Isuzu -->
+    <record id="model_isuzu_dmax" model="vehicle.model"><field name="name">D-Max</field><field name="make_id" ref="make_isuzu"/><field name="year_from">2013</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+    <record id="model_isuzu_kb" model="vehicle.model"><field name="name">KB</field><field name="make_id" ref="make_isuzu"/><field name="year_from">2018</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+
+    <!-- Mazda -->
+    <record id="model_mazda_3" model="vehicle.model"><field name="name">Mazda3</field><field name="make_id" ref="make_mazda"/><field name="year_from">2014</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_mazda_cx5" model="vehicle.model"><field name="name">CX-5</field><field name="make_id" ref="make_mazda"/><field name="year_from">2015</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+
+    <!-- Suzuki -->
+    <record id="model_suzuki_swift" model="vehicle.model"><field name="name">Swift</field><field name="make_id" ref="make_suzuki"/><field name="year_from">2012</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_suzuki_vitara" model="vehicle.model"><field name="name">Vitara</field><field name="make_id" ref="make_suzuki"/><field name="year_from">2016</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+
+    <!-- Mitsubishi -->
+    <record id="model_mitsubishi_pajero" model="vehicle.model"><field name="name">Pajero</field><field name="make_id" ref="make_mitsubishi"/><field name="year_from">2010</field><field name="year_to">2020</field><field name="fuel_type">diesel</field></record>
+    <record id="model_mitsubishi_triton" model="vehicle.model"><field name="name">Triton</field><field name="make_id" ref="make_mitsubishi"/><field name="year_from">2015</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+
+    <!-- Ford -->
+    <record id="model_ford_ranger" model="vehicle.model"><field name="name">Ranger</field><field name="make_id" ref="make_ford"/><field name="year_from">2012</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+    <record id="model_ford_raptor" model="vehicle.model"><field name="name">Raptor</field><field name="make_id" ref="make_ford"/><field name="year_from">2019</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+    <record id="model_ford_ecosport" model="vehicle.model"><field name="name">EcoSport</field><field name="make_id" ref="make_ford"/><field name="year_from">2014</field><field name="year_to">2022</field><field name="fuel_type">petrol</field></record>
+
+    <!-- Chevrolet -->
+    <record id="model_chevrolet_cruze" model="vehicle.model"><field name="name">Cruze</field><field name="make_id" ref="make_chevrolet"/><field name="year_from">2010</field><field name="year_to">2018</field><field name="fuel_type">petrol</field></record>
+    <record id="model_chevrolet_spark" model="vehicle.model"><field name="name">Spark</field><field name="make_id" ref="make_chevrolet"/><field name="year_from">2012</field><field name="year_to">2020</field><field name="fuel_type">petrol</field></record>
+
+    <!-- BMW -->
+    <record id="model_bmw_3series" model="vehicle.model"><field name="name">3 Series</field><field name="make_id" ref="make_bmw"/><field name="year_from">2012</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_bmw_x5" model="vehicle.model"><field name="name">X5</field><field name="make_id" ref="make_bmw"/><field name="year_from">2014</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+
+    <!-- Mercedes -->
+    <record id="model_mercedes_c200" model="vehicle.model"><field name="name">C200</field><field name="make_id" ref="make_mercedes"/><field name="year_from">2014</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_mercedes_c180" model="vehicle.model"><field name="name">C180</field><field name="make_id" ref="make_mercedes"/><field name="year_from">2012</field><field name="year_to">2020</field><field name="fuel_type">petrol</field></record>
+    <record id="model_mercedes_e200" model="vehicle.model"><field name="name">E200</field><field name="make_id" ref="make_mercedes"/><field name="year_from">2010</field><field name="year_to">2020</field><field name="fuel_type">petrol</field></record>
+    <record id="model_mercedes_glc" model="vehicle.model"><field name="name">GLC</field><field name="make_id" ref="make_mercedes"/><field name="year_from">2016</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+
+    <!-- VW -->
+    <record id="model_vw_polo" model="vehicle.model"><field name="name">Polo</field><field name="make_id" ref="make_volkswagen"/><field name="year_from">2010</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_vw_golf" model="vehicle.model"><field name="name">Golf</field><field name="make_id" ref="make_volkswagen"/><field name="year_from">2012</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_vw_tiguan" model="vehicle.model"><field name="name">Tiguan</field><field name="make_id" ref="make_volkswagen"/><field name="year_from">2016</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+
+    <!-- Hyundai -->
+    <record id="model_hyundai_tucson" model="vehicle.model"><field name="name">Tucson</field><field name="make_id" ref="make_hyundai"/><field name="year_from">2016</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_hyundai_elantra" model="vehicle.model"><field name="name">Elantra</field><field name="make_id" ref="make_hyundai"/><field name="year_from">2012</field><field name="year_to">2020</field><field name="fuel_type">petrol</field></record>
+    <record id="model_hyundai_creta" model="vehicle.model"><field name="name">Creta</field><field name="make_id" ref="make_hyundai"/><field name="year_from">2018</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+
+    <!-- Kia -->
+    <record id="model_kia_rio" model="vehicle.model"><field name="name">Rio</field><field name="make_id" ref="make_kia"/><field name="year_from">2012</field><field name="year_to">2020</field><field name="fuel_type">petrol</field></record>
+    <record id="model_kia_sportage" model="vehicle.model"><field name="name">Sportage</field><field name="make_id" ref="make_kia"/><field name="year_from">2016</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+
+    <!-- Subaru -->
+    <record id="model_subaru_forester" model="vehicle.model"><field name="name">Forester</field><field name="make_id" ref="make_subaru"/><field name="year_from">2014</field><field name="year_to">2026</field><field name="fuel_type">petrol</field></record>
+    <record id="model_subaru_impreza" model="vehicle.model"><field name="name">Impreza</field><field name="make_id" ref="make_subaru"/><field name="year_from">2012</field><field name="year_to">2020</field><field name="fuel_type">petrol</field></record>
+
+    <!-- Land Rover -->
+    <record id="model_lr_discovery" model="vehicle.model"><field name="name">Discovery</field><field name="make_id" ref="make_land_rover"/><field name="year_from">2010</field><field name="year_to">2020</field><field name="fuel_type">diesel</field></record>
+    <record id="model_lr_evoque" model="vehicle.model"><field name="name">Range Rover Evoque</field><field name="make_id" ref="make_land_rover"/><field name="year_from">2015</field><field name="year_to">2026</field><field name="fuel_type">diesel</field></record>
+</odoo>

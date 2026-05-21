@@ -1,10 +1,21 @@
+from datetime import timedelta
+
+from odoo import fields
+
 from . import models
 from . import controllers
 
+
 def create_access_rights(env):
-    """Create access rights after module installation"""
-    
-    models = ['customer', 'vehicle', 'estimate', 'estimate.line', 'job.card', 'job.card.line', 'procurement', 'procurement.line']
+    """Create access rights and backfill data after module installation/upgrade."""
+    today = fields.Date.today()
+    env['job.card'].search([
+        '|', ('start_date', '=', False), ('end_date', '=', False),
+    ]).write({
+        'start_date': today,
+        'end_date': today + timedelta(days=1),
+    })
+    model_names = ['customer', 'vehicle', 'estimate', 'estimate.line', 'job.card', 'job.card.line', 'procurement', 'procurement.line']
     group_user = env.ref('base.group_user')
     
     # Get or create groups if they exist
@@ -12,7 +23,7 @@ def create_access_rights(env):
     group_approve_estimate = env.ref('job_card_management.group_can_approve_estimate', raise_if_not_found=False)
     group_approve_procurement = env.ref('job_card_management.group_can_approve_procurement', raise_if_not_found=False)
     
-    for model_name in models:
+    for model_name in model_names:
         model = env['ir.model'].search([('model', '=', model_name)], limit=1)
         if model:
             # Basic user access

@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Common Zimbabwe fleet templates (no owner — pick on job/estimate) -->
+    <record id="seed_v_toyota_hilux_gd6_1" model="vehicle">
+        <field name="registration_number">AGH 3344</field>
+        <field name="name">Work Hilux</field>
+        <field name="chassis_number">JTGD6HILUX0001</field>
+        <field name="engine_number">2GD001</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_hilux_gd6"/>
+        <field name="make">Toyota</field>
+        <field name="model">Hilux GD6</field>
+        <field name="year_of_manufacture">2021</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_toyota_hilux_d4d_1" model="vehicle">
+        <field name="registration_number">AEM 4521</field>
+        <field name="chassis_number">JTHD4DHILUX001</field>
+        <field name="engine_number">2KD001</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_hilux_d4d"/>
+        <field name="make">Toyota</field>
+        <field name="model">Hilux D4D</field>
+        <field name="year_of_manufacture">2014</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_toyota_aqua_1" model="vehicle">
+        <field name="registration_number">AFG 7782</field>
+        <field name="chassis_number">NHP10AQUA001</field>
+        <field name="engine_number">1NZHYB001</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_aqua"/>
+        <field name="make">Toyota</field>
+        <field name="model">Aqua</field>
+        <field name="year_of_manufacture">2018</field>
+        <field name="fuel_type">hybrid</field>
+    </record>
+    <record id="seed_v_toyota_prius_1" model="vehicle">
+        <field name="registration_number">AFL 1190</field>
+        <field name="chassis_number">ZVW30PRIUS01</field>
+        <field name="engine_number">2ZRHYB01</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_prius"/>
+        <field name="make">Toyota</field>
+        <field name="model">Prius</field>
+        <field name="year_of_manufacture">2016</field>
+        <field name="fuel_type">hybrid</field>
+    </record>
+    <record id="seed_v_toyota_corolla_1" model="vehicle">
+        <field name="registration_number">AEK 2201</field>
+        <field name="chassis_number">ZRE152COR01</field>
+        <field name="engine_number">1ZR001</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_corolla"/>
+        <field name="make">Toyota</field>
+        <field name="model">Corolla</field>
+        <field name="year_of_manufacture">2019</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_toyota_hiace_1" model="vehicle">
+        <field name="registration_number">AEL 8891</field>
+        <field name="chassis_number">TRH200HCE01</field>
+        <field name="engine_number">2TR001</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_hiace"/>
+        <field name="make">Toyota</field>
+        <field name="model">Hiace</field>
+        <field name="year_of_manufacture">2017</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_toyota_quantum_1" model="vehicle">
+        <field name="registration_number">AEM 3302</field>
+        <field name="chassis_number">KDH200QTM01</field>
+        <field name="engine_number">2KD002</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_quantum"/>
+        <field name="make">Toyota</field>
+        <field name="model">Quantum</field>
+        <field name="year_of_manufacture">2015</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_toyota_fortuner_1" model="vehicle">
+        <field name="registration_number">AFG 9012</field>
+        <field name="chassis_number">GUN156FOR01</field>
+        <field name="engine_number">2GD002</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_fortuner"/>
+        <field name="make">Toyota</field>
+        <field name="model">Fortuner</field>
+        <field name="year_of_manufacture">2020</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_toyota_rav4_1" model="vehicle">
+        <field name="registration_number">AFH 4410</field>
+        <field name="chassis_number">AXAH54RAV01</field>
+        <field name="engine_number">A25A001</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_rav4"/>
+        <field name="make">Toyota</field>
+        <field name="model">RAV4</field>
+        <field name="year_of_manufacture">2021</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_toyota_yaris_1" model="vehicle">
+        <field name="registration_number">AFD 5521</field>
+        <field name="chassis_number">NCP131YAR01</field>
+        <field name="engine_number">1NZ002</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_yaris"/>
+        <field name="make">Toyota</field>
+        <field name="model">Yaris</field>
+        <field name="year_of_manufacture">2018</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_toyota_landcruiser_1" model="vehicle">
+        <field name="registration_number">AFG 1100</field>
+        <field name="chassis_number">VDJ200LC01</field>
+        <field name="engine_number">1VD001</field>
+        <field name="catalog_make_id" ref="make_toyota"/>
+        <field name="catalog_model_id" ref="model_toyota_landcruiser"/>
+        <field name="make">Toyota</field>
+        <field name="model">Land Cruiser</field>
+        <field name="year_of_manufacture">2016</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_honda_fit_1" model="vehicle">
+        <field name="registration_number">AEB 2234</field>
+        <field name="chassis_number">GE6FIT0001</field>
+        <field name="engine_number">L15A001</field>
+        <field name="catalog_make_id" ref="make_honda"/>
+        <field name="catalog_model_id" ref="model_honda_fit"/>
+        <field name="make">Honda</field>
+        <field name="model">Fit</field>
+        <field name="year_of_manufacture">2017</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_honda_vezel_1" model="vehicle">
+        <field name="registration_number">AEC 3345</field>
+        <field name="chassis_number">RU3VEZEL01</field>
+        <field name="engine_number">LDA001</field>
+        <field name="catalog_make_id" ref="make_honda"/>
+        <field name="catalog_model_id" ref="model_honda_vezel"/>
+        <field name="make">Honda</field>
+        <field name="model">Vezel</field>
+        <field name="year_of_manufacture">2019</field>
+        <field name="fuel_type">hybrid</field>
+    </record>
+    <record id="seed_v_honda_shuttle_1" model="vehicle">
+        <field name="registration_number">AED 4456</field>
+        <field name="chassis_number">GP3SHUT01</field>
+        <field name="engine_number">LDA002</field>
+        <field name="catalog_make_id" ref="make_honda"/>
+        <field name="catalog_model_id" ref="model_honda_shuttle"/>
+        <field name="make">Honda</field>
+        <field name="model">Shuttle</field>
+        <field name="year_of_manufacture">2018</field>
+        <field name="fuel_type">hybrid</field>
+    </record>
+    <record id="seed_v_honda_crv_1" model="vehicle">
+        <field name="registration_number">AEE 5567</field>
+        <field name="chassis_number">RM1CRV001</field>
+        <field name="engine_number">R20A001</field>
+        <field name="catalog_make_id" ref="make_honda"/>
+        <field name="catalog_model_id" ref="model_honda_crv"/>
+        <field name="make">Honda</field>
+        <field name="model">CR-V</field>
+        <field name="year_of_manufacture">2016</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_honda_civic_1" model="vehicle">
+        <field name="registration_number">AEF 6678</field>
+        <field name="chassis_number">FK7CIV001</field>
+        <field name="engine_number">L15B001</field>
+        <field name="catalog_make_id" ref="make_honda"/>
+        <field name="catalog_model_id" ref="model_honda_civic"/>
+        <field name="make">Honda</field>
+        <field name="model">Civic</field>
+        <field name="year_of_manufacture">2020</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_isuzu_dmax_1" model="vehicle">
+        <field name="registration_number">AEG 7789</field>
+        <field name="chassis_number">RT85DMAX01</field>
+        <field name="engine_number">4JJ1001</field>
+        <field name="catalog_make_id" ref="make_isuzu"/>
+        <field name="catalog_model_id" ref="model_isuzu_dmax"/>
+        <field name="make">Isuzu</field>
+        <field name="model">D-Max</field>
+        <field name="year_of_manufacture">2019</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_isuzu_kb_1" model="vehicle">
+        <field name="registration_number">AEH 8890</field>
+        <field name="chassis_number">TFRKB0001</field>
+        <field name="engine_number">4ZE1001</field>
+        <field name="catalog_make_id" ref="make_isuzu"/>
+        <field name="catalog_model_id" ref="model_isuzu_kb"/>
+        <field name="make">Isuzu</field>
+        <field name="model">KB</field>
+        <field name="year_of_manufacture">2021</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_ford_ranger_1" model="vehicle">
+        <field name="registration_number">AEJ 9901</field>
+        <field name="chassis_number">PXRANG01</field>
+        <field name="engine_number">P5AT001</field>
+        <field name="catalog_make_id" ref="make_ford"/>
+        <field name="catalog_model_id" ref="model_ford_ranger"/>
+        <field name="make">Ford</field>
+        <field name="model">Ranger</field>
+        <field name="year_of_manufacture">2018</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_ford_raptor_1" model="vehicle">
+        <field name="registration_number">AEK 1012</field>
+        <field name="name">Raptor</field>
+        <field name="chassis_number">PXRAPT01</field>
+        <field name="engine_number">P5AT002</field>
+        <field name="catalog_make_id" ref="make_ford"/>
+        <field name="catalog_model_id" ref="model_ford_raptor"/>
+        <field name="make">Ford</field>
+        <field name="model">Raptor</field>
+        <field name="year_of_manufacture">2022</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_nissan_navara_1" model="vehicle">
+        <field name="registration_number">AEL 2123</field>
+        <field name="chassis_number">D23NAV01</field>
+        <field name="engine_number">YS23001</field>
+        <field name="catalog_make_id" ref="make_nissan"/>
+        <field name="catalog_model_id" ref="model_nissan_navara"/>
+        <field name="make">Nissan</field>
+        <field name="model">Navara</field>
+        <field name="year_of_manufacture">2019</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_nissan_xtrail_1" model="vehicle">
+        <field name="registration_number">AEM 3234</field>
+        <field name="chassis_number">T32XTR01</field>
+        <field name="engine_number">MR20001</field>
+        <field name="catalog_make_id" ref="make_nissan"/>
+        <field name="catalog_model_id" ref="model_nissan_xtrail"/>
+        <field name="make">Nissan</field>
+        <field name="model">X-Trail</field>
+        <field name="year_of_manufacture">2017</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_bmw_3series_1" model="vehicle">
+        <field name="registration_number">AEN 4345</field>
+        <field name="chassis_number">F30BMW301</field>
+        <field name="engine_number">B48B001</field>
+        <field name="catalog_make_id" ref="make_bmw"/>
+        <field name="catalog_model_id" ref="model_bmw_3series"/>
+        <field name="make">BMW</field>
+        <field name="model">3 Series</field>
+        <field name="year_of_manufacture">2018</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_mercedes_c200_1" model="vehicle">
+        <field name="registration_number">AEO 5456</field>
+        <field name="chassis_number">W205C2001</field>
+        <field name="engine_number">M274001</field>
+        <field name="catalog_make_id" ref="make_mercedes"/>
+        <field name="catalog_model_id" ref="model_mercedes_c200"/>
+        <field name="make">Mercedes-Benz</field>
+        <field name="model">C200</field>
+        <field name="year_of_manufacture">2017</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_mercedes_c180_1" model="vehicle">
+        <field name="registration_number">AEP 6567</field>
+        <field name="chassis_number">W205C1801</field>
+        <field name="engine_number">M274002</field>
+        <field name="catalog_make_id" ref="make_mercedes"/>
+        <field name="catalog_model_id" ref="model_mercedes_c180"/>
+        <field name="make">Mercedes-Benz</field>
+        <field name="model">C180</field>
+        <field name="year_of_manufacture">2016</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_mercedes_glc_1" model="vehicle">
+        <field name="registration_number">AEQ 7678</field>
+        <field name="chassis_number">X253GLC01</field>
+        <field name="engine_number">OM651001</field>
+        <field name="catalog_make_id" ref="make_mercedes"/>
+        <field name="catalog_model_id" ref="model_mercedes_glc"/>
+        <field name="make">Mercedes-Benz</field>
+        <field name="model">GLC</field>
+        <field name="year_of_manufacture">2019</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_hyundai_tucson_1" model="vehicle">
+        <field name="registration_number">AER 8789</field>
+        <field name="chassis_number">TLTUC01</field>
+        <field name="engine_number">G4NA001</field>
+        <field name="catalog_make_id" ref="make_hyundai"/>
+        <field name="catalog_model_id" ref="model_hyundai_tucson"/>
+        <field name="make">Hyundai</field>
+        <field name="model">Tucson</field>
+        <field name="year_of_manufacture">2020</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_hyundai_creta_1" model="vehicle">
+        <field name="registration_number">AES 9890</field>
+        <field name="chassis_number">SU2CRT01</field>
+        <field name="engine_number">G4LD001</field>
+        <field name="catalog_make_id" ref="make_hyundai"/>
+        <field name="catalog_model_id" ref="model_hyundai_creta"/>
+        <field name="make">Hyundai</field>
+        <field name="model">Creta</field>
+        <field name="year_of_manufacture">2021</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_subaru_forester_1" model="vehicle">
+        <field name="registration_number">AET 1091</field>
+        <field name="chassis_number">SJ5FOR01</field>
+        <field name="engine_number">FB25001</field>
+        <field name="catalog_make_id" ref="make_subaru"/>
+        <field name="catalog_model_id" ref="model_subaru_forester"/>
+        <field name="make">Subaru</field>
+        <field name="model">Forester</field>
+        <field name="year_of_manufacture">2018</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_mazda_3_1" model="vehicle">
+        <field name="registration_number">AEU 2102</field>
+        <field name="chassis_number">BM3MAZ01</field>
+        <field name="engine_number">PE001</field>
+        <field name="catalog_make_id" ref="make_mazda"/>
+        <field name="catalog_model_id" ref="model_mazda_3"/>
+        <field name="make">Mazda</field>
+        <field name="model">Mazda3</field>
+        <field name="year_of_manufacture">2019</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_mazda_cx5_1" model="vehicle">
+        <field name="registration_number">AEV 3213</field>
+        <field name="chassis_number">KF2CX501</field>
+        <field name="engine_number">SH001</field>
+        <field name="catalog_make_id" ref="make_mazda"/>
+        <field name="catalog_model_id" ref="model_mazda_cx5"/>
+        <field name="make">Mazda</field>
+        <field name="model">CX-5</field>
+        <field name="year_of_manufacture">2020</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_suzuki_swift_1" model="vehicle">
+        <field name="registration_number">AEW 4324</field>
+        <field name="chassis_number">ZC33SWF01</field>
+        <field name="engine_number">K12C001</field>
+        <field name="catalog_make_id" ref="make_suzuki"/>
+        <field name="catalog_model_id" ref="model_suzuki_swift"/>
+        <field name="make">Suzuki</field>
+        <field name="model">Swift</field>
+        <field name="year_of_manufacture">2018</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_mitsubishi_triton_1" model="vehicle">
+        <field name="registration_number">AEX 5435</field>
+        <field name="chassis_number">MQTRIT01</field>
+        <field name="engine_number">4N15001</field>
+        <field name="catalog_make_id" ref="make_mitsubishi"/>
+        <field name="catalog_model_id" ref="model_mitsubishi_triton"/>
+        <field name="make">Mitsubishi</field>
+        <field name="model">Triton</field>
+        <field name="year_of_manufacture">2019</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+    <record id="seed_v_vw_polo_1" model="vehicle">
+        <field name="registration_number">AEY 6546</field>
+        <field name="chassis_number">6RPOLO01</field>
+        <field name="engine_number">CBZB001</field>
+        <field name="catalog_make_id" ref="make_volkswagen"/>
+        <field name="catalog_model_id" ref="model_vw_polo"/>
+        <field name="make">Volkswagen</field>
+        <field name="model">Polo</field>
+        <field name="year_of_manufacture">2017</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_vw_golf_1" model="vehicle">
+        <field name="registration_number">AEZ 7657</field>
+        <field name="chassis_number">5KGOLF01</field>
+        <field name="engine_number">CJZ001</field>
+        <field name="catalog_make_id" ref="make_volkswagen"/>
+        <field name="catalog_model_id" ref="model_vw_golf"/>
+        <field name="make">Volkswagen</field>
+        <field name="model">Golf</field>
+        <field name="year_of_manufacture">2018</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_kia_sportage_1" model="vehicle">
+        <field name="registration_number">AFA 8768</field>
+        <field name="chassis_number">QLSPRT01</field>
+        <field name="engine_number">G4NA002</field>
+        <field name="catalog_make_id" ref="make_kia"/>
+        <field name="catalog_model_id" ref="model_kia_sportage"/>
+        <field name="make">Kia</field>
+        <field name="model">Sportage</field>
+        <field name="year_of_manufacture">2020</field>
+        <field name="fuel_type">petrol</field>
+    </record>
+    <record id="seed_v_landrover_evoque_1" model="vehicle">
+        <field name="registration_number">AFB 9879</field>
+        <field name="chassis_number">L538EVO01</field>
+        <field name="engine_number">224DT001</field>
+        <field name="catalog_make_id" ref="make_land_rover"/>
+        <field name="catalog_model_id" ref="model_lr_evoque"/>
+        <field name="make">Land Rover</field>
+        <field name="model">Range Rover Evoque</field>
+        <field name="year_of_manufacture">2019</field>
+        <field name="fuel_type">diesel</field>
+    </record>
+</odoo>

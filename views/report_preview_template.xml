@@ -9,13 +9,11 @@
             <title><t t-out="title"/></title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { 
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-                    background: #f3f4f6; 
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: #f3f4f6;
                     min-height: 100vh;
                 }
-                
-                /* Top Bar */
                 .top-bar {
                     background: #1a1a2e;
                     padding: 15px 30px;
@@ -27,14 +25,8 @@
                     top: 0;
                     z-index: 100;
                 }
-                .top-bar-title {
-                    font-weight: 600;
-                    font-size: 16px;
-                }
-                .top-bar-buttons {
-                    display: flex;
-                    gap: 10px;
-                }
+                .top-bar-title { font-weight: 600; font-size: 16px; }
+                .top-bar-buttons { display: flex; gap: 10px; }
                 .btn {
                     padding: 10px 20px;
                     border-radius: 8px;
@@ -48,40 +40,17 @@
                     align-items: center;
                     gap: 6px;
                 }
-                .btn-preview {
-                    background: #667eea;
-                    color: #fff;
+                .btn-back { background: #f59e0b; color: #fff; }
+                .btn-back:hover { background: #d97706; }
+                .btn-preview { background: #667eea; color: #fff; }
+                .btn-preview:hover { background: #5568d3; }
+                .btn-download { background: #22b368; color: #fff; }
+                .btn-download:hover { background: #1a944f; }
+                .pdf-frame {
+                    width: 100%;
+                    height: calc(100vh - 150px);
+                    border: none;
                 }
-                .btn-preview:hover {
-                    background: #5568d3;
-                }
-                .btn-download {
-                    background: #22b368;
-                    color: #fff;
-                }
-                .btn-download:hover {
-                    background: #1a944f;
-                }
-                .btn-close {
-                    background: rgba(255,255,255,0.15);
-                    color: #ccc;
-                }
-                .btn-close:hover {
-                    background: #e5484d;
-                    color: #fff;
-                }
-                
-                /* Document Container */
-                .document-container {
-                    max-width: 900px;
-                    margin: 30px auto;
-                    background: #fff;
-                    border-radius: 12px;
-                    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-                    overflow: hidden;
-                }
-                
-                /* Loader */
                 .loader-overlay {
                     position: fixed;
                     top: 0; left: 0;
@@ -93,16 +62,12 @@
                     z-index: 1000;
                     transition: opacity 0.4s ease;
                 }
-                .loader-overlay.hidden {
-                    opacity: 0;
-                    pointer-events: none;
-                }
+                .loader-overlay.hidden { opacity: 0; pointer-events: none; }
                 .loader-card {
                     background: #fff;
                     padding: 40px 50px;
                     border-radius: 20px;
                     text-align: center;
-                    box-shadow: 0 32px 80px rgba(0,0,0,0.3);
                 }
                 .loader-spinner {
                     border: 4px solid #f3f3f3;
@@ -117,58 +82,38 @@
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
-                .loader-title {
-                    font-size: 16px;
-                    font-weight: 600;
-                    color: #495057;
-                }
-                .loader-subtitle {
-                    font-size: 13px;
-                    color: #868e96;
-                    margin-top: 4px;
-                }
-                
-                /* PDF iframe */
-                .pdf-frame {
-                    width: 100%;
-                    height: calc(100vh - 150px);
-                    border: none;
-                }
             </style>
         </head>
         <body>
-            <!-- Loader -->
             <div id="jc-loader" class="loader-overlay">
                 <div class="loader-card">
                     <div class="loader-spinner"></div>
-                    <p class="loader-title" t-out="title"/>
-                    <p class="loader-subtitle">Generating document preview...</p>
+                    <p t-out="title"/>
+                    <p style="color:#868e96;font-size:13px;margin-top:8px;">Generating document preview...</p>
                 </div>
             </div>
-            
-            <!-- Main Content -->
+
             <div id="jc-viewer" style="display:none;">
                 <div class="top-bar">
                     <span class="top-bar-title">📄 <t t-out="title"/></span>
                     <div class="top-bar-buttons">
-                        <button class="btn btn-preview" onclick="window.open(pdfUrl, '_blank')">
+                        <a class="btn btn-back" id="jc-back-btn" t-att-href="back_url">
+                            ← Back to Edit
+                        </a>
+                        <button class="btn btn-preview" type="button" onclick="window.open(pdfUrl, '_blank')">
                             🔍 Open Preview
                         </button>
-                        <button class="btn btn-download" id="jc-download-btn">
+                        <button class="btn btn-download" type="button" id="jc-download-btn">
                             ⬇ Download PDF
-                        </button>
-                        <button class="btn btn-close" onclick="window.close()">
-                            ✕ Close
                         </button>
                     </div>
                 </div>
-                <div class="document-container">
-                    <iframe id="jc-pdf-frame" class="pdf-frame"></iframe>
-                </div>
+                <iframe id="jc-pdf-frame" class="pdf-frame"></iframe>
             </div>
-            
+
             <script><![CDATA[
                 var pdfUrl = '';
+                var backUrl = ']]><t t-out="back_url"/><![CDATA[';
                 async function loadPDF() {
                     try {
                         var resp = await fetch('/job_card_management/report/preview', {
@@ -182,22 +127,29 @@
                         if (!resp.ok) throw new Error('Failed');
                         var blob = await resp.blob();
                         pdfUrl = URL.createObjectURL(blob);
-                        
                         document.getElementById('jc-loader').classList.add('hidden');
                         setTimeout(function() {
                             document.getElementById('jc-loader').style.display = 'none';
                             document.getElementById('jc-viewer').style.display = 'block';
                             document.getElementById('jc-pdf-frame').src = pdfUrl;
                         }, 500);
-                        
                         document.getElementById('jc-download-btn').onclick = function() {
                             var a = document.createElement('a');
                             a.href = pdfUrl;
                             a.download = ']]><t t-out="title"/><![CDATA[.pdf';
                             a.click();
                         };
+                        var backBtn = document.getElementById('jc-back-btn');
+                        if (backBtn && backUrl) {
+                            backBtn.href = backUrl;
+                            backBtn.onclick = function(e) {
+                                e.preventDefault();
+                                window.location.href = backUrl;
+                            };
+                        }
                     } catch(e) {
-                        document.getElementById('jc-loader').innerHTML = '<div class="loader-card"><p style="color:#e5484d;font-size:16px;">Failed to generate PDF</p><p style="color:#868e96;font-size:13px;margin-top:8px;">Retrying...</p></div>';
+                        document.getElementById('jc-loader').innerHTML =
+                            '<div class="loader-card"><p style="color:#e5484d;">Failed to generate PDF</p></div>';
                         setTimeout(function() {
                             window.location.href = '/report/pdf/]]><t t-out="report_name"/><![CDATA[/]]><t t-out="record_id"/><![CDATA[';
                         }, 1500);

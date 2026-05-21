@@ -133,11 +133,11 @@
         <field name="model">vehicle</field>
         <field name="arch" type="xml">
             <list>
-                <field name="name"/>
                 <field name="registration_number"/>
-                <field name="chassis_number"/>
                 <field name="make"/>
                 <field name="model"/>
+                <field name="name"/>
+                <field name="chassis_number"/>
                 <field name="year_of_manufacture"/>
                 <field name="customer_id"/>
             </list>
@@ -159,13 +159,15 @@
                 <sheet>
                     <group>
                         <group string="Vehicle Identification">
-                            <field name="name"/>
                             <field name="registration_number"/>
-                            <field name="chassis_number"/>
-                            <field name="engine_number"/>
+                            <field name="catalog_make_id" options="{'no_create': False}"/>
+                            <field name="catalog_model_id" options="{'no_create': False}"/>
                             <field name="make"/>
                             <field name="model"/>
                             <field name="year_of_manufacture"/>
+                            <field name="name" placeholder="Optional nickname"/>
+                            <field name="chassis_number"/>
+                            <field name="engine_number"/>
                         </group>
                         <group string="Vehicle Specifications">
                             <field name="engine_type_code"/>

@@ -35,7 +35,7 @@
                                 <tr>
                                     <td style="border: none !important; padding: 16px 20px; vertical-align: top;">
                                         <div style="font-size: 12px; color: #999999; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 6px;">Vehicle</div>
-                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.vehicle_name"/>
+                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.vehicle_reg_number"/>
                                     </td>
                                     <td style="border: none !important; padding: 16px 20px; vertical-align: top;">
                                         <div style="font-size: 12px; color: #999999; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 6px;">Vehicle Model</div>
@@ -54,7 +54,7 @@
                                 </tr>
                                 <tr>
                                     <td style="border: none !important; padding: 16px 20px; vertical-align: top;">
-                                        <div style="font-size: 12px; color: #999999; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 6px;">Vehicle ID</div>
+                                        <div style="font-size: 12px; color: #999999; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 6px;">Vehicle REG Number</div>
                                         <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.vehicle_id.registration_number"/>
                                     </td>
                                     <td style="border: none !important; padding: 16px 20px; vertical-align: top;">
@@ -142,7 +142,7 @@
                                 <tr>
                                     <td style="border: none !important; padding: 16px 20px; vertical-align: top;">
                                         <div style="font-size: 12px; color: #999999; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 6px;">Vehicle</div>
-                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.vehicle_name"/>
+                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.vehicle_reg_number"/>
                                     </td>
                                     <td style="border: none !important; padding: 16px 20px; vertical-align: top;">
                                         <div style="font-size: 12px; color: #999999; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 6px;">Vehicle Model</div>
@@ -161,7 +161,7 @@
                                 </tr>
                                 <tr>
                                     <td style="border: none !important; padding: 16px 20px; vertical-align: top;">
-                                        <div style="font-size: 12px; color: #999999; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 6px;">Vehicle ID</div>
+                                        <div style="font-size: 12px; color: #999999; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 6px;">Vehicle REG Number</div>
                                         <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;" t-field="doc.vehicle_id.registration_number"/>
                                     </td>
                                     <td style="border: none !important; padding: 16px 20px; vertical-align: top;">

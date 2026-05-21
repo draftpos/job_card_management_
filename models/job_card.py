@@ -1,18 +1,18 @@
-import random
-import string
 import logging
-import uuid 
+import uuid
+
 from odoo.http import request, route as http_route
 from odoo.addons.portal.controllers.portal import CustomerPortal
 
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
 
 class JobCard(models.Model):
     _name = 'job.card'
     _description = 'Job Card'
+    _inherit = ['job.card.backend.navigation.mixin']
     _order = 'id desc'
 
     def _default_name(self):
@@ -29,14 +29,24 @@ class JobCard(models.Model):
     #     random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     #     return 'JOB-%s-TEX' % random_part
 
-    name = fields.Char(string='Job Card Number', required=True, default=_default_name)
-    estimate_id = fields.Many2one('estimate', string='Estimate', required=True)
-    customer_id = fields.Many2one('customer', string='First Customer', required=True)  # Changed
-    second_customer_id = fields.Many2one('customer', string='Insurance Company', help='Added at final stage')  # Changed
+    name = fields.Char(
+        string='Job Card Number',
+        required=True,
+        default=_default_name,
+        readonly=True,
+        copy=False,
+    )
+    estimate_id = fields.Many2one('estimate', string='Estimate', required=True, readonly=True)
+    customer_id = fields.Many2one('customer', string='First Customer', required=True)
+    second_customer_id = fields.Many2one('customer', string='Insurance Company', help='Added at final stage')
     excess_percentage = fields.Float(string='Excess (%)', help='Percentage paid by first customer')
     insurance_percentage = fields.Float(string='Insurance Percentage (%)', compute='_compute_insurance_pct', store=True)
-    vehicle_id = fields.Many2one('vehicle', string='Vehicle', required=True)  # Changed
-    vehicle_name = fields.Char(related='vehicle_id.name', string='Vehicle Name', readonly=True)
+    vehicle_id = fields.Many2one('vehicle', string='Vehicle', required=True)
+    vehicle_reg_number = fields.Char(
+        related='vehicle_id.registration_number',
+        string='Vehicle REG Number',
+        readonly=True,
+    )
     vehicle_model = fields.Char(related='vehicle_id.model', string='Vehicle Model', readonly=True)
     vehicle_display = fields.Char(string='Vehicle', compute='_compute_vehicle_display')
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account')
@@ -55,9 +65,29 @@ class JobCard(models.Model):
         string='Supervisors',
         domain=[('is_supervisor', '=', True)],
     )
-    start_date = fields.Date(string='Start Date Expected')
-    end_date = fields.Date(string='End Date Expected')
+    start_date = fields.Date(string='Start Date Expected', required=True)
+    end_date = fields.Date(string='End Date Expected', required=True)
     job_card_lines = fields.One2many('job.card.line', 'job_card_id', string='Job Card Lines')
+    parts_line_ids = fields.One2many(
+        'job.card.line', 'job_card_id', string='Parts Lines',
+        domain=[('line_category', '=', 'parts')],
+    )
+    repairs_line_ids = fields.One2many(
+        'job.card.line', 'job_card_id', string='Repairs Lines',
+        domain=[('line_category', '=', 'repairs')],
+    )
+    paint_line_ids = fields.One2many(
+        'job.card.line', 'job_card_id', string='Paint Lines',
+        domain=[('line_category', '=', 'paint')],
+    )
+    fittings_line_ids = fields.One2many(
+        'job.card.line', 'job_card_id', string='Fittings Lines',
+        domain=[('line_category', '=', 'fittings')],
+    )
+    labour_line_ids = fields.One2many(
+        'job.card.line', 'job_card_id', string='Labour Lines',
+        domain=[('line_category', '=', 'labour')],
+    )
     
     # NEW: Invoice tracking fields
     invoice_created = fields.Boolean(string='Invoice Created', default=False)
@@ -87,17 +117,29 @@ class JobCard(models.Model):
             url += f'&report_type={report_type}'
         return url
 
-    # Replace the existing preview methods:
+    def _job_card_form_action_xmlid(self):
+        return 'job_card_management.action_job_card'
+
+    def _check_schedule_dates(self):
+        for rec in self:
+            if not rec.start_date or not rec.end_date:
+                raise UserError(_(
+                    'Start Date Expected and End Date Expected are required before '
+                    'saving, confirming, or printing this job card.'
+                ))
+            if rec.end_date <= rec.start_date:
+                raise UserError(_('End Date Expected must be after Start Date Expected.'))
+
     def action_preview_job_card(self):
-        """Open browser print preview for Job Card PDF"""
+        self._check_schedule_dates()
+        report = self.env.ref('job_card_management.report_job_card')
         return {
             'type': 'ir.actions.act_url',
-            'url': f'/report/pdf/job_card_management.report_job_card/{self.id}',
+            'url': f'/report/pdf/{report.report_name}/{self.id}',
             'target': 'new',
         }
 
     def action_preview_portal(self):
-        """Open the portal preview page"""
         self.ensure_one()
         if not self.access_token:
             self._generate_access_token()
@@ -108,10 +150,11 @@ class JobCard(models.Model):
         }
 
     def action_preview_pick_slip(self):
-        """Open browser print preview for Pick Slip PDF"""
+        self._check_schedule_dates()
+        report = self.env.ref('job_card_management.report_job_card_pick_slip')
         return {
             'type': 'ir.actions.act_url',
-            'url': f'/report/pdf/job_card_management.report_job_card_pick_slip/{self.id}',
+            'url': f'/report/pdf/{report.report_name}/{self.id}',
             'target': 'new',
         }
 
@@ -141,6 +184,16 @@ class JobCard(models.Model):
                 _logger.warning(f"Could not auto-create invoices for job card {job_card.name}: {str(e)}")
         
         return job_card
+
+    @api.constrains('start_date', 'end_date')
+    def _constrains_schedule_dates(self):
+        for rec in self:
+            if not rec.start_date or not rec.end_date:
+                raise ValidationError(_(
+                    'Start Date Expected and End Date Expected are required on every job card.'
+                ))
+            if rec.end_date <= rec.start_date:
+                raise ValidationError(_('End Date Expected must be after Start Date Expected.'))
 
     # NEW: Method to fetch analytic account
     def _fetch_analytic_account(self):
@@ -295,11 +348,15 @@ class JobCard(models.Model):
         for rec in self:
             rec.insurance_percentage = 100 - rec.excess_percentage if rec.excess_percentage else 0.0
 
-    @api.depends('vehicle_id')
+    @api.depends('vehicle_id', 'vehicle_id.registration_number', 'vehicle_id.make', 'vehicle_id.model')
     def _compute_vehicle_display(self):
         for rec in self:
             if rec.vehicle_id:
-                rec.vehicle_display = f"[{rec.vehicle_id.registration_number}] {rec.vehicle_id.name}"
+                reg = rec.vehicle_id.registration_number or ''
+                make_model = ' '.join(
+                    p for p in [rec.vehicle_id.make, rec.vehicle_id.model] if p
+                )
+                rec.vehicle_display = f"[{reg}] {make_model}".strip()
             else:
                 rec.vehicle_display = ""
 
@@ -316,28 +373,14 @@ class JobCard(models.Model):
                 rec._generate_access_token()
 
     def action_start_job(self):
-        """Start job with validation for start and end dates"""
-        if not self.start_date:
-            raise UserError(_('Please set the Start Date before starting the job.'))
-        if not self.end_date:
-            raise UserError(_('Please set the End Date before starting the job.'))
-        if self.end_date <= self.start_date:
-            raise UserError(_('End Date must be after Start Date.'))
-        
+        self._check_schedule_dates()
         self.state = 'in_progress'
         return True
 
     def action_create_requisition(self):
         if self.state not in ['approved', 'in_progress']:
             raise UserError(_('Job card must be approved or in progress before creating requisition.'))
-        
-        # Validate start and end dates before creating requisition
-        if not self.start_date:
-            raise UserError(_('Please set the Start Date before creating requisition.'))
-        if not self.end_date:
-            raise UserError(_('Please set the End Date before creating requisition.'))
-        if self.end_date <= self.start_date:
-            raise UserError(_('End Date must be after Start Date.'))
+        self._check_schedule_dates()
         
         procurement = self.env['procurement'].create({
             'job_card_id': self.id,
@@ -437,6 +480,18 @@ class JobCardLine(models.Model):
 
     job_card_id = fields.Many2one('job.card', string='Job Card', ondelete='cascade', required=True)
     sequence = fields.Integer(string='Sequence', default=10)
+    line_category = fields.Selection(
+        [
+            ('parts', 'Parts'),
+            ('repairs', 'Repairs'),
+            ('paint', 'Paint'),
+            ('fittings', 'Fittings'),
+            ('labour', 'Labour'),
+        ],
+        string='Category',
+        default='parts',
+        required=True,
+    )
     display_type = fields.Selection([
         ('line_section', 'Section'),
         ('line_note', 'Note'),
@@ -448,6 +503,13 @@ class JobCardLine(models.Model):
     unit_price = fields.Float(string='Unit Price')
     tax_ids = fields.Many2many('account.tax', string='Taxes')
     discount = fields.Float(string='Discount (%)', default=0.0)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get('line_category'):
+                vals['line_category'] = self.env.context.get('default_line_category', 'parts')
+        return super().create(vals_list)
 
     @api.depends('quantity', 'unit_price', 'discount', 'tax_ids')
     def _compute_amount(self):

@@ -112,7 +112,7 @@ class JobCardDashboard(models.Model):
             'id': job.id,
             'name': job.name,
             'customer': job.customer_id.name,
-            'vehicle': job.vehicle_name or '',
+            'vehicle': job.vehicle_reg_number or job.vehicle_display or '',
             'start_date': str(job.start_date) if job.start_date else '',
             'end_date': str(job.end_date) if job.end_date else '',
             'state': state_selection.get(job.state, job.state),

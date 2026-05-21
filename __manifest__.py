@@ -1,6 +1,6 @@
 {
     'name': 'Job Card Management',
-    'version': '1.0',
+    'version': '19.0.2.0.1',
     'category': 'Services',
     'author': 'Odoo Development Team',
     'license': 'LGPL-3',
@@ -8,6 +8,8 @@
     'data': [
         'static/security/job_card_groups.xml',
         'static/security/ir.model.access.csv',
+        'data/vehicle_catalog_seed.xml',
+        'data/vehicle_records_seed.xml',
         'static/security/job_card_dashboard_access.xml',
         'reports/job_card_report.xml',
         'views/menu_root_views.xml',
@@ -21,7 +23,6 @@
         'views/job_card_profitability_views.xml',
         'views/menu_views.xml',
         'views/job_card_dashboard_views.xml',
-        'views/report_preview_template.xml',
         'views/estimate_portal_templates.xml',
     ],
     'assets': {

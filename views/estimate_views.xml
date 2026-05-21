@@ -28,22 +28,16 @@
                             </div>
                             <div class="col-5">
                                 <table class="table table-sm table-borderless" style="border: none;">
-                                    <tr>
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Vehicle:</td>
+                                    <tr t-if="doc.vehicle_reg_number">
+                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Vehicle REG:</td>
                                         <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.vehicle_id.name"/>
+                                            <span t-field="doc.vehicle_reg_number"/>
                                         </td>
                                     </tr>
                                     <tr t-if="doc.vehicle_model">
                                         <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Model:</td>
                                         <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
                                             <span t-field="doc.vehicle_model"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.vehicle_id.registration_number">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Vehicle ID:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.vehicle_id.registration_number"/>
                                         </td>
                                     </tr>
                                     <tr t-if="doc.create_date">
@@ -173,18 +167,21 @@
                 <sheet>
                     <group col="2">
                         <group string="Estimate Details">
-                            <field name="name"/>
+                            <field name="name" readonly="1"/>
                             <field name="customer_id" readonly="state in ('approved', 'converted')"/>
                         </group>
                         <group string="Vehicle Details">
-                            <field name="vehicle_id" readonly="state in ('approved', 'converted')"/>
+                            <field name="vehicle_id" readonly="state in ('approved', 'converted')"
+                                   context="{'default_customer_id': customer_id}"/>
+                            <field name="vehicle_display" readonly="1"/>
+                            <field name="vehicle_reg_number" readonly="1"/>
                             <field name="vehicle_name" readonly="1"/>
                             <field name="vehicle_model" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Order Lines" name="order_lines">
-                            <field name="estimate_lines" widget="section_and_note_one2many" nolabel="1" 
+                            <field name="estimate_lines" widget="section_and_note_one2many" nolabel="1"
                                 readonly="state in ('approved', 'converted')">
                                 <list editable="bottom" string="Estimate Lines">
                                     <control>
@@ -192,6 +189,7 @@
                                         <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
                                         <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
                                     </control>
+                                    <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
                                     <field name="product_id" string="Product" required="not display_type" invisible="display_type != False"/>
@@ -203,6 +201,131 @@
                                     <field name="discount" string="Disc.%" width="60px" invisible="display_type != False"/>
                                     <field name="price_subtotal" string="Subtotal" invisible="display_type != False" readonly="1"/>
                                     <field name="price_total" string="Amount" invisible="display_type != False" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Parts" name="parts_lines">
+                            <field name="parts_line_ids" widget="section_and_note_one2many" nolabel="1"
+                                readonly="state in ('approved', 'converted')"
+                                context="{'default_line_category': 'parts'}">
+                                <list editable="bottom">
+                                    <control>
+                                        <create name="add_product_control" string="Add a product"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section', 'default_line_category': 'parts'}"/>
+                                        <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note', 'default_line_category': 'parts'}"/>
+                                    </control>
+                                    <field name="line_category" column_invisible="True"/>
+                                    <field name="display_type" column_invisible="True"/>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="name" invisible="display_type == False"/>
+                                    <field name="quantity" invisible="display_type != False"/>
+                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" invisible="display_type != False"/>
+                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" invisible="display_type != False"/>
+                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Repairs" name="repairs_lines">
+                            <field name="repairs_line_ids" widget="section_and_note_one2many" nolabel="1"
+                                readonly="state in ('approved', 'converted')"
+                                context="{'default_line_category': 'repairs'}">
+                                <list editable="bottom">
+                                    <control>
+                                        <create name="add_product_control" string="Add a product"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section', 'default_line_category': 'repairs'}"/>
+                                        <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note', 'default_line_category': 'repairs'}"/>
+                                    </control>
+                                    <field name="line_category" column_invisible="True"/>
+                                    <field name="display_type" column_invisible="True"/>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="name" invisible="display_type == False"/>
+                                    <field name="quantity" invisible="display_type != False"/>
+                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" invisible="display_type != False"/>
+                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" invisible="display_type != False"/>
+                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Paint" name="paint_lines">
+                            <field name="paint_line_ids" widget="section_and_note_one2many" nolabel="1"
+                                readonly="state in ('approved', 'converted')"
+                                context="{'default_line_category': 'paint'}">
+                                <list editable="bottom">
+                                    <control>
+                                        <create name="add_product_control" string="Add a product"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section', 'default_line_category': 'paint'}"/>
+                                        <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note', 'default_line_category': 'paint'}"/>
+                                    </control>
+                                    <field name="line_category" column_invisible="True"/>
+                                    <field name="display_type" column_invisible="True"/>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="name" invisible="display_type == False"/>
+                                    <field name="quantity" invisible="display_type != False"/>
+                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" invisible="display_type != False"/>
+                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" invisible="display_type != False"/>
+                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Fittings" name="fittings_lines">
+                            <field name="fittings_line_ids" widget="section_and_note_one2many" nolabel="1"
+                                readonly="state in ('approved', 'converted')"
+                                context="{'default_line_category': 'fittings'}">
+                                <list editable="bottom">
+                                    <control>
+                                        <create name="add_product_control" string="Add a product"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section', 'default_line_category': 'fittings'}"/>
+                                        <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note', 'default_line_category': 'fittings'}"/>
+                                    </control>
+                                    <field name="line_category" column_invisible="True"/>
+                                    <field name="display_type" column_invisible="True"/>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="name" invisible="display_type == False"/>
+                                    <field name="quantity" invisible="display_type != False"/>
+                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" invisible="display_type != False"/>
+                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" invisible="display_type != False"/>
+                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Labour" name="labour_lines">
+                            <field name="labour_line_ids" widget="section_and_note_one2many" nolabel="1"
+                                readonly="state in ('approved', 'converted')"
+                                context="{'default_line_category': 'labour'}">
+                                <list editable="bottom">
+                                    <control>
+                                        <create name="add_product_control" string="Add a product"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section', 'default_line_category': 'labour'}"/>
+                                        <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note', 'default_line_category': 'labour'}"/>
+                                    </control>
+                                    <field name="line_category" column_invisible="True"/>
+                                    <field name="display_type" column_invisible="True"/>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="name" invisible="display_type == False"/>
+                                    <field name="quantity" invisible="display_type != False"/>
+                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" invisible="display_type != False"/>
+                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" invisible="display_type != False"/>
+                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
@@ -231,7 +354,7 @@
             <list>
                 <field name="name"/>
                 <field name="customer_id"/>
-                <field name="vehicle_name"/>
+                <field name="vehicle_reg_number"/>
                 <field name="amount_total"/>
                 <field name="create_uid"/>
                 <field name="state"/>

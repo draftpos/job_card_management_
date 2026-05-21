@@ -24,7 +24,7 @@
                         <tr>
                             <td><a t-att-href="f'/my/estimates/{estimate.id}?access_token={estimate.access_token}'"><t t-esc="estimate.name"/></a></td>
                             <td><t t-esc="estimate.customer_id.name"/></td>
-                            <td><t t-esc="estimate.vehicle_name"/></td>
+                            <td><t t-esc="estimate.vehicle_reg_number"/></td>
                             <td class="text-end">$ <t t-esc="'{:.2f}'.format(estimate.amount_total)"/></td>
                             <td><span class="badge rounded-pill text-bg-info" t-esc="estimate.state"/></td>
                         </tr>
@@ -58,8 +58,8 @@
                                     <i class="fa fa-download me-1"/> Download PDF
                                 </a>
                             </div>
-                            <a class="btn btn-light" t-att-href="f'/web#id={estimate.id}&amp;model=estimate&amp;view_type=form'">
-                                <i class="fa fa-arrow-left me-1"/> Edit in Odoo
+                            <a class="btn btn-light" t-if="estimate.backend_form_url" t-att-href="estimate.backend_form_url">
+                                <i class="fa fa-arrow-left me-1"/> Back to Edit
                             </a>
                         </div>
 
@@ -129,7 +129,7 @@
                                             </tr>
                                             <tr>
                                                 <th class="ps-0 pb-0">Vehicle:</th>
-                                                <td class="w-100 pb-0 text-wrap"><t t-esc="estimate.vehicle_name"/></td>
+                                                <td class="w-100 pb-0 text-wrap"><t t-esc="estimate.vehicle_reg_number"/></td>
                                             </tr>
                                             <tr>
                                                 <th class="ps-0 pb-0">Model:</th>
