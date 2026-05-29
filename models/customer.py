@@ -66,6 +66,12 @@ class Customer(models.Model):
                 'vat': vals.get('vat_number'),
                 'customer_rank': 1,
             }
+            if self.env.context.get('default_is_vendor') or self.env.context.get('default_is_supplier'):
+                partner_vals['is_supplier'] = True
+                partner_vals['supplier_rank'] = 1
+                partner_vals['is_customer'] = False
+                partner_vals['customer_rank'] = 0
+
             partner = self.env['res.partner'].create(partner_vals)
             vals['partner_id'] = partner.id
         return super(Customer, self).create(vals_list)
