@@ -65,8 +65,8 @@ class JobCard(models.Model):
         string='Supervisors',
         domain=[('is_supervisor', '=', True)],
     )
-    start_date = fields.Date(string='Start Date Expected', required=True, default=lambda self: fields.Date.context_today(self))
-    end_date = fields.Date(string='End Date Expected', required=True)
+    start_date = fields.Date(string='Start Date Expected', default=fields.Date.context_today, required=True)
+    end_date = fields.Date(string='End Date Expected')
     job_card_lines = fields.One2many('job.card.line', 'job_card_id', string='Job Card Lines')
     parts_line_ids = fields.One2many(
         'job.card.line', 'job_card_id', string='Parts Lines',

@@ -238,7 +238,6 @@ class Estimate(models.Model):
             'customer_id': self.customer_id.id,
             'vehicle_id': self.vehicle_id.id,
             'start_date': today,
-            'end_date': today + timedelta(days=1),
         })
         for line in self.estimate_lines:
             line_vals = {
