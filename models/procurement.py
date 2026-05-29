@@ -24,8 +24,8 @@ class Procurement(models.Model):
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account')
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('submitted_for_approval', 'Submit for Approval'),
-        ('approved', 'Approved'),
+        ('submitted_for_approval', 'Submit for Requisition Approval'),
+        ('approved', 'Requisition Approved'),
         ('purchase_order_created', 'Purchase Order Created')
     ], default='draft')
 
@@ -74,6 +74,19 @@ class Procurement(models.Model):
     def action_create_purchase_order(self):
         if self.state != 'approved':
             raise UserError(_('Requisition must be approved before creating purchase orders.'))
+
+        purchase_lines = self.procurement_lines.filtered(
+            lambda l: not l.display_type and l.type == 'purchase_order'
+        )
+        missing_vendor_lines = purchase_lines.filtered(
+            lambda l: (
+                not l.vendor_id
+                or not l.vendor_id.partner_id
+                or not l.vendor_id.partner_id.is_supplier
+            )
+        )
+        if missing_vendor_lines:
+            raise UserError(_('Please set a valid supplier/vendor on all purchase-order lines before creating a purchase order.'))
         
         # Group by vendor
         vendor_lines = {}
@@ -96,7 +109,7 @@ class Procurement(models.Model):
                     'product_id': line.product_id.id,
                     'product_qty': line.quantity,
                     'product_uom_id': line.product_uom_id.id or (line.product_id.uom_id.id if line.product_id else False),
-                    'price_unit': getattr(line, 'unit_price', 0.0) or 0.0,
+                    'price_unit': line.buying_price or 0.0,
                     'date_planned': fields.Datetime.now(),
                 }
                 if self.analytic_account_id:
@@ -201,11 +214,20 @@ class ProcurementLine(models.Model):
     product_id = fields.Many2one('product.product', string='Product')
     product_uom_id = fields.Many2one('uom.uom', string='Unit of Measure', default=lambda self: self.env.ref('uom.product_uom_unit', raise_if_not_found=False).id if self.env.ref('uom.product_uom_unit', raise_if_not_found=False) else False)
     quantity = fields.Float(string='Quantity', default=1.0)
+    buying_price = fields.Float(string='Buying Price')
+    selling_price = fields.Float(string='Selling Price')
+    profit = fields.Float(string='Profit', compute='_compute_profitability', store=False)
+    markup_percent = fields.Float(string='Markup %', compute='_compute_profitability', store=False)
     type = fields.Selection([
         ('internal_transfer', 'Internal Transfer'),
         ('purchase_order', 'Purchase Order')
     ], string='Type', required=True, default='purchase_order')
-    vendor_id = fields.Many2one('customer', string='Vendor', help='Editable only after requisition approved', domain="[('customer_type', '=', 'main')]")
+    vendor_id = fields.Many2one(
+        'customer',
+        string='Vendor',
+        help='Editable only after requisition approved',
+        domain="[('customer_type', '=', 'main'), ('partner_id.is_supplier', '=', True)]",
+    )
     receipt_status = fields.Selection([
         ('open', 'Open'),
         ('partial', 'Partial'),
@@ -218,3 +240,18 @@ class ProcurementLine(models.Model):
     def _onchange_type(self):
         if self.type == 'internal_transfer':
             self.vendor_id = False
+
+    @api.onchange('product_id')
+    def _onchange_product_id_prices(self):
+        if self.product_id:
+            self.buying_price = self.product_id.standard_price or 0.0
+            self.selling_price = self.product_id.lst_price or 0.0
+
+    @api.depends('buying_price', 'selling_price', 'quantity')
+    def _compute_profitability(self):
+        for line in self:
+            line.profit = (line.selling_price - line.buying_price) * (line.quantity or 0.0)
+            if line.buying_price:
+                line.markup_percent = ((line.selling_price - line.buying_price) / line.buying_price) * 100.0
+            else:
+                line.markup_percent = 0.0

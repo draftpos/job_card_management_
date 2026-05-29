@@ -125,19 +125,19 @@
                                     <t t-set="tax" t-value="sum(line.price_total - line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
                                     
                                     <tr class="o_subtotal">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Untaxed Amount</td>
+                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Excl</td>
                                         <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
                                             $ <t t-esc="'{:.2f}'.format(subtotal)"/>
                                         </td>
                                     </tr>
                                     <tr t-if="tax &gt; 0" class="o_taxes">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Tax Amount</td>
+                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Tax</td>
                                         <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
                                             $ <t t-esc="'{:.2f}'.format(tax)"/>
                                         </td>
                                     </tr>
                                     <tr class="o_total">
-                                        <td style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;"><strong>Total</strong></td>
+                                        <td style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;"><strong>Total Incl</strong></td>
                                         <td class="text-end" style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;">
                                             <strong>$ <t t-esc="'{:.2f}'.format(doc.total_amount)"/></strong>
                                         </td>
@@ -201,10 +201,22 @@
                                             <span t-field="doc.vehicle_reg_number"/>
                                         </td>
                                     </tr>
-                                    <tr t-if="doc.analytic_account_id">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Analytic Account:</td>
+                                    <tr t-if="doc.start_date">
+                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Start Date:</td>
                                         <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.analytic_account_id.name"/>
+                                            <span t-field="doc.start_date"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="doc.end_date">
+                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Expected End Date:</td>
+                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
+                                            <span t-field="doc.end_date"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="doc.technician_ids">
+                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Technicians:</td>
+                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
+                                            <span t-esc="', '.join(doc.technician_ids.mapped('name'))"/>
                                         </td>
                                     </tr>
                                 </table>
@@ -307,7 +319,7 @@
                     <button name="action_preview_pick_slip" string="Pick Slip" type="object" class="btn-secondary"/>
                     
                     <!-- Statusbar -->
-                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,in_progress,completed,delivered"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,in_progress,requisition_started,completed,delivered"/>
                 </header>
                 <sheet>
                     <!-- LOCK BADGE when completed/delivered -->
@@ -357,6 +369,7 @@
                                     <field name="unit_price" string="Unit Price" invisible="display_type != False"/>
                                     <field name="tax_ids" string="Taxes" widget="many2many_tags" invisible="display_type != False"/>
                                     <field name="discount" string="Disc.%" width="60px" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="price_subtotal" string="Subtotal" invisible="display_type != False" readonly="1"/>
                                     <field name="price_total" string="Amount" invisible="display_type != False" readonly="1"/>
                                 </list>
@@ -381,6 +394,7 @@
                                     <field name="unit_price" invisible="display_type != False"/>
                                     <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
                                     <field name="discount" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" readonly="1" invisible="display_type != False"/>
                                 </list>
@@ -405,6 +419,7 @@
                                     <field name="unit_price" invisible="display_type != False"/>
                                     <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
                                     <field name="discount" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" readonly="1" invisible="display_type != False"/>
                                 </list>
@@ -429,6 +444,7 @@
                                     <field name="unit_price" invisible="display_type != False"/>
                                     <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
                                     <field name="discount" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" readonly="1" invisible="display_type != False"/>
                                 </list>
@@ -453,6 +469,7 @@
                                     <field name="unit_price" invisible="display_type != False"/>
                                     <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
                                     <field name="discount" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" readonly="1" invisible="display_type != False"/>
                                 </list>
@@ -477,6 +494,7 @@
                                     <field name="unit_price" invisible="display_type != False"/>
                                     <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
                                     <field name="discount" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" readonly="1" invisible="display_type != False"/>
                                 </list>

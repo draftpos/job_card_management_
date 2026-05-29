@@ -57,18 +57,19 @@
                                     <th name="th_description" class="text-start" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Description</th>
                                     <th name="th_quantity" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Quantity</th>
                                     <th name="th_priceunit" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Unit Price</th>
+                                    <th name="th_tax" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Tax</th>
                                     <th name="th_subtotal" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Amount</th>
                                 </tr>
                             </thead>
                             <tbody class="estimate_tbody">
                                 <t t-foreach="doc.estimate_lines" t-as="line">
                                     <tr t-if="line.display_type == 'line_section'" class="o_line_section">
-                                        <td colspan="4" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
+                                        <td colspan="5" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
                                             <span t-field="line.name"/>
                                         </td>
                                     </tr>
                                     <tr t-elif="line.display_type == 'line_note'" class="o_line_note">
-                                        <td colspan="4" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
+                                        <td colspan="5" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
                                             <span t-field="line.name"/>
                                         </td>
                                     </tr>
@@ -84,6 +85,9 @@
                                         <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
                                             $ <span t-esc="'{:.2f}'.format(line.unit_price)"/>
                                         </td>
+                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
+                                            <span t-esc="', '.join(line.tax_ids.mapped('name')) if line.tax_ids else '-'"/>
+                                        </td>
                                         <td class="text-end o_price_total" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.4px;">
                                             $ <span t-esc="'{:.2f}'.format(line.price_total)"/>
                                         </td>
@@ -98,19 +102,19 @@
                             <div class="col-5">
                                 <table class="table table-sm table-borderless" style="border: none; border-top: 3px solid #000;">
                                     <tr class="o_subtotal">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Untaxed Amount</td>
+                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Excl</td>
                                         <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
                                             $ <span t-esc="'{:.2f}'.format(doc.amount_untaxed)"/>
                                         </td>
                                     </tr>
                                     <tr t-if="doc.amount_tax" class="o_taxes">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Tax Amount</td>
+                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Tax</td>
                                         <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
                                             $ <span t-esc="'{:.2f}'.format(doc.amount_tax)"/>
                                         </td>
                                     </tr>
                                     <tr class="o_total">
-                                        <td style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;"><strong>Total</strong></td>
+                                        <td style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;"><strong>Total Incl</strong></td>
                                         <td class="text-end" style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;">
                                             <strong>$ <span t-esc="'{:.2f}'.format(doc.amount_total)"/></strong>
                                         </td>
@@ -198,6 +202,7 @@
                                     <field name="product_uom_id" string="UoM" required="not display_type" invisible="display_type != False" groups="uom.group_uom" width="80px"/>
                                     <field name="unit_price" string="Unit Price" invisible="display_type != False"/>
                                     <field name="tax_ids" string="Taxes" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" string="Disc.%" width="60px" invisible="display_type != False"/>
                                     <field name="price_subtotal" string="Subtotal" invisible="display_type != False" readonly="1"/>
                                     <field name="price_total" string="Amount" invisible="display_type != False" readonly="1"/>
@@ -223,6 +228,7 @@
                                     <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" invisible="display_type != False"/>
                                     <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" invisible="display_type != False"/>
                                     <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" readonly="1" invisible="display_type != False"/>
@@ -248,6 +254,7 @@
                                     <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" invisible="display_type != False"/>
                                     <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" invisible="display_type != False"/>
                                     <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" readonly="1" invisible="display_type != False"/>
@@ -273,6 +280,7 @@
                                     <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" invisible="display_type != False"/>
                                     <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" invisible="display_type != False"/>
                                     <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" readonly="1" invisible="display_type != False"/>
@@ -298,6 +306,7 @@
                                     <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" invisible="display_type != False"/>
                                     <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" invisible="display_type != False"/>
                                     <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" readonly="1" invisible="display_type != False"/>
@@ -323,6 +332,7 @@
                                     <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" invisible="display_type != False"/>
                                     <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" invisible="display_type != False"/>
                                     <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" readonly="1" invisible="display_type != False"/>
@@ -333,11 +343,15 @@
                     <table class="float-end">
                         <tbody>
                             <tr>
-                                <td class="o_td_label"><label for="amount_untaxed">Untaxed Amount</label></td>
+                                <td class="o_td_label"><label for="amount_untaxed">Total Excl</label></td>
                                 <td><field name="amount_untaxed" widget="monetary" readonly="1"/></td>
                             </tr>
                             <tr>
-                                <td class="o_td_label"><label for="amount_total">Total</label></td>
+                                <td class="o_td_label"><label for="amount_tax">Total Tax</label></td>
+                                <td><field name="amount_tax" widget="monetary" readonly="1"/></td>
+                            </tr>
+                            <tr>
+                                <td class="o_td_label"><label for="amount_total">Total Incl</label></td>
                                 <td><field name="amount_total" widget="monetary" readonly="1"/></td>
                             </tr>
                         </tbody>

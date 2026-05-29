@@ -65,7 +65,7 @@ class JobCard(models.Model):
         string='Supervisors',
         domain=[('is_supervisor', '=', True)],
     )
-    start_date = fields.Date(string='Start Date Expected', required=True)
+    start_date = fields.Date(string='Start Date Expected', required=True, default=lambda self: fields.Date.context_today(self))
     end_date = fields.Date(string='End Date Expected', required=True)
     job_card_lines = fields.One2many('job.card.line', 'job_card_id', string='Job Card Lines')
     parts_line_ids = fields.One2many(
@@ -404,9 +404,11 @@ class JobCard(models.Model):
                     'product_id': line.product_id.id,
                     'product_uom_id': line.product_uom_id.id if line.product_uom_id else False,
                     'quantity': line.quantity,
+                    'buying_price': line.product_id.standard_price or 0.0,
+                    'selling_price': line.unit_price or line.product_id.lst_price or 0.0,
                     'type': 'purchase_order',  # Assume purchase order for external procurement
                 })
-        self.state = 'in_progress'
+        self.state = 'requisition_started'
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'procurement',
@@ -516,6 +518,7 @@ class JobCardLine(models.Model):
         for line in self:
             if line.display_type:
                 line.price_subtotal = 0
+                line.tax_amount = 0
                 line.price_total = 0
             else:
                 subtotal = line.quantity * line.unit_price
@@ -529,10 +532,13 @@ class JobCardLine(models.Model):
                             if key in taxes:
                                 taxes[key] = taxes[key] * (1 - line.discount / 100.0)
                     line.price_total = taxes.get('total_included', subtotal)
+                    line.tax_amount = line.price_total - line.price_subtotal
                 else:
                     line.price_total = subtotal
+                    line.tax_amount = 0
 
     price_subtotal = fields.Float(string='Subtotal', compute='_compute_amount', store=False)
+    tax_amount = fields.Float(string='Tax', compute='_compute_amount', store=False)
     price_total = fields.Float(string='Amount', compute='_compute_amount', store=False)
 
 

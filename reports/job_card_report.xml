@@ -94,8 +94,18 @@
                                     </t>
                                 </tbody>
                                 <tfoot>
+                                    <t t-set="subtotal" t-value="sum(line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
+                                    <t t-set="tax" t-value="sum(line.price_total - line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
+                                    <tr style="background-color: #ffffff;">
+                                        <td colspan="3" style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;">Total Excl</td>
+                                        <td style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;"><span t-esc="'$ {:.2f}'.format(subtotal)"/></td>
+                                    </tr>
+                                    <tr t-if="tax > 0" style="background-color: #ffffff;">
+                                        <td colspan="3" style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;">Total Tax</td>
+                                        <td style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;"><span t-esc="'$ {:.2f}'.format(tax)"/></td>
+                                    </tr>
                                     <tr style="background-color: #f5f6f8;">
-                                        <td colspan="3" style="border: none !important; padding: 16px 20px; font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: right;">TOTAL</td>
+                                        <td colspan="3" style="border: none !important; padding: 16px 20px; font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: right;">Total Incl</td>
                                         <td style="border: none !important; padding: 16px 20px; font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: right;"><span t-esc="'$ {:.2f}'.format((doc.total_amount or 0.0))"/></td>
                                     </tr>
                                 </tfoot>

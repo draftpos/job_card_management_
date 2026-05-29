@@ -1,10 +1,10 @@
 {
     'name': 'Job Card Management',
-    'version': '19.0.2.0.1',
+    'version': '19.0.2.0.2',
     'category': 'Services',
     'author': 'Odoo Development Team',
     'license': 'LGPL-3',
-    'depends': ['sale', 'purchase', 'purchase_requisition', 'stock', 'account', 'hr', 'hr_expense', 'mail'],
+    'depends': ['sale', 'sale_management', 'purchase', 'purchase_requisition', 'stock', 'account', 'hr', 'hr_expense', 'mail', 'havano_all_in_one'],
     'data': [
         'static/security/job_card_groups.xml',
         'static/security/ir.model.access.csv',
@@ -20,6 +20,7 @@
         'views/job_card_views.xml',
         'views/job_card_portal_templates.xml', 
         'views/procurement_views.xml',
+        'views/purchase_views.xml',
         'views/job_card_profitability_views.xml',
         'views/menu_views.xml',
         'views/job_card_dashboard_views.xml',

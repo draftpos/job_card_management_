@@ -137,9 +137,9 @@ class Estimate(models.Model):
             estimate.amount_tax = sum(lines.mapped(lambda l: l.price_total - l.price_subtotal))
             estimate.amount_total = estimate.amount_untaxed + estimate.amount_tax
 
-    amount_untaxed = fields.Float(string='Untaxed Amount', compute='_compute_totals')
-    amount_tax = fields.Float(string='Tax Amount', compute='_compute_totals')
-    amount_total = fields.Float(string='Total', compute='_compute_totals')
+    amount_untaxed = fields.Float(string='Total Excl', compute='_compute_totals')
+    amount_tax = fields.Float(string='Total Tax', compute='_compute_totals')
+    amount_total = fields.Float(string='Total Incl', compute='_compute_totals')
 
     def _job_card_form_action_xmlid(self):
         return 'job_card_management.action_estimate'
@@ -394,6 +394,7 @@ class EstimateLine(models.Model):
         for line in self:
             if line.display_type:
                 line.price_subtotal = 0
+                line.tax_amount = 0
                 line.price_total = 0
             else:
                 subtotal = line.quantity * line.unit_price
@@ -409,10 +410,13 @@ class EstimateLine(models.Model):
                             if key in taxes_data:
                                 taxes_data[key] = taxes_data[key] * (1 - line.discount / 100.0)
                     line.price_total = taxes_data.get('total_included', subtotal)
+                    line.tax_amount = line.price_total - line.price_subtotal
                 else:
                     line.price_total = subtotal
+                    line.tax_amount = 0
 
     price_subtotal = fields.Float(string='Subtotal', compute='_compute_amount')
+    tax_amount = fields.Float(string='Tax', compute='_compute_amount')
     price_total = fields.Float(string='Amount', compute='_compute_amount')
 
 

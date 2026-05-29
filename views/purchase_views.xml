@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_order_form_inherit_job_card" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.job.card</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Rename 'Unit Price' to 'Buying Price' -->
+            <xpath expr="//field[@name='order_line']/list//field[@name='price_unit']" position="attributes">
+                <attribute name="string">Buying Price</attribute>
+            </xpath>
+            
+            <!-- Replace tax_totals widget with custom fields for totals -->
+            <xpath expr="//field[@name='tax_totals']" position="replace">
+                <group class="oe_subtotal_footer oe_right">
+                    <field name="amount_untaxed" string="Total Excl"/>
+                    <field name="amount_tax" string="Total Tax"/>
+                    <div class="oe_subtotal_footer_separator oe_inline">
+                        <label for="amount_total" string="Total Incl"/>
+                    </div>
+                    <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

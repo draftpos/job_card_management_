@@ -299,15 +299,15 @@
                                         <table class="table table-sm" name="jobcard_totals_table">
                                             <!-- Calculate subtotal and tax the same way as estimate -->
                                             <tr class="o_subtotal">
-                                                <td>Untaxed Amount</td>
+                                                <td>Total Excl</td>
                                                 <td class="text-end">$ <t t-esc="'{:.2f}'.format(sum(line.price_subtotal for line in job_card.job_card_lines if not line.display_type))"/></td>
                                             </tr>
                                             <tr t-if="sum(line.price_total - line.price_subtotal for line in job_card.job_card_lines if not line.display_type) > 0" class="o_taxes">
-                                                <td>Tax Amount</td>
+                                                <td>Total Tax</td>
                                                 <td class="text-end">$ <t t-esc="'{:.2f}'.format(sum(line.price_total - line.price_subtotal for line in job_card.job_card_lines if not line.display_type))"/></td>
                                             </tr>
                                             <tr class="o_total">
-                                                <td><strong>Total</strong></td>
+                                                <td><strong>Total Incl</strong></td>
                                                 <td class="text-end"><strong>$ <t t-esc="'{:.2f}'.format(job_card.total_amount)"/></strong></td>
                                             </tr>
                                             

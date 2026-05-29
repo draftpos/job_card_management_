@@ -6,8 +6,8 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_submit_for_approval" string="Submit for Approval" type="object" invisible="state not in ['draft']"/>
-                    <button name="action_approve_requisition" string="Approve Requisition" type="object" invisible="state not in ['submitted_for_approval']"/>
+                    <button name="action_submit_for_approval" string="Submit for Requisition Approval" type="object" invisible="state not in ['draft']"/>
+                    <button name="action_approve_requisition" string="Requisition Approved" type="object" invisible="state not in ['submitted_for_approval']"/>
                     <button name="action_create_purchase_order" string="Create Purchase Order" type="object" invisible="state not in ['approved']"/>
                     <button name="action_create_grv" string="Create GRV" type="object" invisible="state not in ['purchase_order_created']"/>
                     <field name="state" widget="statusbar"/>
@@ -24,9 +24,15 @@
                             <field name="receipt_delivered_count" widget="statinfo" string="Delivered"/>
                         </button>
                     </div>
-                    <field name="name"/>
-                    <field name="job_card_id"/>
-                    <field name="analytic_account_id"/>
+                    <group col="2">
+                        <group>
+                            <field name="name"/>
+                            <field name="job_card_id"/>
+                        </group>
+                        <group>
+                            <field name="analytic_account_id" string="Analytic Line"/>
+                        </group>
+                    </group>
                     <group col="1" string="Procurement Lines">
                         <field name="procurement_lines" widget="section_and_note_one2many" nolabel="1">
                             <list editable="bottom">
@@ -41,8 +47,12 @@
                                 <field name="name" string="Section/Note" invisible="display_type == False"/>
                                 <field name="product_uom_id" string="UoM" required="not display_type" invisible="display_type != False" groups="uom.group_uom" width="80px"/>
                                 <field name="quantity" string="Quantity" invisible="display_type != False"/>
+                                <field name="buying_price" invisible="display_type != False or type == 'internal_transfer'"/>
+                                <field name="selling_price" invisible="display_type != False or type == 'internal_transfer'"/>
+                                <field name="profit" readonly="1" invisible="display_type != False or type == 'internal_transfer'"/>
+                                <field name="markup_percent" readonly="1" invisible="display_type != False or type == 'internal_transfer'"/>
                                 <field name="type"/>
-                                <field name="vendor_id" invisible="type == 'internal_transfer'"/>
+                                <field name="vendor_id" invisible="type == 'internal_transfer'" required="type == 'purchase_order'"/>
                                 <field name="receipt_status"/>
                                 <field name="purchase_order_created"/>
                                 <field name="internal_transfer_created"/>
