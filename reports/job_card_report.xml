@@ -62,6 +62,13 @@
                                         <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;"><span t-esc="'$ {:.2f}'.format(doc.total_amount or 0.0)"/></div>
                                     </td>
                                 </tr>
+                                <tr t-if="doc.create_date">
+                                    <td style="border: none !important; padding: 16px 20px; vertical-align: top;">
+                                        <div style="font-size: 12px; color: #999999; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 6px;">Date Created</div>
+                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;"><span t-field="doc.create_date" t-options='{"widget": "date"}'/></div>
+                                    </td>
+                                    <td style="border: none !important; padding: 16px 20px; vertical-align: top;"></td>
+                                </tr>
                             </table>
                         </div>
 
@@ -71,24 +78,26 @@
                             <table style="width: 100%; border: none !important; border-collapse: collapse;">
                                 <thead>
                                     <tr>
-                                        <th style="border: none !important; padding: 16px 20px; text-align: left; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Products</th>
+                                        <th style="border: none !important; padding: 16px 20px; text-align: left; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Description</th>
                                         <th style="border: none !important; padding: 16px 20px; text-align: right; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Quantity</th>
                                         <th style="border: none !important; padding: 16px 20px; text-align: right; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Unit Price</th>
+                                        <th style="border: none !important; padding: 16px 20px; text-align: right; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Tax</th>
                                         <th style="border: none !important; padding: 16px 20px; text-align: right; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <t t-foreach="doc.job_card_lines" t-as="line">
                                         <tr t-if="line.display_type == 'line_section'" style="background-color: #f1f3f5;">
-                                            <td colspan="4" style="border: none !important; padding: 16px 20px; font-size: 18px; font-weight: bold; color: #1a1a2e; text-transform: uppercase; letter-spacing: 0.5px;"><strong t-field="line.name"/></td>
+                                            <td colspan="5" style="border: none !important; padding: 16px 20px; font-size: 18px; font-weight: bold; color: #1a1a2e; text-transform: uppercase; letter-spacing: 0.5px;"><strong t-field="line.name"/></td>
                                         </tr>
                                         <tr t-elif="line.display_type == 'line_note'" style="background-color: #ffffff;">
-                                            <td colspan="4" style="border: none !important; padding: 16px 20px; font-size: 16px; color: #aaa; font-style: italic;"><em t-field="line.name"/></td>
+                                            <td colspan="5" style="border: none !important; padding: 16px 20px; font-size: 16px; color: #aaa; font-style: italic;"><em t-field="line.name"/></td>
                                         </tr>
                                         <tr t-else="" style="background-color: #ffffff;">
                                             <td style="border: none !important; padding: 16px 20px; font-size: 18px; color: #1a1a2e; font-weight: bold;"><span t-field="line.product_id.name"/></td>
                                             <td style="border: none !important; padding: 16px 20px; font-size: 16px; color: #444; text-align: right;"><span t-esc="'{:.2f}'.format(line.quantity)"/> <span style="color: #aaa; font-size: 13px;" t-field="line.product_uom_id.name"/></td>
                                             <td style="border: none !important; padding: 16px 20px; font-size: 16px; color: #444; text-align: right;"><span t-esc="'$ {:.2f}'.format(line.unit_price)"/></td>
+                                            <td style="border: none !important; padding: 16px 20px; font-size: 16px; color: #444; text-align: right;"><span t-esc="', '.join(line.tax_ids.mapped('name')) if line.tax_ids else '-'"/></td>
                                             <td style="border: none !important; padding: 16px 20px; font-size: 18px; color: #1a1a2e; text-align: right; font-weight: bold;"><span t-esc="'$ {:.2f}'.format(line.price_total)"/></td>
                                         </tr>
                                     </t>
@@ -97,15 +106,15 @@
                                     <t t-set="subtotal" t-value="sum(line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
                                     <t t-set="tax" t-value="sum(line.price_total - line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
                                     <tr style="background-color: #ffffff;">
-                                        <td colspan="3" style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;">Total Excl</td>
+                                        <td colspan="4" style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;">Total Excl</td>
                                         <td style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;"><span t-esc="'$ {:.2f}'.format(subtotal)"/></td>
                                     </tr>
                                     <tr t-if="tax > 0" style="background-color: #ffffff;">
-                                        <td colspan="3" style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;">Total Tax</td>
+                                        <td colspan="4" style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;">Total Tax</td>
                                         <td style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;"><span t-esc="'$ {:.2f}'.format(tax)"/></td>
                                     </tr>
                                     <tr style="background-color: #f5f6f8;">
-                                        <td colspan="3" style="border: none !important; padding: 16px 20px; font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: right;">Total Incl</td>
+                                        <td colspan="4" style="border: none !important; padding: 16px 20px; font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: right;">Total Incl</td>
                                         <td style="border: none !important; padding: 16px 20px; font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: right;"><span t-esc="'$ {:.2f}'.format((doc.total_amount or 0.0))"/></td>
                                     </tr>
                                 </tfoot>
@@ -179,6 +188,13 @@
                                         <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;"><t t-if="doc.analytic_account_id" t-field="doc.analytic_account_id.name"/></div>
                                     </td>
                                 </tr>
+                                <tr t-if="doc.create_date">
+                                    <td style="border: none !important; padding: 16px 20px; vertical-align: top;">
+                                        <div style="font-size: 12px; color: #999999; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 6px;">Date Created</div>
+                                        <div style="font-size: 18px; color: #1a1a2e; font-weight: bold;"><span t-field="doc.create_date" t-options='{"widget": "date"}'/></div>
+                                    </td>
+                                    <td style="border: none !important; padding: 16px 20px; vertical-align: top;"></td>
+                                </tr>
                             </table>
                         </div>
 
@@ -188,26 +204,46 @@
                             <table style="width: 100%; border: none !important; border-collapse: collapse;">
                                 <thead>
                                     <tr>
-                                        <th style="border: none !important; padding: 16px 20px; text-align: left; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Products</th>
+                                        <th style="border: none !important; padding: 16px 20px; text-align: left; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Description</th>
                                         <th style="border: none !important; padding: 16px 20px; text-align: right; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Quantity</th>
-                                        <th style="border: none !important; padding: 16px 20px; text-align: left; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">UoM</th>
+                                        <th style="border: none !important; padding: 16px 20px; text-align: right; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Unit Price</th>
+                                        <th style="border: none !important; padding: 16px 20px; text-align: right; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Tax</th>
+                                        <th style="border: none !important; padding: 16px 20px; text-align: right; font-size: 12px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <t t-foreach="doc.job_card_lines" t-as="line">
                                         <tr t-if="line.display_type == 'line_section'" style="background-color: #f1f3f5;">
-                                            <td colspan="3" style="border: none !important; padding: 16px 20px; font-size: 18px; font-weight: bold; color: #1a1a2e; text-transform: uppercase; letter-spacing: 0.5px;"><strong t-field="line.name"/></td>
+                                            <td colspan="5" style="border: none !important; padding: 16px 20px; font-size: 18px; font-weight: bold; color: #1a1a2e; text-transform: uppercase; letter-spacing: 0.5px;"><strong t-field="line.name"/></td>
                                         </tr>
                                         <tr t-elif="line.display_type == 'line_note'" style="background-color: #ffffff;">
-                                            <td colspan="3" style="border: none !important; padding: 16px 20px; font-size: 16px; color: #aaa; font-style: italic;"><em t-field="line.name"/></td>
+                                            <td colspan="5" style="border: none !important; padding: 16px 20px; font-size: 16px; color: #aaa; font-style: italic;"><em t-field="line.name"/></td>
                                         </tr>
                                         <tr t-else="" style="background-color: #ffffff;">
                                             <td style="border: none !important; padding: 16px 20px; font-size: 18px; color: #1a1a2e; font-weight: bold;"><span t-field="line.product_id.name"/></td>
-                                            <td style="border: none !important; padding: 16px 20px; font-size: 16px; color: #444; text-align: right;"><span t-field="line.quantity"/></td>
-                                            <td style="border: none !important; padding: 16px 20px; font-size: 16px; color: #444;"><span t-field="line.product_uom_id.name"/></td>
+                                            <td style="border: none !important; padding: 16px 20px; font-size: 16px; color: #444; text-align: right;"><span t-esc="'{:.2f}'.format(line.quantity)"/> <span style="color: #aaa; font-size: 13px;" t-field="line.product_uom_id.name"/></td>
+                                            <td style="border: none !important; padding: 16px 20px; font-size: 16px; color: #444; text-align: right;"><span t-esc="'$ {:.2f}'.format(line.unit_price)"/></td>
+                                            <td style="border: none !important; padding: 16px 20px; font-size: 16px; color: #444; text-align: right;"><span t-esc="', '.join(line.tax_ids.mapped('name')) if line.tax_ids else '-'"/></td>
+                                            <td style="border: none !important; padding: 16px 20px; font-size: 18px; color: #1a1a2e; text-align: right; font-weight: bold;"><span t-esc="'$ {:.2f}'.format(line.price_total)"/></td>
                                         </tr>
                                     </t>
                                 </tbody>
+                                <tfoot>
+                                    <t t-set="subtotal" t-value="sum(line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
+                                    <t t-set="tax" t-value="sum(line.price_total - line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
+                                    <tr style="background-color: #ffffff;">
+                                        <td colspan="4" style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;">Total Excl</td>
+                                        <td style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;"><span t-esc="'$ {:.2f}'.format(subtotal)"/></td>
+                                    </tr>
+                                    <tr t-if="tax > 0" style="background-color: #ffffff;">
+                                        <td colspan="4" style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;">Total Tax</td>
+                                        <td style="border: none !important; padding: 12px 20px; font-size: 16px; color: #333; text-align: right;"><span t-esc="'$ {:.2f}'.format(tax)"/></td>
+                                    </tr>
+                                    <tr style="background-color: #f5f6f8;">
+                                        <td colspan="4" style="border: none !important; padding: 16px 20px; font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: right;">Total Incl</td>
+                                        <td style="border: none !important; padding: 16px 20px; font-size: 22px; font-weight: bold; color: #1a1a2e; text-align: right;"><span t-esc="'$ {:.2f}'.format((doc.total_amount or 0.0))"/></td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
