@@ -4,7 +4,7 @@
     'category': 'Services',
     'author': 'Odoo Development Team',
     'license': 'LGPL-3',
-    'depends': ['sale', 'sale_management', 'purchase', 'purchase_requisition', 'stock', 'account', 'hr', 'hr_expense', 'mail', 'havano_all_in_one'],
+    'depends': ['sale', 'sale_management', 'purchase', 'purchase_requisition', 'stock', 'account', 'hr', 'hr_expense', 'mail'],
     'data': [
         'static/security/job_card_groups.xml',
         'static/security/ir.model.access.csv',
@@ -40,5 +40,4 @@
     },
     'installable': True,
     'application': True,
-    'post_init_hook': 'create_access_rights',
 }

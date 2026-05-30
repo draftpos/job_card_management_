@@ -149,6 +149,58 @@ class JobCardDashboard extends Component {
             target: "current",
         });
     }
+
+    _getCommonDomain() {
+        const domain = [];
+        if (this.state.filters.user_id && this.state.filters.user_id !== "0") {
+            domain.push(["create_uid", "=", parseInt(this.state.filters.user_id, 10)]);
+        }
+        if (this.state.filters.date_from) {
+            domain.push(["create_date", ">=", this.state.filters.date_from]);
+        }
+        if (this.state.filters.date_to) {
+            domain.push(["create_date", "<=", this.state.filters.date_to]);
+        }
+        return domain;
+    }
+
+    _getStatusDomain(status) {
+        if (!status) return [];
+        if (status === 'draft') return [["state", "=", "draft"]];
+        if (status === 'approved') return [["state", "=", "approved"]];
+        if (status === 'in_progress') return [["state", "=", "in_progress"]];
+        if (status === 'completed') return [["state", "=", "completed"]];
+        if (status === 'delivered') return [["state", "=", "delivered"]];
+        return [];
+    }
+
+    openAction(res_model, name, extra_domain = []) {
+        let domain = this._getCommonDomain();
+        if (res_model === 'estimate' || res_model === 'job.card') {
+            domain = domain.concat(this._getStatusDomain(this.state.filters.status));
+        }
+        if (res_model === 'procurement') {
+            if (this.state.filters.status === 'approved') {
+                domain.push(["state", "in", ["approved", "purchase_order_created"]]);
+            } else {
+                domain = domain.concat(this._getStatusDomain(this.state.filters.status));
+            }
+        }
+        if (res_model === 'account.move' || res_model === 'account.payment' || res_model === 'job.card.profitability') {
+            domain = []; // Keep it simple for related models without complex joins
+        }
+        if (extra_domain.length > 0) {
+            domain = domain.concat(extra_domain);
+        }
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            name: name,
+            res_model: res_model,
+            domain: domain,
+            views: [[false, "list"], [false, "form"]],
+            target: "current",
+        });
+    }
 }
 
 registry.category("actions").add("job_card_management.dashboard", JobCardDashboard);

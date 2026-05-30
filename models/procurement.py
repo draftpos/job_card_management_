@@ -112,8 +112,9 @@ class Procurement(models.Model):
                     'price_unit': line.buying_price or 0.0,
                     'date_planned': fields.Datetime.now(),
                 }
-                if self.analytic_account_id:
-                    po_line_vals['analytic_distribution'] = {str(self.analytic_account_id.id): 100.0}
+                analytic_account = self.analytic_account_id or self.job_card_id.analytic_account_id
+                if analytic_account:
+                    po_line_vals['analytic_distribution'] = {str(analytic_account.id): 100.0}
                 self.env['purchase.order.line'].create(po_line_vals)
             po.button_confirm()
             for line in lines:

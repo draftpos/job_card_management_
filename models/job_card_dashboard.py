@@ -7,7 +7,7 @@ class JobCardDashboard(models.Model):
     _auto = False  # No DB table
 
     @api.model
-    def get_dashboard_data(self, user_id=None, date_from=None, date_to=None):
+    def get_dashboard_data(self, user_id=None, date_from=None, date_to=None, status=None):
         """Return all dashboard statistics with optional filters"""
         today = fields.Date.today()
 
@@ -30,6 +30,22 @@ class JobCardDashboard(models.Model):
             estimate_domain.append(('create_date', '<=', date_to))
             job_domain.append(('create_date', '<=', date_to))
             procurement_domain.append(('create_date', '<=', date_to))
+
+        if status:
+            if status == 'draft':
+                estimate_domain.append(('state', '=', 'draft'))
+                job_domain.append(('state', '=', 'draft'))
+                procurement_domain.append(('state', '=', 'draft'))
+            elif status == 'approved':
+                estimate_domain.append(('state', '=', 'approved'))
+                job_domain.append(('state', '=', 'approved'))
+                procurement_domain.append(('state', 'in', ['approved', 'purchase_order_created']))
+            elif status == 'in_progress':
+                job_domain.append(('state', '=', 'in_progress'))
+            elif status == 'completed':
+                job_domain.append(('state', '=', 'completed'))
+            elif status == 'delivered':
+                job_domain.append(('state', '=', 'delivered'))
 
         # Estimates
         total_estimates = self.env['estimate'].search_count(estimate_domain)
@@ -71,9 +87,15 @@ class JobCardDashboard(models.Model):
                       job_cards_with_invoices.mapped('insurance_invoice_id').ids
         paid_invoices = self.env['account.move'].search([
             ('id', 'in', invoice_ids),
-            ('payment_state', '=', 'paid'),
+            ('payment_state', 'in', ['paid', 'in_payment']),
         ])
         total_payments_done = sum(paid_invoices.mapped('amount_total'))
+
+        # Total Job Value & Profitability
+        total_job_value = sum(job_cards.mapped('total_amount'))
+        
+        profitability_records = self.env['job.card.profitability'].search([('job_card_id', 'in', job_cards.ids)])
+        total_profitability = sum(profitability_records.mapped('net_profit'))
 
         return {
             'total_estimates': total_estimates,
@@ -85,10 +107,12 @@ class JobCardDashboard(models.Model):
             'jobs_completed': jobs_completed,
             'jobs_delivered': jobs_delivered,
             'jobs_overdue': jobs_overdue,
+            'total_job_value': total_job_value,
+            'total_profitability': total_profitability,
         }
 
     @api.model
-    def get_overdue_jobs(self, user_id=None, date_from=None, date_to=None):
+    def get_overdue_jobs(self, user_id=None, date_from=None, date_to=None, status=None):
         """Return overdue job cards for the table with optional filters"""
         today = fields.Date.today()
 
@@ -103,20 +127,31 @@ class JobCardDashboard(models.Model):
             job_domain.append(('create_date', '>=', date_from))
         if date_to:
             job_domain.append(('create_date', '<=', date_to))
+        if status:
+            if status in ['in_progress', 'approved']:
+                job_domain.append(('state', '=', status))
+            elif status in ['completed', 'delivered']:
+                # completed and delivered are not overdue
+                job_domain.append(('id', '=', False))
 
         overdue_jobs = self.env['job.card'].search(job_domain)
 
         state_selection = dict(self.env['job.card']._fields['state'].selection)
 
-        return [{
-            'id': job.id,
-            'name': job.name,
-            'customer': job.customer_id.name,
-            'vehicle': job.vehicle_reg_number or job.vehicle_display or '',
-            'start_date': str(job.start_date) if job.start_date else '',
-            'end_date': str(job.end_date) if job.end_date else '',
-            'state': state_selection.get(job.state, job.state),
-            'total_amount': job.total_amount,
-            'total_job_value': sum(self.env['job.card'].search(job_domain).mapped('total_amount')),
-            'total_profitability': 0,  # Placeholder - calculate based on your business logic
-        } for job in overdue_jobs]
+        res = []
+        for job in overdue_jobs:
+            state_label = state_selection.get(job.state, job.state)
+            # Since all jobs in this list are overdue, we just append to the label
+            state_label = f"{state_label} but Overdue"
+            
+            res.append({
+                'id': job.id,
+                'name': job.name,
+                'customer': job.customer_id.name,
+                'vehicle': job.vehicle_reg_number or job.vehicle_display or '',
+                'start_date': str(job.start_date) if job.start_date else '',
+                'end_date': str(job.end_date) if job.end_date else '',
+                'state': state_label,
+                'total_amount': job.total_amount,
+            })
+        return res

@@ -185,15 +185,7 @@ class JobCard(models.Model):
         
         return job_card
 
-    @api.constrains('start_date', 'end_date')
-    def _constrains_schedule_dates(self):
-        for rec in self:
-            if not rec.start_date or not rec.end_date:
-                raise ValidationError(_(
-                    'Start Date Expected and End Date Expected are required on every job card.'
-                ))
-            if rec.end_date <= rec.start_date:
-                raise ValidationError(_('End Date Expected must be after Start Date Expected.'))
+
 
     # NEW: Method to fetch analytic account
     def _fetch_analytic_account(self):
@@ -257,10 +249,6 @@ class JobCard(models.Model):
             })
             customer_invoice.action_post()
             self.customer_invoice_id = customer_invoice.id
-            
-            # Update analytic account name with invoice number
-            if self.analytic_account_id:
-                self.analytic_account_id.name = customer_invoice.name
         
         # Create invoice for insurance (insurance portion)
         insurance_lines = self._prepare_invoice_lines('insurance', income_account)
@@ -382,9 +370,12 @@ class JobCard(models.Model):
             raise UserError(_('Job card must be approved or in progress before creating requisition.'))
         self._check_schedule_dates()
         
+        if not self.analytic_account_id:
+            self.analytic_account_id = self._fetch_analytic_account()
+        
         procurement = self.env['procurement'].create({
             'job_card_id': self.id,
-            'analytic_account_id': self.analytic_account_id.id,
+            'analytic_account_id': self.analytic_account_id.id if self.analytic_account_id else False,
         })
         # Create procurement lines from job card lines, keeping sections and notes
         for line in self.job_card_lines:

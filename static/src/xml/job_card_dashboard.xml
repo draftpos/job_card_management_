@@ -65,7 +65,7 @@
             <!-- STATS - 4 per row -->
             <div class="row g-2 mb-2">
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-blue">
+                    <div class="stat-card stat-blue cursor-pointer" t-on-click="() => this.openAction('estimate', 'Total Estimates')">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value" t-out="state.data.total_estimates or 0"/><div class="stat-label">Total Estimates</div></div>
                             <div class="stat-icon"><i class="fa fa-file-text-o"/></div>
@@ -73,7 +73,7 @@
                     </div>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-green">
+                    <div class="stat-card stat-green cursor-pointer" t-on-click="() => this.openAction('estimate', 'Estimates Converted', [['state', '=', 'converted']])">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value" t-out="state.data.estimates_converted or 0"/><div class="stat-label">Estimates Converted</div></div>
                             <div class="stat-icon"><i class="fa fa-check-circle"/></div>
@@ -81,7 +81,7 @@
                     </div>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-yellow">
+                    <div class="stat-card stat-yellow cursor-pointer" t-on-click="() => this.openAction('job.card', 'Jobs In Progress', [['state', '=', 'in_progress']])">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value" t-out="state.data.jobs_in_progress or 0"/><div class="stat-label">Jobs In Progress</div></div>
                             <div class="stat-icon"><i class="fa fa-spinner"/></div>
@@ -89,7 +89,7 @@
                     </div>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-cyan">
+                    <div class="stat-card stat-cyan cursor-pointer" t-on-click="() => this.openAction('procurement', 'Requisitions In Progress', [['state', 'not in', ['draft', 'purchase_order_created']]])">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value" t-out="state.data.reqs_in_progress or 0"/><div class="stat-label">Requisitions In Progress</div></div>
                             <div class="stat-icon"><i class="fa fa-shopping-cart"/></div>
@@ -100,7 +100,7 @@
 
             <div class="row g-2 mb-2">
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-purple">
+                    <div class="stat-card stat-purple cursor-pointer" t-on-click="() => this.openAction('account.move', 'Total Invoices Done', [['move_type', '=', 'out_invoice']])">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value" t-out="state.data.total_invoices_done or 0"/><div class="stat-label">Total Invoices Done</div></div>
                             <div class="stat-icon"><i class="fa fa-file-text"/></div>
@@ -108,7 +108,7 @@
                     </div>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-green">
+                    <div class="stat-card stat-green cursor-pointer" t-on-click="() => this.openAction('account.move', 'Total Payments Done', [['payment_state', 'in', ['paid', 'in_payment']]])">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value" t-out="state.formattedPayments"/><div class="stat-label">Total Payments Done</div></div>
                             <div class="stat-icon"><i class="fa fa-money"/></div>
@@ -116,7 +116,7 @@
                     </div>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-blue">
+                    <div class="stat-card stat-blue cursor-pointer" t-on-click="() => this.openAction('job.card', 'Total Job Value')">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value" t-out="state.formattedJobValue"/><div class="stat-label">Total Job Value</div></div>
                             <div class="stat-icon"><i class="fa fa-bar-chart"/></div>
@@ -124,7 +124,7 @@
                     </div>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-teal">
+                    <div class="stat-card stat-teal cursor-pointer" t-on-click="() => this.openAction('job.card', 'Jobs Completed', [['state', '=', 'completed']])">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value" t-out="state.data.jobs_completed or 0"/><div class="stat-label">Jobs Completed</div></div>
                             <div class="stat-icon"><i class="fa fa-flag-checkered"/></div>
@@ -135,7 +135,7 @@
 
             <div class="row g-2 mb-3">
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-green">
+                    <div class="stat-card stat-green cursor-pointer" t-on-click="() => this.openAction('job.card', 'Jobs Delivered', [['state', '=', 'delivered']])">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value" t-out="state.data.jobs_delivered or 0"/><div class="stat-label">Jobs Delivered</div></div>
                             <div class="stat-icon"><i class="fa fa-truck"/></div>
@@ -143,7 +143,7 @@
                     </div>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-red">
+                    <div class="stat-card stat-red cursor-pointer" t-on-click="() => this.openAction('job.card', 'Jobs Overdue', [['state', 'not in', ['completed', 'delivered', 'draft']]])">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value text-danger" t-out="state.data.jobs_overdue or 0"/><div class="stat-label">Jobs Overdue</div></div>
                             <div class="stat-icon"><i class="fa fa-exclamation-triangle"/></div>
@@ -159,7 +159,7 @@
                     </div>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="stat-card stat-purple">
+                    <div class="stat-card stat-purple cursor-pointer" t-on-click="() => this.openAction('job.card.profitability', 'Total Profitability')">
                         <div class="d-flex justify-content-between align-items-start">
                             <div><div class="stat-value" t-out="state.formattedProfitability"/><div class="stat-label">Total Profitability</div></div>
                             <div class="stat-icon"><i class="fa fa-line-chart"/></div>
