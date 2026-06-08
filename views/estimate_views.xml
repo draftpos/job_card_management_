@@ -205,12 +205,12 @@
                 <filter string="Converted" name="converted" domain="[('state', '=', 'converted')]"/>
                 
                 <group expand="0" string="Group By">
-                    <filter string="Sales Person" name="group_sales_person" context="{'group_by':'create_uid'}"/>
-                    <filter string="Vehicle Make" name="group_vehicle_make" context="{'group_by':'vehicle_make'}"/>
-                    <filter string="Customer" name="group_customer" context="{'group_by':'customer_id'}"/>
-                    <filter string="Status" name="group_state" context="{'group_by':'state'}"/>
-                    <filter string="Creation Month" name="group_create_date_month" context="{'group_by':'create_date:month'}"/>
-                    <filter string="Creation Date" name="group_create_date_day" context="{'group_by':'create_date:day'}"/>
+                    <filter string="Sales Person" name="group_sales_person" domain="[]" context="{'group_by':'create_uid'}"/>
+                    <filter string="Vehicle" name="group_vehicle" domain="[]" context="{'group_by':'vehicle_id'}"/>
+                    <filter string="Customer" name="group_customer" domain="[]" context="{'group_by':'customer_id'}"/>
+                    <filter string="Status" name="group_state" domain="[]" context="{'group_by':'state'}"/>
+                    <filter string="Creation Month" name="group_create_date_month" domain="[]" context="{'group_by':'create_date:month'}"/>
+                    <filter string="Creation Date" name="group_create_date_day" domain="[]" context="{'group_by':'create_date:day'}"/>
                 </group>
             </search>
         </field>
