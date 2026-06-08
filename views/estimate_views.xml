@@ -116,15 +116,13 @@
                                         </td>
                                         <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
                                             <span t-esc="'{:.2f}'.format(line.quantity)"/>
-                                            <span> </span>
-                                            <span t-field="line.product_uom_id.name"/>
                                         </td>
                                         <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
                                             $ <span t-esc="'{:.2f}'.format(line.unit_price)"/>
                                         </td>
 
                                         <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            <span t-esc="', '.join(line.tax_ids.mapped('description') or line.tax_ids.mapped('name'))"/>
+                                            <span t-esc="', '.join(t.invoice_label or t.name for t in line.tax_ids)"/>
                                         </td>
                                         <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
                                             $ <span t-esc="'{:.2f}'.format(line.tax_amount)"/>
