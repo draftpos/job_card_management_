@@ -91,20 +91,19 @@
                                     <th name="th_description" class="text-start" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Description</th>
                                     <th name="th_quantity" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Quantity</th>
                                     <th name="th_priceunit" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Unit Price</th>
-                                    <th name="th_taxes" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Taxes</th>
-                                    <th name="th_tax" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Tax</th>
+                                    <th name="th_tax" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">VAT</th>
                                     <th name="th_subtotal" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Amount</th>
                                 </tr>
                             </thead>
                             <tbody class="job_card_tbody">
                                 <t t-foreach="doc.job_card_lines" t-as="line">
                                     <tr t-if="line.display_type == 'line_section'" class="o_line_section">
-                                        <td colspan="6" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
+                                        <td colspan="5" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
                                             <span t-field="line.name"/>
                                         </td>
                                     </tr>
                                     <tr t-elif="line.display_type == 'line_note'" class="o_line_note">
-                                        <td colspan="6" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
+                                        <td colspan="5" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
                                             <span t-field="line.name"/>
                                         </td>
                                     </tr>
@@ -120,9 +119,7 @@
                                         <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
                                             $ <span t-esc="'{:.2f}'.format(line.unit_price)"/>
                                         </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            <span t-esc="', '.join(line.tax_ids.mapped('name')) if line.tax_ids else '-'"/>
-                                        </td>
+
                                         <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
                                             $ <span t-esc="'{:.2f}'.format(line.tax_amount)"/>
                                         </td>
@@ -148,7 +145,7 @@
                                         </td>
                                     </tr>
                                     <tr class="o_taxes">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Tax</td>
+                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total VAT</td>
                                         <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
                                             $ <span t-esc="'{:.2f}'.format(tax)"/>
                                         </td>
