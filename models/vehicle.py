@@ -118,7 +118,7 @@ class Vehicle(models.Model):
     @api.model
     def _format_display_name(self, vehicle):
         reg = (vehicle.registration_number or 'N/A').strip()
-        make_model = ' '.join(p for p in [vehicle.make, vehicle.model] if p)
+        make_model = ' '.join(p for p in [vehicle.make_id.name, vehicle.model_id.name] if p)
         if make_model:
             return f'({reg}) {make_model}'
         return f'({reg})'

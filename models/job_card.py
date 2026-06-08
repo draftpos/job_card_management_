@@ -347,13 +347,13 @@ class JobCard(models.Model):
         for rec in self:
             rec.insurance_percentage = 100 - rec.excess_percentage if rec.excess_percentage else 0.0
 
-    @api.depends('vehicle_id', 'vehicle_id.registration_number', 'vehicle_id.make', 'vehicle_id.model')
+    @api.depends('vehicle_id', 'vehicle_id.registration_number', 'vehicle_id.make_id.name', 'vehicle_id.model_id.name')
     def _compute_vehicle_display(self):
         for rec in self:
             if rec.vehicle_id:
                 reg = rec.vehicle_id.registration_number or ''
                 make_model = ' '.join(
-                    p for p in [rec.vehicle_id.make, rec.vehicle_id.model] if p
+                    p for p in [rec.vehicle_id.make_id.name, rec.vehicle_id.model_id.name] if p
                 )
                 rec.vehicle_display = f"[{reg}] {make_model}".strip()
             else:

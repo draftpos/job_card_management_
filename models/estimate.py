@@ -152,7 +152,7 @@ class Estimate(models.Model):
     def _job_card_form_action_xmlid(self):
         return 'job_card_management.action_estimate'
 
-    @api.depends('vehicle_id', 'vehicle_id.registration_number', 'vehicle_id.make', 'vehicle_id.model')
+    @api.depends('vehicle_id', 'vehicle_id.registration_number', 'vehicle_id.make_id.name', 'vehicle_id.model_id.name')
     def _compute_vehicle_display(self):
         Vehicle = self.env['vehicle']
         for estimate in self:
