@@ -192,11 +192,15 @@
             <search>
                 <field name="name"/>
                 <field name="customer_id"/>
+                <field name="insurance_company_id"/>
+                <field name="create_uid" string="Created By"/>
                 <separator/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
                 <group expand="0" string="Group By">
-                    <filter string="Customer" name="group_customer" domain="[]" context="{'group_by':'customer_id'}"/>
+                    <filter string="Customer" name="group_customer" domain="[]" context="{\'group_by\':\'customer_id\'}"/>
+                    <filter string="Insurance Company" name="group_insurance" domain="[]" context="{\'group_by\':\'insurance_company_id\'}"/>
+                    <filter string="Created By" name="group_create_uid" domain="[]" context="{\'group_by\':\'create_uid\'}"/>
                     <filter string="Status" name="group_state" domain="[]" context="{'group_by':'state'}"/>
                 </group>
             </search>
@@ -238,7 +242,8 @@
                     <group col="2">
                         <group string="Quotation Details">
                             <field name="name" readonly="1"/>
-                            <field name="customer_id" readonly="state in ('approved', 'converted')"/>
+                            <field name="customer_id" readonly="state in (\'approved\', \'converted\')"/>
+                            <field name="insurance_company_id" readonly="state in (\'approved\', \'converted\')"/>
                         </group>
                         <group string="Vehicle Details">
                             <field name="vehicle_id" readonly="state in ('approved', 'converted')"
@@ -268,10 +273,10 @@
                                     <field name="quantity" optional="show" string="Quantity" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" string="UoM" invisible="1" required="not display_type" groups="uom.group_uom" width="80px"/>
                                     <field name="unit_price" optional="show" string="Unit Price" invisible="display_type != False"/>
-                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" optional="show" string="Disc.%" width="60px" invisible="display_type != False"/>
-                                    <field name="price_subtotal" optional="hide" string="Subtotal" invisible="display_type != False" readonly="1"/>
+                                    <field name="tax_ids" column_invisible="1"/>
+                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" column_invisible="1"/>
+                                    <field name="price_subtotal" column_invisible="1"/>
                                     <field name="price_total" optional="show" string="Amount" invisible="display_type != False" readonly="1"/>
                                 </list>
                             </field>
@@ -294,10 +299,10 @@
                                     <field name="quantity" optional="show" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" optional="show" invisible="display_type != False"/>
-                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" optional="show" invisible="display_type != False"/>
-                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="tax_ids" column_invisible="1"/>
+                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" column_invisible="1"/>
+                                    <field name="price_subtotal" column_invisible="1"/>
                                     <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
@@ -320,10 +325,10 @@
                                     <field name="quantity" optional="show" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" optional="show" invisible="display_type != False"/>
-                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" optional="show" invisible="display_type != False"/>
-                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="tax_ids" column_invisible="1"/>
+                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" column_invisible="1"/>
+                                    <field name="price_subtotal" column_invisible="1"/>
                                     <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
@@ -346,10 +351,10 @@
                                     <field name="quantity" optional="show" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" optional="show" invisible="display_type != False"/>
-                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" optional="show" invisible="display_type != False"/>
-                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="tax_ids" column_invisible="1"/>
+                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" column_invisible="1"/>
+                                    <field name="price_subtotal" column_invisible="1"/>
                                     <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
@@ -372,10 +377,10 @@
                                     <field name="quantity" optional="show" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" optional="show" invisible="display_type != False"/>
-                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" optional="show" invisible="display_type != False"/>
-                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="tax_ids" column_invisible="1"/>
+                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" column_invisible="1"/>
+                                    <field name="price_subtotal" column_invisible="1"/>
                                     <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
@@ -398,10 +403,10 @@
                                     <field name="quantity" optional="show" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" optional="show" invisible="display_type != False"/>
-                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" optional="show" invisible="display_type != False"/>
-                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="tax_ids" column_invisible="1"/>
+                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" column_invisible="1"/>
+                                    <field name="price_subtotal" column_invisible="1"/>
                                     <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
@@ -431,6 +436,8 @@
             <list>
                 <field name="name"/>
                 <field name="customer_id"/>
+                <field name="insurance_company_id"/>
+                <field name="create_uid" string="Created By"/>
                 <field name="vehicle_reg_number"/>
                 <field name="insurance_company_id" optional="show"/>
                 <field name="amount_total"/>

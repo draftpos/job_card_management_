@@ -527,19 +527,6 @@ class JobCardLine(models.Model):
                 self.product_uom_id = self.product_id.uom_id
             self.tax_ids = self.product_id.taxes_id
 
-        if self.product_id and self.job_card_id:
-            warn_dup = self.env['ir.config_parameter'].sudo().get_param('job_card_management.warn_duplicate_products', default='True')
-            if str(warn_dup).lower() in ('true', '1', 't'):
-                existing_lines = self.job_card_id.job_card_lines.filtered(
-                    lambda l: l.product_id == self.product_id and l._origin.id != self._origin.id
-                )
-                if existing_lines:
-                    return {
-                        'warning': {
-                            'title': 'Duplicate Product',
-                            'message': f'The product "{self.product_id.name}" is already present in this job card.'
-                        }
-                    }
 
     def unlink(self):
         for line in self:

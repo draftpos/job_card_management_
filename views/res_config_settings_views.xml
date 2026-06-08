@@ -44,11 +44,7 @@
                             <field name="vehicle_require_color"/>
                         </setting>
                     </block>
-                    <block title="Warnings" name="job_card_warnings_setting_container">
-                        <setting string="Warn on Duplicate Products" help="Show a warning if a duplicate product is added to quotation or job card lines.">
-                            <field name="warn_duplicate_products"/>
-                        </setting>
-                    </block>
+
                 </app>
             </xpath>
         </field>

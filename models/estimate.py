@@ -39,6 +39,12 @@ class Estimate(models.Model):
         copy=False,
     )
     customer_id = fields.Many2one('customer', string='Customer', required=True)
+    insurance_company_id = fields.Many2one(
+        'customer',
+        string='Insurance Company',
+        domain="[('customer_type', '=', 'insurance')]",
+        help='Select or create an insurance company'
+    )
     vehicle_id = fields.Many2one(
         'vehicle',
         string='Vehicle',
@@ -73,7 +79,6 @@ class Estimate(models.Model):
     ], default='draft')
     has_job_card = fields.Boolean(string='Job Card Opened', default=False)
     job_card_id = fields.Many2one('job.card', string='Linked Job Card')
-    insurance_company_id = fields.Many2one(related='job_card_id.second_customer_id', string='Insurance Company')
     sale_order_id = fields.Many2one('sale.order', string='Sales Order')
     terms_and_conditions = fields.Html(
         string='Terms and Conditions',
@@ -405,19 +410,6 @@ class EstimateLine(models.Model):
                 self.product_uom_id = self.product_id.uom_id
             self.tax_ids = self.product_id.taxes_id
 
-        if self.product_id and self.estimate_id:
-            warn_dup = self.env['ir.config_parameter'].sudo().get_param('job_card_management.warn_duplicate_products', default='True')
-            if str(warn_dup).lower() in ('true', '1', 't'):
-                existing_lines = self.estimate_id.estimate_lines.filtered(
-                    lambda l: l.product_id == self.product_id and l._origin.id != self._origin.id
-                )
-                if existing_lines:
-                    return {
-                        'warning': {
-                            'title': 'Duplicate Product',
-                            'message': f'The product "{self.product_id.name}" is already present in this quotation.'
-                        }
-                    }
 
     def unlink(self):
         for line in self:
