@@ -73,6 +73,7 @@ class Estimate(models.Model):
     ], default='draft')
     has_job_card = fields.Boolean(string='Job Card Opened', default=False)
     job_card_id = fields.Many2one('job.card', string='Linked Job Card')
+    insurance_company_id = fields.Many2one(related='job_card_id.second_customer_id', string='Insurance Company')
     sale_order_id = fields.Many2one('sale.order', string='Sales Order')
     terms_and_conditions = fields.Html(
         string='Terms and Conditions',

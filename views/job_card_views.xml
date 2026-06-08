@@ -53,7 +53,7 @@
                             <field name="vehicle_reg_number" readonly="1"/>
                             <field name="vehicle_model" readonly="1"/>
                             <field name="start_date" required="1" readonly="state in ('completed', 'delivered')"/>
-                            <field name="end_date" required="1" readonly="state in ('completed', 'delivered')"/>
+                            <field name="end_date" readonly="state in ('completed', 'delivered')"/>
                         </group>
                         <group string="Financial Details">
                             <field name="second_customer_id" readonly="state in ('completed', 'delivered')"/>

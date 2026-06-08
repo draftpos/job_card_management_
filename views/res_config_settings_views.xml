@@ -13,6 +13,37 @@
                             <field name="job_card_default_terms" class="w-100"/>
                         </setting>
                     </block>
+                    <block title="Quotation Print Format" name="job_card_quotation_print_setting_container">
+                        <setting string="Print Full Customer Details" help="If unchecked, only the customer name will be printed.">
+                            <field name="print_customer_full_details"/>
+                        </setting>
+                        <setting string="Show TIN Number" help="Print TIN number on quotations" invisible="not print_customer_full_details">
+                            <field name="print_customer_tin"/>
+                        </setting>
+                        <setting string="Show Phone" help="Print customer phone number on quotations" invisible="not print_customer_full_details">
+                            <field name="print_customer_phone"/>
+                        </setting>
+                        <setting string="Show Email" help="Print customer email on quotations" invisible="not print_customer_full_details">
+                            <field name="print_customer_email"/>
+                        </setting>
+                        <setting string="Show Address" help="Print customer address on quotations" invisible="not print_customer_full_details">
+                            <field name="print_customer_address"/>
+                        </setting>
+                    </block>
+                    <block title="Vehicle Required Fields" name="job_card_vehicle_setting_container">
+                        <setting string="Require Chassis Number" help="Make chassis number mandatory for vehicles">
+                            <field name="vehicle_require_chassis"/>
+                        </setting>
+                        <setting string="Require Engine Number" help="Make engine number mandatory for vehicles">
+                            <field name="vehicle_require_engine"/>
+                        </setting>
+                        <setting string="Require Year of Manufacture" help="Make year of manufacture mandatory for vehicles">
+                            <field name="vehicle_require_year"/>
+                        </setting>
+                        <setting string="Require Color" help="Make vehicle color mandatory">
+                            <field name="vehicle_require_color"/>
+                        </setting>
+                    </block>
                 </app>
             </xpath>
         </field>

@@ -1,4 +1,5 @@
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class Vehicle(models.Model):
@@ -12,8 +13,8 @@ class Vehicle(models.Model):
         help='Optional nickname for the vehicle.',
     )
     registration_number = fields.Char(string='Registration Number', required=True)
-    chassis_number = fields.Char(string='Chassis / VIN Number', required=True)
-    engine_number = fields.Char(string='Engine Number', required=True)
+    chassis_number = fields.Char(string='Chassis / VIN Number')
+    engine_number = fields.Char(string='Engine Number')
     catalog_make_id = fields.Many2one('vehicle.make', string='Make (Catalog)')
     catalog_model_id = fields.Many2one(
         'vehicle.model',
@@ -22,7 +23,26 @@ class Vehicle(models.Model):
     )
     make = fields.Char(string='Make', required=True)
     model = fields.Char(string='Model', required=True)
-    year_of_manufacture = fields.Integer(string='Year of Manufacture', required=True)
+    year_of_manufacture = fields.Integer(string='Year of Manufacture')
+    color = fields.Char(string='Color')
+
+    @api.constrains('chassis_number', 'engine_number', 'year_of_manufacture', 'color')
+    def _check_required_fields(self):
+        IrConfigParam = self.env['ir.config_parameter'].sudo()
+        req_chassis = IrConfigParam.get_param('job_card_management.vehicle_require_chassis') == 'True'
+        req_engine = IrConfigParam.get_param('job_card_management.vehicle_require_engine') == 'True'
+        req_year = IrConfigParam.get_param('job_card_management.vehicle_require_year') == 'True'
+        req_color = IrConfigParam.get_param('job_card_management.vehicle_require_color') == 'True'
+        
+        for record in self:
+            if req_chassis and not record.chassis_number:
+                raise ValidationError("Chassis Number is required as per settings.")
+            if req_engine and not record.engine_number:
+                raise ValidationError("Engine Number is required as per settings.")
+            if req_year and not record.year_of_manufacture:
+                raise ValidationError("Year of Manufacture is required as per settings.")
+            if req_color and not record.color:
+                raise ValidationError("Color is required as per settings.")
 
     engine_type_code = fields.Char(string='Engine Type/Code')
     transmission = fields.Selection([

@@ -139,6 +139,7 @@
                 <field name="name"/>
                 <field name="chassis_number"/>
                 <field name="year_of_manufacture"/>
+                <field name="color" optional="show"/>
                 <field name="customer_id"/>
             </list>
         </field>
@@ -165,6 +166,7 @@
                             <field name="make"/>
                             <field name="model"/>
                             <field name="year_of_manufacture"/>
+                            <field name="color"/>
                             <field name="name" placeholder="Optional nickname"/>
                             <field name="chassis_number"/>
                             <field name="engine_number"/>

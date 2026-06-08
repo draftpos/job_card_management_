@@ -76,16 +76,23 @@
                         </div>
 
                         <div t-if="estimate.customer_id">
+                            <t t-set="IrConfigParam" t-value="estimate.env['ir.config_parameter'].sudo()"/>
+                            <t t-set="print_full" t-value="IrConfigParam.get_param('job_card_management.print_customer_full_details') == 'True'"/>
+                            <t t-set="print_phone" t-value="IrConfigParam.get_param('job_card_management.print_customer_phone') == 'True'"/>
+                            <t t-set="print_email" t-value="IrConfigParam.get_param('job_card_management.print_customer_email') == 'True'"/>
+
                             <h6><small class="text-muted">Customer</small></h6>
                             <div class="d-flex align-items-center gap-2">
                                 <strong t-esc="estimate.customer_id.name"/>
                             </div>
-                            <div t-if="estimate.customer_id.phone" class="small text-muted mt-1">
-                                <i class="fa fa-phone"/> <t t-esc="estimate.customer_id.phone"/>
-                            </div>
-                            <div t-if="estimate.customer_id.email" class="small text-muted">
-                                <i class="fa fa-envelope"/> <t t-esc="estimate.customer_id.email"/>
-                            </div>
+                            <t t-if="print_full">
+                                <div t-if="print_phone and estimate.customer_id.phone" class="small text-muted mt-1">
+                                    <i class="fa fa-phone"/> <t t-esc="estimate.customer_id.phone"/>
+                                </div>
+                                <div t-if="print_email and estimate.customer_id.email" class="small text-muted">
+                                    <i class="fa fa-envelope"/> <t t-esc="estimate.customer_id.email"/>
+                                </div>
+                            </t>
                         </div>
                     </div>
                 </div>

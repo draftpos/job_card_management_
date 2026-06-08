@@ -33,13 +33,22 @@
                         <div class="row mt-1 mb-3" style="margin-top: 0px !important; padding-top: 0px !important;">
                             <div class="col-6">
                                 <div t-if="doc.customer_id" style="font-size: 14px;">
+                                    <t t-set="IrConfigParam" t-value="doc.env['ir.config_parameter'].sudo()"/>
+                                    <t t-set="print_full" t-value="IrConfigParam.get_param('job_card_management.print_customer_full_details') == 'True'"/>
+                                    <t t-set="print_tin" t-value="IrConfigParam.get_param('job_card_management.print_customer_tin') == 'True'"/>
+                                    <t t-set="print_phone" t-value="IrConfigParam.get_param('job_card_management.print_customer_phone') == 'True'"/>
+                                    <t t-set="print_email" t-value="IrConfigParam.get_param('job_card_management.print_customer_email') == 'True'"/>
+                                    <t t-set="print_addr" t-value="IrConfigParam.get_param('job_card_management.print_customer_address') == 'True'"/>
+                                    
                                     <strong>Customer Details:</strong><br/>
                                     <span t-field="doc.customer_id.name"/><br/>
-                                    <t t-if="doc.customer_id.street"><span t-field="doc.customer_id.street"/><br/></t>
-                                    <t t-if="doc.customer_id.city"><span t-field="doc.customer_id.city"/><t t-if="doc.customer_id.country">, <span t-field="doc.customer_id.country"/></t><br/></t>
-                                    <t t-if="doc.customer_id.phone">Phone: <span t-field="doc.customer_id.phone"/><br/></t>
-                                    <t t-if="doc.customer_id.email">Email: <span t-field="doc.customer_id.email"/><br/></t>
-                                    <t t-if="doc.customer_id.vat_number">TIN/VAT: <span t-field="doc.customer_id.vat_number"/></t>
+                                    <t t-if="print_full">
+                                        <t t-if="print_addr and doc.customer_id.street"><span t-field="doc.customer_id.street"/><br/></t>
+                                        <t t-if="print_addr and doc.customer_id.city"><span t-field="doc.customer_id.city"/><t t-if="doc.customer_id.country">, <span t-field="doc.customer_id.country"/></t><br/></t>
+                                        <t t-if="print_phone and doc.customer_id.phone">Phone: <span t-field="doc.customer_id.phone"/><br/></t>
+                                        <t t-if="print_email and doc.customer_id.email">Email: <span t-field="doc.customer_id.email"/><br/></t>
+                                        <t t-if="print_tin and doc.customer_id.vat_number">TIN/VAT: <span t-field="doc.customer_id.vat_number"/></t>
+                                    </t>
                                 </div>
                             </div>
                             <div class="col-6">
@@ -402,8 +411,9 @@
                 <field name="name"/>
                 <field name="customer_id"/>
                 <field name="vehicle_reg_number"/>
+                <field name="insurance_company_id" optional="show"/>
                 <field name="amount_total"/>
-                <field name="create_uid"/>
+                <field name="create_uid" string="Sales Person"/>
                 <field name="state"/>
             </list>
         </field>
