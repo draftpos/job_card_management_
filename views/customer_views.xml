@@ -22,43 +22,49 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <group string="Customer Information">
-                        <field name="name"/>
-                        <field name="customer_type"/>
-                        <field name="partner_id" invisible="1"/>
+                    <group>
+                        <group string="Customer Information">
+                            <field name="name"/>
+                            <field name="customer_type"/>
+                            <field name="partner_id" invisible="1"/>
+                        </group>
+                        
+                        <group string="Contact Details">
+                            <field name="email" required="1"/>
+                            <field name="phone" required="1"/>
+                            <field name="website"/>
+                        </group>
                     </group>
                     
-                    <group string="Contact Details">
-                        <field name="email" required="1"/>
-                        <field name="phone" required="1"/>
-                        <field name="website"/>
+                    <group>
+                        <group string="Address">
+                            <field name="street"/>
+                            <field name="street2"/>
+                            <field name="city"/>
+                            <field name="state"/>
+                            <field name="zip_code"/>
+                            <field name="country"/>
+                        </group>
+                        
+                        <group string="Tax &amp; Registration">
+                            <field name="vat_number"/>
+                            <field name="registration_number"/>
+                        </group>
                     </group>
                     
-                    <group string="Address">
-                        <field name="street"/>
-                        <field name="street2"/>
-                        <field name="city"/>
-                        <field name="state"/>
-                        <field name="zip_code"/>
-                        <field name="country"/>
-                    </group>
-                    
-                    <group string="Tax &amp; Registration">
-                        <field name="vat_number"/>
-                        <field name="registration_number"/>
-                    </group>
-                    
-                    <group string="Insurance Company Details" invisible="customer_type != 'insurance'">
-                        <field name="insurance_company_reg_no"/>
-                        <field name="claims_contact_person"/>
-                        <field name="claims_phone"/>
-                        <field name="claims_email"/>
-                    </group>
-                    
-                    <group string="Banking">
-                        <field name="bank_name"/>
-                        <field name="bank_account_number"/>
-                        <field name="bank_routing_number"/>
+                    <group>
+                        <group string="Banking">
+                            <field name="bank_name"/>
+                            <field name="bank_account_number"/>
+                            <field name="bank_routing_number"/>
+                        </group>
+
+                        <group string="Insurance Company Details" invisible="customer_type != 'insurance'">
+                            <field name="insurance_company_reg_no"/>
+                            <field name="claims_contact_person"/>
+                            <field name="claims_phone"/>
+                            <field name="claims_email"/>
+                        </group>
                     </group>
                     
                     <group string="Notes">

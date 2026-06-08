@@ -45,8 +45,8 @@
                     <group col="3">
                         <group string="Job Card Details">
                             <field name="name" readonly="1"/>
-                            <field name="order_number" readonly="state in ('completed', 'delivered')"/>
-                            <field name="claims_number" readonly="state in ('completed', 'delivered')"/>
+                            <field name="order_number" readonly="state in ('approved', 'in_progress', 'requisition_started', 'completed', 'delivered')"/>
+                            <field name="claims_number" readonly="state in ('approved', 'in_progress', 'requisition_started', 'completed', 'delivered')"/>
                             <field name="estimate_id" readonly="1"/>
                             <field name="customer_id" readonly="state in ('completed', 'delivered')"/>
                             <field name="vehicle_display" readonly="1"/>
