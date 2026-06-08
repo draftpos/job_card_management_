@@ -519,7 +519,14 @@ class JobCardLine(models.Model):
         return super().create(vals_list)
 
     @api.onchange('product_id')
-    def _onchange_product_id_warning(self):
+    def _onchange_product_id(self):
+        if self.product_id:
+            self.name = self.product_id.display_name or self.product_id.name
+            self.unit_price = self.product_id.lst_price
+            if self.product_id.uom_id:
+                self.product_uom_id = self.product_id.uom_id
+            self.tax_ids = self.product_id.taxes_id
+
         if self.product_id and self.job_card_id:
             warn_dup = self.env['ir.config_parameter'].sudo().get_param('job_card_management.warn_duplicate_products', default='True')
             if str(warn_dup).lower() in ('true', '1', 't'):
@@ -533,6 +540,11 @@ class JobCardLine(models.Model):
                             'message': f'The product "{self.product_id.name}" is already present in this job card.'
                         }
                     }
+
+    def unlink(self):
+        for line in self:
+            line.write({'tax_ids': [(5, 0, 0)]})
+        return super().unlink()
 
     @api.depends('quantity', 'unit_price', 'discount', 'tax_ids')
     def _compute_amount(self):
