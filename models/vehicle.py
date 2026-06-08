@@ -133,8 +133,8 @@ class Vehicle(models.Model):
             domain = [
                 '|', '|', '|', '|',
                 ('registration_number', operator, name),
-                ('make', operator, name),
-                ('model', operator, name),
+                ('make_id.name', operator, name),
+                ('model_id.name', operator, name),
                 ('name', operator, name),
                 ('chassis_number', operator, name),
             ]
