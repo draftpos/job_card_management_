@@ -130,12 +130,12 @@ class JobCard(models.Model):
 
     def _check_schedule_dates(self):
         for rec in self:
-            if not rec.start_date or not rec.end_date:
+            if not rec.start_date:
                 raise UserError(_(
-                    'Start Date Expected and End Date Expected are required before '
+                    'Start Date Expected is required before '
                     'saving, confirming, or printing this job card.'
                 ))
-            if rec.end_date <= rec.start_date:
+            if rec.end_date and rec.end_date <= rec.start_date:
                 raise UserError(_('End Date Expected must be after Start Date Expected.'))
 
     def action_preview_job_card(self):

@@ -207,7 +207,7 @@
                                                         <t t-esc="line.product_uom_id.name"/>
                                                     </td>
                                                     <td class="text-end d-none d-sm-table-cell">$ <t t-esc="'{:.2f}'.format(line.unit_price)"/></td>
-                                                    <td class="text-end d-none d-sm-table-cell"><t t-esc="', '.join(line.tax_ids.mapped('description') or line.tax_ids.mapped('name'))"/></td>
+                                                    <td class="text-end d-none d-sm-table-cell"><t t-esc="', '.join(t.invoice_label or t.name for t in line.tax_ids)"/></td>
                                                     <td class="text-end d-none d-sm-table-cell">$ <t t-esc="'{:.2f}'.format(line.tax_amount)"/></td>
                                                     <td class="text-end o_price_total">$ <t t-esc="'{:.2f}'.format(line.price_total)"/></td>
                                                 </tr>
