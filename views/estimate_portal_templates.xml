@@ -187,6 +187,7 @@
                                                 <th class="text-end" id="product_qty_header">Quantity</th>
                                                 <th class="text-end d-none d-sm-table-cell" id="product_unit_price_header">Unit Price</th>
                                                 <th class="text-end d-none d-sm-table-cell" id="tax_header">VAT</th>
+                                                <th class="text-end d-none d-sm-table-cell" id="tax_amount_header">VAT Amount</th>
                                                 <th class="text-end" id="subtotal_header">Amount</th>
                                             </tr>
                                         </thead>
@@ -206,6 +207,7 @@
                                                         <t t-esc="line.product_uom_id.name"/>
                                                     </td>
                                                     <td class="text-end d-none d-sm-table-cell">$ <t t-esc="'{:.2f}'.format(line.unit_price)"/></td>
+                                                    <td class="text-end d-none d-sm-table-cell"><t t-esc="', '.join(line.tax_ids.mapped('description') or line.tax_ids.mapped('name'))"/></td>
                                                     <td class="text-end d-none d-sm-table-cell">$ <t t-esc="'{:.2f}'.format(line.tax_amount)"/></td>
                                                     <td class="text-end o_price_total">$ <t t-esc="'{:.2f}'.format(line.price_total)"/></td>
                                                 </tr>

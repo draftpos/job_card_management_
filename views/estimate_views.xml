@@ -94,6 +94,7 @@
                                     <th name="th_priceunit" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Unit Price</th>
 
                                     <th name="th_tax" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">VAT</th>
+                                    <th name="th_tax_amount" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">VAT Amount</th>
                                     <th name="th_subtotal" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Amount</th>
                                 </tr>
                             </thead>
@@ -122,6 +123,9 @@
                                             $ <span t-esc="'{:.2f}'.format(line.unit_price)"/>
                                         </td>
 
+                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
+                                            <span t-esc="', '.join(line.tax_ids.mapped('description') or line.tax_ids.mapped('name'))"/>
+                                        </td>
                                         <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
                                             $ <span t-esc="'{:.2f}'.format(line.tax_amount)"/>
                                         </td>
@@ -247,8 +251,8 @@
                                     <field name="quantity" optional="show" string="Quantity" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" string="UoM" invisible="1" required="not display_type" groups="uom.group_uom" width="80px"/>
                                     <field name="unit_price" optional="show" string="Unit Price" invisible="display_type != False"/>
-                                    <field name="tax_ids" column_invisible="True"/>
-                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" optional="show" string="Disc.%" width="60px" invisible="display_type != False"/>
                                     <field name="price_subtotal" optional="hide" string="Subtotal" invisible="display_type != False" readonly="1"/>
                                     <field name="price_total" optional="show" string="Amount" invisible="display_type != False" readonly="1"/>
@@ -273,8 +277,8 @@
                                     <field name="quantity" optional="show" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" optional="show" invisible="display_type != False"/>
-                                    <field name="tax_ids" column_invisible="True"/>
-                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" optional="show" invisible="display_type != False"/>
                                     <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
@@ -299,8 +303,8 @@
                                     <field name="quantity" optional="show" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" optional="show" invisible="display_type != False"/>
-                                    <field name="tax_ids" column_invisible="True"/>
-                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" optional="show" invisible="display_type != False"/>
                                     <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
@@ -325,8 +329,8 @@
                                     <field name="quantity" optional="show" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" optional="show" invisible="display_type != False"/>
-                                    <field name="tax_ids" column_invisible="True"/>
-                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" optional="show" invisible="display_type != False"/>
                                     <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
@@ -351,8 +355,8 @@
                                     <field name="quantity" optional="show" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" optional="show" invisible="display_type != False"/>
-                                    <field name="tax_ids" column_invisible="True"/>
-                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" optional="show" invisible="display_type != False"/>
                                     <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
@@ -377,8 +381,8 @@
                                     <field name="quantity" optional="show" invisible="display_type != False"/>
                                     <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
                                     <field name="unit_price" optional="show" invisible="display_type != False"/>
-                                    <field name="tax_ids" column_invisible="True"/>
-                                    <field name="tax_amount" optional="show" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="show" string="VAT Amount" invisible="display_type != False" readonly="1"/>
                                     <field name="discount" optional="show" invisible="display_type != False"/>
                                     <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
                                     <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>

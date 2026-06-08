@@ -134,8 +134,8 @@
         <field name="arch" type="xml">
             <list>
                 <field name="registration_number"/>
-                <field name="make"/>
-                <field name="model"/>
+                <field name="make_id"/>
+                <field name="model_id"/>
                 <field name="name"/>
                 <field name="chassis_number"/>
                 <field name="year_of_manufacture"/>
@@ -161,10 +161,8 @@
                     <group>
                         <group string="Vehicle Identification">
                             <field name="registration_number"/>
-                            <field name="catalog_make_id" options="{'no_create': False}"/>
-                            <field name="catalog_model_id" options="{'no_create': False}"/>
-                            <field name="make"/>
-                            <field name="model"/>
+                            <field name="make_id" options="{'no_create': False}"/>
+                            <field name="model_id" options="{'no_create': False}"/>
                             <field name="year_of_manufacture"/>
                             <field name="color"/>
                             <field name="name" placeholder="Optional nickname"/>

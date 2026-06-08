@@ -41,7 +41,7 @@ class Estimate(models.Model):
     customer_id = fields.Many2one('customer', string='Customer', required=True)
     vehicle_id = fields.Many2one(
         'vehicle',
-        string='Vehicle Details',
+        string='Vehicle',
         required=True,
         domain="['|', ('customer_id', '=', customer_id), ('customer_id', '=', False)]",
     )
@@ -55,8 +55,8 @@ class Estimate(models.Model):
         string='Vehicle Name',
         readonly=True,
     )
-    vehicle_model = fields.Char(related='vehicle_id.model', string='Vehicle Model', readonly=True)
-    vehicle_make = fields.Char(related='vehicle_id.make', string='Vehicle Make', readonly=True)
+    vehicle_model = fields.Char(related='vehicle_id.model_id.name', string='Vehicle Model', readonly=True)
+    vehicle_make = fields.Char(related='vehicle_id.make_id.name', string='Vehicle Make', readonly=True)
     vehicle_chassis_number = fields.Char(related='vehicle_id.chassis_number', string='Vehicle Chassis', readonly=True)
     vehicle_year_of_manufacture = fields.Integer(related='vehicle_id.year_of_manufacture', string='Year of Manufacture', readonly=True)
     vehicle_display = fields.Char(
@@ -395,6 +395,22 @@ class EstimateLine(models.Model):
             if not vals.get('line_category'):
                 vals['line_category'] = self.env.context.get('default_line_category', 'parts')
         return super().create(vals_list)
+
+    @api.onchange('product_id')
+    def _onchange_product_id_warning(self):
+        if self.product_id and self.estimate_id:
+            warn_dup = self.env['ir.config_parameter'].sudo().get_param('job_card_management.warn_duplicate_products', default='True')
+            if str(warn_dup).lower() in ('true', '1', 't'):
+                existing_lines = self.estimate_id.estimate_lines.filtered(
+                    lambda l: l.product_id == self.product_id and l._origin.id != self._origin.id
+                )
+                if existing_lines:
+                    return {
+                        'warning': {
+                            'title': 'Duplicate Product',
+                            'message': f'The product "{self.product_id.name}" is already present in this quotation.'
+                        }
+                    }
 
     @api.depends('quantity', 'unit_price', 'discount', 'tax_ids')
     def _compute_amount(self):

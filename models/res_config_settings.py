@@ -57,6 +57,12 @@ class ResConfigSettings(models.TransientModel):
         default=False
     )
 
+    warn_duplicate_products = fields.Boolean(
+        string='Warn on Duplicate Products in Lines',
+        config_parameter='job_card_management.warn_duplicate_products',
+        default=True
+    )
+
     @api.model
     def get_values(self):
         res = super(ResConfigSettings, self).get_values()

@@ -15,14 +15,20 @@ class Vehicle(models.Model):
     registration_number = fields.Char(string='Registration Number', required=True)
     chassis_number = fields.Char(string='Chassis / VIN Number')
     engine_number = fields.Char(string='Engine Number')
-    catalog_make_id = fields.Many2one('vehicle.make', string='Make (Catalog)')
-    catalog_model_id = fields.Many2one(
+    make_id = fields.Many2one('vehicle.make', string='Make', required=True)
+    model_id = fields.Many2one(
         'vehicle.model',
-        string='Model (Catalog)',
-        domain="[('make_id', '=', catalog_make_id)]",
+        string='Model',
+        domain="[('make_id', '=', make_id)]",
+        required=True
     )
-    make = fields.Char(string='Make', required=True)
-    model = fields.Char(string='Model', required=True)
+
+    def _compute_display_name(self):
+        for vehicle in self:
+            parts = [vehicle.registration_number]
+            if vehicle.make_id and vehicle.model_id:
+                parts.append(f"({vehicle.make_id.name} {vehicle.model_id.name})")
+            vehicle.display_name = " ".join(filter(None, parts))
     year_of_manufacture = fields.Integer(string='Year of Manufacture')
     color = fields.Char(string='Color')
 
@@ -91,20 +97,16 @@ class Vehicle(models.Model):
                 ('state', '=', 'delivered'),
             ], order='create_date desc')
 
-    @api.onchange('catalog_make_id')
-    def _onchange_catalog_make_id(self):
-        self.catalog_model_id = False
-        if self.catalog_make_id:
-            self.make = self.catalog_make_id.name
+    @api.onchange('make_id')
+    def _onchange_make_id(self):
+        self.model_id = False
 
-    @api.onchange('catalog_model_id')
-    def _onchange_catalog_model_id(self):
-        if self.catalog_model_id:
-            self.model = self.catalog_model_id.name
-            if self.catalog_model_id.fuel_type:
-                self.fuel_type = self.catalog_model_id.fuel_type
-            if self.catalog_model_id.year_to:
-                self.year_of_manufacture = self.catalog_model_id.year_to
+    @api.onchange('model_id')
+    def _onchange_model_id(self):
+        if self.model_id and self.model_id.fuel_type:
+            self.fuel_type = self.model_id.fuel_type
+        if self.model_id and self.model_id.year_to:
+            self.year_of_manufacture = self.model_id.year_to
 
     @api.model_create_multi
     def create(self, vals_list):
