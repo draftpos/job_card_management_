@@ -125,8 +125,10 @@ class Procurement(models.Model):
                     po_line_vals['analytic_distribution'] = {str(analytic_account.id): 100.0}
                 self.env['purchase.order.line'].create(po_line_vals)
             po.button_confirm()
-            # Automatically create draft supplier invoice
-            po.action_create_invoice()
+            # Automatically create draft supplier invoice only if a purchase journal exists
+            purchase_journal = self.env['account.journal'].search([('type', '=', 'purchase'), ('company_id', '=', self.env.company.id)], limit=1)
+            if purchase_journal:
+                po.action_create_invoice()
             for line in lines:
                 line.write({'purchase_order_created': True})
 
