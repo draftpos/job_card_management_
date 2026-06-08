@@ -192,23 +192,12 @@
             <search>
                 <field name="name"/>
                 <field name="customer_id"/>
-                <field name="vehicle_reg_number"/>
-                <field name="create_uid" string="Sales Person"/>
-                <field name="create_date"/>
-                
                 <separator/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
-                <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]"/>
                 <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
-                <filter string="Converted" name="converted" domain="[('state', '=', 'converted')]"/>
-                
                 <group expand="0" string="Group By">
-                    <filter string="Sales Person" name="group_sales_person" domain="[]" context="{'group_by':'create_uid'}"/>
-                    <filter string="Vehicle" name="group_vehicle" domain="[]" context="{'group_by':'vehicle_id'}"/>
                     <filter string="Customer" name="group_customer" domain="[]" context="{'group_by':'customer_id'}"/>
                     <filter string="Status" name="group_state" domain="[]" context="{'group_by':'state'}"/>
-                    <filter string="Creation Month" name="group_create_date_month" domain="[]" context="{'group_by':'create_date:month'}"/>
-                    <filter string="Creation Date" name="group_create_date_day" domain="[]" context="{'group_by':'create_date:day'}"/>
                 </group>
             </search>
         </field>
