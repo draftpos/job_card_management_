@@ -17,3 +17,4 @@ access_job_card_reopen,Job Card Reopener,model_job_card,group_can_reopen_job_car
 access_estimate_redo,Estimate Redo,model_estimate,group_can_redo_estimate,1,1,1,1
 access_vehicle_make_user,vehicle.make.user.access,model_vehicle_make,base.group_user,1,0,0,0
 access_vehicle_model_user,vehicle.model.user.access,model_vehicle_model,base.group_user,1,0,0,0
+access_procurement_zero_price_wizard,procurement.zero.price.wizard,model_procurement_zero_price_wizard,base.group_user,1,1,1,1

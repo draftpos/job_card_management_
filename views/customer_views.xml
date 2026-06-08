@@ -29,8 +29,8 @@
                     </group>
                     
                     <group string="Contact Details">
-                        <field name="email"/>
-                        <field name="phone"/>
+                        <field name="email" required="1"/>
+                        <field name="phone" required="1"/>
                         <field name="website"/>
                     </group>
                     

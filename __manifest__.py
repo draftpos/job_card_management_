@@ -10,6 +10,7 @@
         'static/security/ir.model.access.csv',
         'data/vehicle_catalog_seed.xml',
         'data/vehicle_records_seed.xml',
+        'data/taxes_data.xml',
         'static/security/job_card_dashboard_access.xml',
         'reports/job_card_report.xml',
         'views/menu_root_views.xml',
@@ -24,6 +25,7 @@
         'views/job_card_profitability_views.xml',
         'views/menu_views.xml',
         'views/job_card_dashboard_views.xml',
+        'views/res_config_settings_views.xml',
         'views/estimate_portal_templates.xml',
     ],
     'assets': {

@@ -7,6 +7,7 @@ from odoo.exceptions import UserError
 class Procurement(models.Model):
     _name = 'procurement'
     _description = 'Procurement / Requisition'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
 
     def _default_name(self):
@@ -75,6 +76,13 @@ class Procurement(models.Model):
         if self.state != 'approved':
             raise UserError(_('Requisition must be approved before creating purchase orders.'))
 
+        # Check for zero/unset buying price on all purchase order lines
+        zero_price_lines = self.procurement_lines.filtered(
+            lambda l: not l.display_type and l.type == 'purchase_order' and not l.buying_price
+        )
+        if zero_price_lines:
+            raise UserError(_('Please set a valid buying price for all purchase order lines before creating a purchase order. Buying price cannot be zero.'))
+
         purchase_lines = self.procurement_lines.filtered(
             lambda l: not l.display_type and l.type == 'purchase_order'
         )
@@ -117,6 +125,8 @@ class Procurement(models.Model):
                     po_line_vals['analytic_distribution'] = {str(analytic_account.id): 100.0}
                 self.env['purchase.order.line'].create(po_line_vals)
             po.button_confirm()
+            # Automatically create draft supplier invoice
+            po.action_create_invoice()
             for line in lines:
                 line.write({'purchase_order_created': True})
 
@@ -225,7 +235,7 @@ class ProcurementLine(models.Model):
     ], string='Type', required=True, default='purchase_order')
     vendor_id = fields.Many2one(
         'customer',
-        string='Vendor',
+        string='Supplier',
         help='Editable only after requisition approved',
         domain="[('customer_type', '=', 'main'), ('partner_id.is_supplier', '=', True)]",
     )
@@ -256,3 +266,12 @@ class ProcurementLine(models.Model):
                 line.markup_percent = ((line.selling_price - line.buying_price) / line.buying_price) * 100.0
             else:
                 line.markup_percent = 0.0
+class ProcurementZeroPriceWizard(models.TransientModel):
+    _name = 'procurement.zero.price.wizard'
+    _description = 'Zero Buying Price Warning Wizard'
+
+    procurement_id = fields.Many2one('procurement', string='Procurement', required=True)
+
+    def action_confirm(self):
+        # Proceed with PO creation
+        return self.procurement_id.with_context(ignore_zero_price_warning=True).action_create_purchase_order()

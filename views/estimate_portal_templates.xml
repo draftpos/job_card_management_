@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="portal_my_estimates" name="My Estimates">
+    <template id="portal_my_estimates" name="My Quotations">
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
             <t t-call="portal.portal_searchbar">
-                <t t-set="title">Estimates</t>
+                <t t-set="title">Quotations</t>
             </t>
             <div t-if="not estimates" class="alert alert-warning" role="alert">
                 There are currently no estimates.
@@ -12,7 +12,7 @@
             <t t-if="estimates" t-call="portal.portal_table">
                 <thead>
                     <tr class="active">
-                        <th>Estimate #</th>
+                        <th>Quotation #</th>
                         <th>Customer</th>
                         <th>Vehicle</th>
                         <th class="text-end">Total</th>
@@ -34,12 +34,12 @@
         </t>
     </template>
 
-    <!-- Estimate Portal Detail - EXACT copy of Sale Order portal structure -->
-    <template id="portal_estimate_detail" name="Estimate Detail">
+    <!-- Quotation Portal Detail - EXACT copy of Sale Order portal structure -->
+    <template id="portal_estimate_detail" name="Quotation Detail">
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
             <t t-call="portal.portal_searchbar">
-                <t t-set="title">Estimate <t t-esc="estimate.name"/></t>
+                <t t-set="title">Quotation <t t-esc="estimate.name"/></t>
             </t>
 
             <div class="row">
@@ -109,16 +109,16 @@
                         <!-- Intro -->
                         <div id="introduction" class="border-bottom-0 pt-0 pb-3">
                             <div class="d-flex gap-2" id="intro_row">
-                                <h2>Estimate - <em t-esc="estimate.name"/></h2>
+                                <h2>Quotation - <em t-esc="estimate.name"/></h2>
                             </div>
                         </div>
                         
                         <div id="content">
                             <div id="informations" class="row">
-                                <!-- Estimate Info -->
+                                <!-- Quotation Info -->
                                 <div id="estimate_info" class="col-12 col-lg-6 mb-4">
                                     <span id="estimate_info_title">
-                                        <h5 class="mb-1">Estimate Information</h5>
+                                        <h5 class="mb-1">Quotation Information</h5>
                                         <hr class="mt-1 mb-2"/>
                                     </span>
                                     <table class="table table-borderless table-sm">
@@ -179,6 +179,8 @@
                                                 <th class="text-start" id="product_name_header">Products</th>
                                                 <th class="text-end" id="product_qty_header">Quantity</th>
                                                 <th class="text-end d-none d-sm-table-cell" id="product_unit_price_header">Unit Price</th>
+                                                <th class="text-end d-none d-sm-table-cell" id="taxes_header">Taxes</th>
+                                                <th class="text-end d-none d-sm-table-cell" id="tax_header">Tax</th>
                                                 <th class="text-end" id="subtotal_header">Amount</th>
                                             </tr>
                                         </thead>
@@ -198,6 +200,8 @@
                                                         <t t-esc="line.product_uom_id.name"/>
                                                     </td>
                                                     <td class="text-end d-none d-sm-table-cell">$ <t t-esc="'{:.2f}'.format(line.unit_price)"/></td>
+                                                    <td class="text-end d-none d-sm-table-cell"><t t-esc="', '.join(line.tax_ids.mapped('name')) if line.tax_ids else '-'"/></td>
+                                                    <td class="text-end d-none d-sm-table-cell">$ <t t-esc="'{:.2f}'.format(line.tax_amount)"/></td>
                                                     <td class="text-end o_price_total">$ <t t-esc="'{:.2f}'.format(line.price_total)"/></td>
                                                 </tr>
                                             </t>
@@ -213,7 +217,7 @@
                                                 <td>Total Excl</td>
                                                 <td class="text-end">$ <t t-esc="'{:.2f}'.format(estimate.amount_untaxed)"/></td>
                                             </tr>
-                                            <tr t-if="estimate.amount_tax" class="o_taxes">
+                                            <tr class="o_taxes">
                                                 <td>Total Tax</td>
                                                 <td class="text-end">$ <t t-esc="'{:.2f}'.format(estimate.amount_tax)"/></td>
                                             </tr>

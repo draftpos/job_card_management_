@@ -39,6 +39,8 @@ class JobCard(models.Model):
     estimate_id = fields.Many2one('estimate', string='Estimate', required=True, readonly=True)
     customer_id = fields.Many2one('customer', string='First Customer', required=True)
     second_customer_id = fields.Many2one('customer', string='Insurance Company', help='Added at final stage')
+    order_number = fields.Char(string='Order Number')
+    claims_number = fields.Char(string='Claims Number')
     excess_percentage = fields.Float(string='Excess (%)', help='Percentage paid by first customer')
     insurance_percentage = fields.Float(string='Insurance Percentage (%)', compute='_compute_insurance_pct', store=True)
     vehicle_id = fields.Many2one('vehicle', string='Vehicle', required=True)
@@ -65,7 +67,7 @@ class JobCard(models.Model):
         string='Supervisors',
         domain=[('is_supervisor', '=', True)],
     )
-    start_date = fields.Date(string='Start Date Expected', default=fields.Date.context_today, required=True)
+    start_date = fields.Date(string='Start Date Expected', required=True)
     end_date = fields.Date(string='End Date Expected')
     job_card_lines = fields.One2many('job.card.line', 'job_card_id', string='Job Card Lines')
     parts_line_ids = fields.One2many(
@@ -314,6 +316,9 @@ class JobCard(models.Model):
         ('delivered', 'Delivered')
     ], default='draft')
     total_amount = fields.Float(string='Total Amount', compute='_compute_total', store=True)
+    amount_untaxed = fields.Float(string='Total Excl', compute='_compute_total', store=True)
+    amount_tax = fields.Float(string='Total Tax', compute='_compute_total', store=True)
+    amount_total = fields.Float(string='Total Incl', compute='_compute_total', store=True)
 
 # Workflow actions with validations - function to reopen job card added at the end
     def action_reopen(self):
@@ -348,10 +353,13 @@ class JobCard(models.Model):
             else:
                 rec.vehicle_display = ""
 
-    @api.depends('job_card_lines.price_total')
+    @api.depends('job_card_lines.price_total', 'job_card_lines.price_subtotal', 'job_card_lines.tax_amount')
     def _compute_total(self):
         for rec in self:
-            rec.total_amount = sum(rec.job_card_lines.filtered(lambda l: not l.display_type).mapped('price_total'))
+            rec.amount_untaxed = sum(rec.job_card_lines.filtered(lambda l: not l.display_type).mapped('price_subtotal'))
+            rec.amount_tax = sum(rec.job_card_lines.filtered(lambda l: not l.display_type).mapped('tax_amount'))
+            rec.amount_total = rec.amount_untaxed + rec.amount_tax
+            rec.total_amount = rec.amount_total
 
     def action_approve_job_card(self):
 
@@ -366,8 +374,8 @@ class JobCard(models.Model):
         return True
 
     def action_create_requisition(self):
-        if self.state not in ['approved', 'in_progress']:
-            raise UserError(_('Job card must be approved or in progress before creating requisition.'))
+        if self.state not in ['in_progress']:
+            raise UserError(_('You must start the job before you can create a requisition.'))
         self._check_schedule_dates()
         
         if not self.analytic_account_id:
@@ -523,6 +531,7 @@ class JobCardLine(models.Model):
                             if key in taxes:
                                 taxes[key] = taxes[key] * (1 - line.discount / 100.0)
                     line.price_total = taxes.get('total_included', subtotal)
+                    line.price_subtotal = taxes.get('total_excluded', subtotal)
                     line.tax_amount = line.price_total - line.price_subtotal
                 else:
                     line.price_total = subtotal

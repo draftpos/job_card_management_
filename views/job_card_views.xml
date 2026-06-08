@@ -2,367 +2,6 @@
 <odoo>
 
     <!-- ============================================================ -->
-    <!-- JOB CARD REPORT TEMPLATE - Matching Estimate Design -->
-    <!-- ============================================================ -->
-    <template id="report_job_card_template">
-        <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="doc">
-                <t t-call="web.external_layout">
-                    <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; letter-spacing: 0.4px; color: #333;">
-                        
-                        <div class="oe_structure"/>
-                        
-                        <!-- Title -->
-                        <h2 style="color: #1a1a2e; font-size: 24px; font-weight: 700; letter-spacing: 0.6px; margin-bottom: 25px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                            <span t-field="doc.name"/>
-                        </h2>
-
-                        <!-- Customer & Vehicle Info -->
-                        <div class="row mt-4 mb-4">
-                            <div t-if="doc.customer_id" class="col-7" style="font-size: 15px;">
-                                <div style="font-weight: 700; font-size: 16px; color: #1a1a2e; margin-bottom: 6px; letter-spacing: 0.5px;">Customer Name:</div>
-                                <div style="font-size: 16px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;" t-field="doc.customer_id.name"/>
-                                <div t-if="doc.customer_id.phone" style="color: #555; margin-top: 4px; font-size: 14px;">
-                                    Phone: <span t-field="doc.customer_id.phone"/>
-                                </div>
-                                <div t-if="doc.customer_id.email" style="color: #555; font-size: 14px;">
-                                    Email: <span t-field="doc.customer_id.email"/>
-                                </div>
-                            </div>
-                            <div class="col-5">
-                                <table class="table table-sm table-borderless" style="border: none;">
-                                    <tr t-if="doc.estimate_id">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Estimate:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.estimate_id.name"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.vehicle_reg_number">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Vehicle REG:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.vehicle_reg_number"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.vehicle_model">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Model:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.vehicle_model"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.start_date">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Start Date:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.start_date"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.end_date">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">End Date:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.end_date"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.create_date">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Date:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.create_date" t-options='{"widget": "date"}'/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.technician_ids">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Technicians:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <t t-foreach="doc.technician_ids" t-as="tech">
-                                                <span t-esc="tech.name"/><t t-if="tech_last">, </t>
-                                            </t>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Lines Table -->
-                        <table class="table o_main_table table-borderless mb-0" id="job_card_table" style="border: none; width: 100%;">
-                            <thead>
-                                <tr style="border-bottom: 3px solid #000 !important;">
-                                    <th name="th_description" class="text-start" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Description</th>
-                                    <th name="th_quantity" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Quantity</th>
-                                    <th name="th_priceunit" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Unit Price</th>
-                                    <th name="th_tax" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Tax</th>
-                                    <th name="th_subtotal" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody class="job_card_tbody">
-                                <t t-foreach="doc.job_card_lines" t-as="line">
-                                    <tr t-if="line.display_type == 'line_section'" class="o_line_section">
-                                        <td colspan="5" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
-                                            <span t-field="line.name"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-elif="line.display_type == 'line_note'" class="o_line_note">
-                                        <td colspan="5" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
-                                            <span t-field="line.name"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-else="">
-                                        <td style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            <span t-field="line.product_id.name"/>
-                                        </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            <t t-esc="'{:.2f}'.format(line.quantity)"/>
-                                            <span> </span>
-                                            <span t-field="line.product_uom_id.name"/>
-                                        </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            $ <t t-esc="'{:.2f}'.format(line.unit_price)"/>
-                                        </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            <span t-esc="', '.join(line.tax_ids.mapped('name')) if line.tax_ids else '-'"/>
-                                        </td>
-                                        <td class="text-end o_price_total" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.4px;">
-                                            $ <t t-esc="'{:.2f}'.format(line.price_total)"/>
-                                        </td>
-                                    </tr>
-                                </t>
-                            </tbody>
-                        </table>
-
-                        <!-- Totals -->
-                        <div class="row mt-3">
-                            <div class="col-7"/>
-                            <div class="col-5">
-                                <table class="table table-sm table-borderless" style="border: none; border-top: 3px solid #000;">
-                                    <!-- Calculate totals from lines -->
-                                    <t t-set="subtotal" t-value="sum(line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
-                                    <t t-set="tax" t-value="sum(line.price_total - line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
-                                    
-                                    <tr class="o_subtotal">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Excl</td>
-                                        <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
-                                            $ <t t-esc="'{:.2f}'.format(subtotal)"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="tax &gt; 0" class="o_taxes">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Tax</td>
-                                        <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
-                                            $ <t t-esc="'{:.2f}'.format(tax)"/>
-                                        </td>
-                                    </tr>
-                                    <tr class="o_total">
-                                        <td style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;"><strong>Total Incl</strong></td>
-                                        <td class="text-end" style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;">
-                                            <strong>$ <t t-esc="'{:.2f}'.format(doc.total_amount)"/></strong>
-                                        </td>
-                                    </tr>
-                                    <!-- Insurance split if applicable -->
-                                    <t t-if="doc.second_customer_id and doc.excess_percentage">
-                                        <tr>
-                                            <td style="border: none; padding: 8px 12px; font-size: 13px; color: #777; letter-spacing: 0.3px;">
-                                                <small>Customer Portion (<t t-esc="doc.excess_percentage"/>%)</small>
-                                            </td>
-                                            <td class="text-end" style="border: none; padding: 8px 12px; font-size: 13px; color: #777;">
-                                                <small>$ <t t-esc="'{:.2f}'.format(doc.total_amount * doc.excess_percentage / 100)"/></small>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: none; padding: 8px 12px; font-size: 13px; color: #777; letter-spacing: 0.3px;">
-                                                <small>Insurance Portion (<t t-esc="doc.insurance_percentage"/>%)</small>
-                                            </td>
-                                            <td class="text-end" style="border: none; padding: 8px 12px; font-size: 13px; color: #777;">
-                                                <small>$ <t t-esc="'{:.2f}'.format(doc.total_amount * doc.insurance_percentage / 100)"/></small>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                </table>
-                            </div>
-                        </div>
-
-                    </div>
-                </t>
-            </t>
-        </t>
-    </template>
-
-    <!-- ============================================================ -->
-    <!-- PICK SLIP REPORT TEMPLATE - Matching Estimate Design -->
-    <!-- ============================================================ -->
-    <template id="report_job_card_pick_slip_template">
-        <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="doc">
-                <t t-call="web.external_layout">
-                    <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; letter-spacing: 0.4px; color: #333;">
-                        
-                        <div class="oe_structure"/>
-                        
-                        <!-- Title -->
-                        <h2 style="color: #1a1a2e; font-size: 24px; font-weight: 700; letter-spacing: 0.6px; margin-bottom: 25px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                            Pick Slip: <span t-field="doc.name"/>
-                        </h2>
-
-                        <!-- Info -->
-                        <div class="row mt-4 mb-4">
-                            <div t-if="doc.customer_id" class="col-7" style="font-size: 15px;">
-                                <div style="font-weight: 700; font-size: 16px; color: #1a1a2e; margin-bottom: 6px; letter-spacing: 0.5px;">Customer Name:</div>
-                                <div style="font-size: 16px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;" t-field="doc.customer_id.name"/>
-                            </div>
-                            <div class="col-5">
-                                <table class="table table-sm table-borderless" style="border: none;">
-                                    <tr t-if="doc.vehicle_reg_number">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Vehicle REG:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.vehicle_reg_number"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.start_date">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Start Date:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.start_date"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.end_date">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Expected End Date:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.end_date"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.create_date">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Date:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.create_date" t-options='{"widget": "date"}'/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.technician_ids">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Technicians:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-esc="', '.join(doc.technician_ids.mapped('name'))"/>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Products Table -->
-                        <table class="table o_main_table table-borderless mb-0" style="border: none; width: 100%;">
-                            <thead>
-                                <tr style="border-bottom: 3px solid #000 !important;">
-                                    <th name="th_description" class="text-start" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Description</th>
-                                    <th name="th_quantity" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Quantity</th>
-                                    <th name="th_priceunit" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Unit Price</th>
-                                    <th name="th_tax" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Tax</th>
-                                    <th name="th_subtotal" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody class="job_card_tbody">
-                                <t t-foreach="doc.job_card_lines" t-as="line">
-                                    <tr t-if="line.display_type == 'line_section'" class="o_line_section">
-                                        <td colspan="5" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
-                                            <span t-field="line.name"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-elif="line.display_type == 'line_note'" class="o_line_note">
-                                        <td colspan="5" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
-                                            <span t-field="line.name"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-else="">
-                                        <td style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            <span t-field="line.product_id.name"/>
-                                        </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            <t t-esc="'{:.2f}'.format(line.quantity)"/>
-                                            <span> </span>
-                                            <span t-field="line.product_uom_id.name"/>
-                                        </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            $ <t t-esc="'{:.2f}'.format(line.unit_price)"/>
-                                        </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            <span t-esc="', '.join(line.tax_ids.mapped('name')) if line.tax_ids else '-'"/>
-                                        </td>
-                                        <td class="text-end o_price_total" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.4px;">
-                                            $ <t t-esc="'{:.2f}'.format(line.price_total)"/>
-                                        </td>
-                                    </tr>
-                                </t>
-                            </tbody>
-                        </table>
-
-                        <!-- Totals -->
-                        <div class="row mt-3">
-                            <div class="col-7"/>
-                            <div class="col-5">
-                                <table class="table table-sm table-borderless" style="border: none; border-top: 3px solid #000;">
-                                    <!-- Calculate totals from lines -->
-                                    <t t-set="subtotal" t-value="sum(line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
-                                    <t t-set="tax" t-value="sum(line.price_total - line.price_subtotal for line in doc.job_card_lines if not line.display_type)"/>
-                                    
-                                    <tr class="o_subtotal">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Excl</td>
-                                        <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
-                                            $ <t t-esc="'{:.2f}'.format(subtotal)"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="tax &gt; 0" class="o_taxes">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Tax</td>
-                                        <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
-                                            $ <t t-esc="'{:.2f}'.format(tax)"/>
-                                        </td>
-                                    </tr>
-                                    <tr class="o_total">
-                                        <td style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;"><strong>Total Incl</strong></td>
-                                        <td class="text-end" style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;">
-                                            <strong>$ <t t-esc="'{:.2f}'.format(doc.total_amount)"/></strong>
-                                        </td>
-                                    </tr>
-                                    <!-- Insurance split if applicable -->
-                                    <t t-if="doc.second_customer_id and doc.excess_percentage">
-                                        <tr>
-                                            <td style="border: none; padding: 8px 12px; font-size: 13px; color: #777; letter-spacing: 0.3px;">
-                                                <small>Customer Portion (<t t-esc="doc.excess_percentage"/>%)</small>
-                                            </td>
-                                            <td class="text-end" style="border: none; padding: 8px 12px; font-size: 13px; color: #777;">
-                                                <small>$ <t t-esc="'{:.2f}'.format(doc.total_amount * doc.excess_percentage / 100)"/></small>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: none; padding: 8px 12px; font-size: 13px; color: #777; letter-spacing: 0.3px;">
-                                                <small>Insurance Portion (<t t-esc="doc.insurance_percentage"/>%)</small>
-                                            </td>
-                                            <td class="text-end" style="border: none; padding: 8px 12px; font-size: 13px; color: #777;">
-                                                <small>$ <t t-esc="'{:.2f}'.format(doc.total_amount * doc.insurance_percentage / 100)"/></small>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                </table>
-                            </div>
-                        </div>
-
-                    </div>
-                </t>
-            </t>
-        </t>
-    </template>
-
-    <!-- REPORT ACTIONS -->
-    <record id="report_job_card" model="ir.actions.report">
-        <field name="paperformat_id" ref="base.paperformat_euro"/>
-        <field name="name">Job Card Report</field>
-        <field name="model">job.card</field>
-        <field name="report_type">qweb-pdf</field>
-        <field name="report_name">job_card_management.report_job_card_template</field>
-        <field name="report_file">job_card_management.report_job_card_template</field>
-        <field name="print_report_name">'Job Card - ' + object.name</field>
-    </record>
-
-    <record id="report_job_card_pick_slip" model="ir.actions.report">
-        <field name="paperformat_id" ref="base.paperformat_euro"/>
-        <field name="name">Pick Slip</field>
-        <field name="model">job.card</field>
-        <field name="report_type">qweb-pdf</field>
-        <field name="report_name">job_card_management.report_job_card_pick_slip_template</field>
-        <field name="report_file">job_card_management.report_job_card_pick_slip_template</field>
-        <field name="print_report_name">'Pick Slip - ' + object.name</field>
-    </record>
-
-    <!-- ============================================================ -->
     <!-- ============================================================ -->
     <!-- FORM VIEW -->
     <!-- ============================================================ -->
@@ -377,7 +16,7 @@
                     
                     <!-- Approved state buttons -->
                     <button name="action_start_job" string="Start Job" type="object" invisible="state not in ['approved']"/>
-                    <button name="action_create_requisition" string="Requisition" type="object" invisible="state not in ['approved', 'in_progress']"/>
+                    <button name="action_create_requisition" string="Requisition" type="object" invisible="state not in ['in_progress']"/>
                     
                     <!-- In Progress state buttons -->
                     <button name="action_finalize_job_card" string="Finalize Job Card" type="object" invisible="state not in ['in_progress', 'requisition_started']"/>
@@ -406,6 +45,8 @@
                     <group col="3">
                         <group string="Job Card Details">
                             <field name="name" readonly="1"/>
+                            <field name="order_number" readonly="state in ('completed', 'delivered')"/>
+                            <field name="claims_number" readonly="state in ('completed', 'delivered')"/>
                             <field name="estimate_id" readonly="1"/>
                             <field name="customer_id" readonly="state in ('completed', 'delivered')"/>
                             <field name="vehicle_display" readonly="1"/>
@@ -418,7 +59,6 @@
                             <field name="second_customer_id" readonly="state in ('completed', 'delivered')"/>
                             <field name="excess_percentage" readonly="state in ('completed', 'delivered')"/>
                             <field name="insurance_percentage" readonly="1"/>
-                            <field name="total_amount" readonly="1"/>
                             <field name="analytic_account_id" readonly="state in ('completed', 'delivered')"/>
                         </group>
                         <group string="Team">
@@ -438,16 +78,16 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" string="Product" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" string="Product" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" string="Section / Note" invisible="display_type == False"/>
-                                    <field name="quantity" string="Quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" string="UoM" required="not display_type" invisible="display_type != False" groups="uom.group_uom" width="80px"/>
-                                    <field name="unit_price" string="Unit Price" invisible="display_type != False"/>
-                                    <field name="tax_ids" string="Taxes" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="discount" string="Disc.%" width="60px" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="price_subtotal" string="Subtotal" invisible="display_type != False" readonly="1"/>
-                                    <field name="price_total" string="Amount" invisible="display_type != False" readonly="1"/>
+                                    <field name="quantity" optional="show" string="Quantity" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" string="UoM" invisible="1" required="not display_type" groups="uom.group_uom" width="80px"/>
+                                    <field name="unit_price" optional="show" string="Unit Price" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" string="Taxes" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" optional="show" string="Disc.%" width="60px" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="Tax" invisible="display_type != False" readonly="1"/>
+                                    <field name="price_subtotal" optional="hide" string="Subtotal" invisible="display_type != False" readonly="1"/>
+                                    <field name="price_total" optional="show" string="Amount" invisible="display_type != False" readonly="1"/>
                                 </list>
                             </field>
                         </page>
@@ -463,16 +103,16 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" invisible="display_type == False"/>
-                                    <field name="quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
-                                    <field name="unit_price" invisible="display_type != False"/>
-                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="discount" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
-                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                    <field name="quantity" optional="show" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="Tax" invisible="display_type != False" readonly="1"/>
+                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
@@ -488,16 +128,16 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" invisible="display_type == False"/>
-                                    <field name="quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
-                                    <field name="unit_price" invisible="display_type != False"/>
-                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="discount" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
-                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                    <field name="quantity" optional="show" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="Tax" invisible="display_type != False" readonly="1"/>
+                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
@@ -513,16 +153,16 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" invisible="display_type == False"/>
-                                    <field name="quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
-                                    <field name="unit_price" invisible="display_type != False"/>
-                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="discount" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
-                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                    <field name="quantity" optional="show" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="Tax" invisible="display_type != False" readonly="1"/>
+                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
@@ -538,16 +178,16 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" invisible="display_type == False"/>
-                                    <field name="quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
-                                    <field name="unit_price" invisible="display_type != False"/>
-                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="discount" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
-                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                    <field name="quantity" optional="show" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="Tax" invisible="display_type != False" readonly="1"/>
+                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
@@ -563,20 +203,28 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" invisible="display_type == False"/>
-                                    <field name="quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
-                                    <field name="unit_price" invisible="display_type != False"/>
-                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="discount" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
-                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                    <field name="quantity" optional="show" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="discount" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="Tax" invisible="display_type != False" readonly="1"/>
+                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
                     </notebook>
+                    <group class="oe_subtotal_footer oe_right" colspan="2" name="job_card_total">
+                        <field name="amount_untaxed" widget="monetary" string="Total Excl"/>
+                        <field name="amount_tax" widget="monetary" string="Total Tax"/>
+                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                            <label for="amount_total" string="Total Incl"/>
+                        </div>
+                        <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                    </group>
                 </sheet>
             </form>
         </field>

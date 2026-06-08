@@ -4,46 +4,72 @@
     <template id="estimates_report">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="web.external_layout">
-                    <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; letter-spacing: 0.4px; color: #333;">
-                        
-                        <div class="oe_structure"/>
-                        
-                        <!-- Title -->
-                        <h2 style="color: #1a1a2e; font-size: 24px; font-weight: 700; letter-spacing: 0.6px; margin-bottom: 25px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                            <span t-field="doc.name"/>
-                        </h2>
-
-                        <!-- Customer & Vehicle Info -->
-                        <div class="row mt-4 mb-4">
-                            <div t-if="doc.customer_id" class="col-7" style="font-size: 15px;">
-                                <div style="font-weight: 700; font-size: 16px; color: #1a1a2e; margin-bottom: 6px; letter-spacing: 0.5px;">Customer Name:</div>
-                                <div style="font-size: 16px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;" t-field="doc.customer_id.name"/>
-                                <div t-if="doc.customer_id.phone" style="color: #555; margin-top: 4px; font-size: 14px;">
-                                    Phone: <span t-field="doc.customer_id.phone"/>
+                <t t-call="web.basic_layout">
+                    <div class="header">
+                        <div class="row mb-2">
+                            <div class="col-12 text-center">
+                                <h2 style="font-weight: bold; text-transform: uppercase; color: #1a1a2e; margin: 0; letter-spacing: 1px; font-size: 24px;">Estimates</h2>
+                            </div>
+                        </div>
+                        <div class="row align-items-center" style="border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; margin-bottom: 10px;">
+                            <div class="col-6">
+                                <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" style="max-height: 80px;" alt="Logo"/>
+                                <h3 t-else="" style="color: #1a1a2e; font-weight: bold;"><span t-field="res_company.name"/></h3>
+                            </div>
+                            <div class="col-6 text-end" style="font-size: 14px; color: #555;">
+                                <div style="font-weight: bold; color: #1a1a2e; font-size: 16px;"><span t-field="res_company.name"/></div>
+                                <div t-if="res_company.street"><span t-field="res_company.street"/></div>
+                                <div>
+                                    <t t-if="res_company.city"><span t-field="res_company.city"/></t>
+                                    <t t-if="res_company.country_id">, <span t-field="res_company.country_id.name"/></t>
                                 </div>
-                                <div t-if="doc.customer_id.email" style="color: #555; font-size: 14px;">
-                                    Email: <span t-field="doc.customer_id.email"/>
+                                <div t-if="res_company.phone">Phone: <span t-field="res_company.phone"/></div>
+                                <div t-if="res_company.email">Email: <span t-field="res_company.email"/></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; letter-spacing: 0.4px; color: #333; margin-top: 0px !important; padding-top: 0px !important;">
+                        
+                        <div class="row mt-1 mb-3" style="margin-top: 0px !important; padding-top: 0px !important;">
+                            <div class="col-6">
+                                <div t-if="doc.customer_id" style="font-size: 14px;">
+                                    <strong>Customer Details:</strong><br/>
+                                    <span t-field="doc.customer_id.name"/><br/>
+                                    <t t-if="doc.customer_id.street"><span t-field="doc.customer_id.street"/><br/></t>
+                                    <t t-if="doc.customer_id.city"><span t-field="doc.customer_id.city"/><t t-if="doc.customer_id.country">, <span t-field="doc.customer_id.country"/></t><br/></t>
+                                    <t t-if="doc.customer_id.phone">Phone: <span t-field="doc.customer_id.phone"/><br/></t>
+                                    <t t-if="doc.customer_id.email">Email: <span t-field="doc.customer_id.email"/><br/></t>
+                                    <t t-if="doc.customer_id.vat_number">TIN/VAT: <span t-field="doc.customer_id.vat_number"/></t>
                                 </div>
                             </div>
-                            <div class="col-5">
+                            <div class="col-6">
                                 <table class="table table-sm table-borderless" style="border: none;">
+                                    <tr>
+                                        <td style="border: none; padding: 4px 10px; font-weight: bold; font-size: 14px;">Estimate No:</td>
+                                        <td class="text-end" style="border: none; padding: 4px 10px; font-size: 14px;"><span t-field="doc.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: none; padding: 4px 10px; font-weight: bold; font-size: 14px;">Date/Time:</td>
+                                        <td class="text-end" style="border: none; padding: 4px 10px; font-size: 14px;"><span t-field="doc.create_date"/></td>
+                                    </tr>
                                     <tr t-if="doc.vehicle_reg_number">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Vehicle REG:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.vehicle_reg_number"/>
+                                        <td style="border: none; padding: 4px 10px; font-weight: bold; font-size: 14px;">Vehicle Reg:</td>
+                                        <td class="text-end" style="border: none; padding: 4px 10px; font-size: 14px;"><span t-field="doc.vehicle_reg_number"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: none; padding: 4px 10px; font-weight: bold; font-size: 14px;">Salesperson:</td>
+                                        <td class="text-end" style="border: none; padding: 4px 10px; font-size: 14px;"><span t-field="doc.create_uid.name"/></td>
+                                    </tr>
+                                    <tr t-if="doc.create_uid.phone or doc.create_uid.partner_id.phone">
+                                        <td style="border: none; padding: 4px 10px; font-weight: bold; font-size: 14px;">Phone:</td>
+                                        <td class="text-end" style="border: none; padding: 4px 10px; font-size: 14px;">
+                                            <span t-esc="doc.create_uid.phone or doc.create_uid.partner_id.phone"/>
                                         </td>
                                     </tr>
-                                    <tr t-if="doc.vehicle_model">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Model:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.vehicle_model"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.create_date">
-                                        <td style="border: none; padding: 6px 10px; font-weight: 700; color: #1a1a2e; font-size: 14px; letter-spacing: 0.4px;">Date:</td>
-                                        <td class="text-end" style="border: none; padding: 6px 10px; font-size: 14px; color: #333;">
-                                            <span t-field="doc.create_date"/>
+                                    <tr t-if="doc.create_uid.email or doc.create_uid.partner_id.email">
+                                        <td style="border: none; padding: 4px 10px; font-weight: bold; font-size: 14px;">Email:</td>
+                                        <td class="text-end" style="border: none; padding: 4px 10px; font-size: 14px;">
+                                            <span t-esc="doc.create_uid.email or doc.create_uid.partner_id.email"/>
                                         </td>
                                     </tr>
                                 </table>
@@ -57,19 +83,20 @@
                                     <th name="th_description" class="text-start" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Description</th>
                                     <th name="th_quantity" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Quantity</th>
                                     <th name="th_priceunit" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Unit Price</th>
-                                    <th name="th_tax" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Tax</th>
+                                    <th name="th_taxes" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">VAT</th>
+                                    <th name="th_tax" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">VAT</th>
                                     <th name="th_subtotal" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Amount</th>
                                 </tr>
                             </thead>
                             <tbody class="estimate_tbody">
                                 <t t-foreach="doc.estimate_lines" t-as="line">
                                     <tr t-if="line.display_type == 'line_section'" class="o_line_section">
-                                        <td colspan="5" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
+                                        <td colspan="6" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
                                             <span t-field="line.name"/>
                                         </td>
                                     </tr>
                                     <tr t-elif="line.display_type == 'line_note'" class="o_line_note">
-                                        <td colspan="5" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
+                                        <td colspan="6" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
                                             <span t-field="line.name"/>
                                         </td>
                                     </tr>
@@ -87,6 +114,9 @@
                                         </td>
                                         <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
                                             <span t-esc="', '.join(line.tax_ids.mapped('name')) if line.tax_ids else '-'"/>
+                                        </td>
+                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
+                                            $ <span t-esc="'{:.2f}'.format(line.tax_amount)"/>
                                         </td>
                                         <td class="text-end o_price_total" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.4px;">
                                             $ <span t-esc="'{:.2f}'.format(line.price_total)"/>
@@ -107,8 +137,8 @@
                                             $ <span t-esc="'{:.2f}'.format(doc.amount_untaxed)"/>
                                         </td>
                                     </tr>
-                                    <tr t-if="doc.amount_tax" class="o_taxes">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Tax</td>
+                                    <tr class="o_taxes">
+                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total VAT</td>
                                         <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
                                             $ <span t-esc="'{:.2f}'.format(doc.amount_tax)"/>
                                         </td>
@@ -120,6 +150,14 @@
                                         </td>
                                     </tr>
                                 </table>
+                            </div>
+                        </div>
+                        <div t-if="doc.terms_and_conditions" class="row mt-4">
+                            <div class="col-12" style="font-size: 13px; color: #555;">
+                                <strong>Terms and Conditions:</strong>
+                                <div style="margin-top: 5px;">
+                                    <span t-field="doc.terms_and_conditions"/>
+                                </div>
                             </div>
                         </div>
 
@@ -139,7 +177,7 @@
     </record>
 
     <record id="action_estimate" model="ir.actions.act_window">
-        <field name="name">Estimates</field>
+        <field name="name">Quotations</field>
         <field name="res_model">estimate</field>
         <field name="view_mode">list,form</field>
     </record>
@@ -170,24 +208,25 @@
                 </header>
                 <sheet>
                     <group col="2">
-                        <group string="Estimate Details">
+                        <group string="Quotation Details">
                             <field name="name" readonly="1"/>
                             <field name="customer_id" readonly="state in ('approved', 'converted')"/>
                         </group>
                         <group string="Vehicle Details">
                             <field name="vehicle_id" readonly="state in ('approved', 'converted')"
                                    context="{'default_customer_id': customer_id}"/>
-                            <field name="vehicle_display" readonly="1"/>
-                            <field name="vehicle_reg_number" readonly="1"/>
-                            <field name="vehicle_name" readonly="1"/>
+                            <field name="vehicle_make" readonly="1"/>
                             <field name="vehicle_model" readonly="1"/>
+                            <field name="vehicle_chassis_number" readonly="1"/>
+                            <field name="vehicle_reg_number" readonly="1"/>
+                            <field name="vehicle_year_of_manufacture" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Order Lines" name="order_lines">
                             <field name="estimate_lines" widget="section_and_note_one2many" nolabel="1"
                                 readonly="state in ('approved', 'converted')">
-                                <list editable="bottom" string="Estimate Lines">
+                                <list editable="bottom" string="Quotation Lines">
                                     <control>
                                         <create name="add_product_control" string="Add a product"/>
                                         <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
@@ -196,16 +235,16 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" string="Product" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" string="Product" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" string="Section/Note" invisible="display_type == False"/>
-                                    <field name="quantity" string="Quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" string="UoM" required="not display_type" invisible="display_type != False" groups="uom.group_uom" width="80px"/>
-                                    <field name="unit_price" string="Unit Price" invisible="display_type != False"/>
-                                    <field name="tax_ids" string="Taxes" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" string="Disc.%" width="60px" invisible="display_type != False"/>
-                                    <field name="price_subtotal" string="Subtotal" invisible="display_type != False" readonly="1"/>
-                                    <field name="price_total" string="Amount" invisible="display_type != False" readonly="1"/>
+                                    <field name="quantity" optional="show" string="Quantity" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" string="UoM" invisible="1" required="not display_type" groups="uom.group_uom" width="80px"/>
+                                    <field name="unit_price" optional="show" string="Unit Price" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" string="VAT" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" optional="show" string="Disc.%" width="60px" invisible="display_type != False"/>
+                                    <field name="price_subtotal" optional="hide" string="Subtotal" invisible="display_type != False" readonly="1"/>
+                                    <field name="price_total" optional="show" string="Amount" invisible="display_type != False" readonly="1"/>
                                 </list>
                             </field>
                         </page>
@@ -222,16 +261,16 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" invisible="display_type == False"/>
-                                    <field name="quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
-                                    <field name="unit_price" invisible="display_type != False"/>
-                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" invisible="display_type != False"/>
-                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
-                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                    <field name="quantity" optional="show" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" optional="show" invisible="display_type != False"/>
+                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
@@ -248,16 +287,16 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" invisible="display_type == False"/>
-                                    <field name="quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
-                                    <field name="unit_price" invisible="display_type != False"/>
-                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" invisible="display_type != False"/>
-                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
-                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                    <field name="quantity" optional="show" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" optional="show" invisible="display_type != False"/>
+                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
@@ -274,16 +313,16 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" invisible="display_type == False"/>
-                                    <field name="quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
-                                    <field name="unit_price" invisible="display_type != False"/>
-                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" invisible="display_type != False"/>
-                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
-                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                    <field name="quantity" optional="show" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" optional="show" invisible="display_type != False"/>
+                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
@@ -300,16 +339,16 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" invisible="display_type == False"/>
-                                    <field name="quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
-                                    <field name="unit_price" invisible="display_type != False"/>
-                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" invisible="display_type != False"/>
-                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
-                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                    <field name="quantity" optional="show" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" optional="show" invisible="display_type != False"/>
+                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
@@ -326,37 +365,33 @@
                                     <field name="line_category" column_invisible="True"/>
                                     <field name="display_type" column_invisible="True"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type" invisible="display_type != False"/>
+                                    <field name="product_id" optional="show" required="not display_type" invisible="display_type != False"/>
                                     <field name="name" invisible="display_type == False"/>
-                                    <field name="quantity" invisible="display_type != False"/>
-                                    <field name="product_uom_id" invisible="display_type != False" groups="uom.group_uom"/>
-                                    <field name="unit_price" invisible="display_type != False"/>
-                                    <field name="tax_ids" widget="many2many_tags" invisible="display_type != False"/>
-                                    <field name="tax_amount" string="Tax" invisible="display_type != False" readonly="1"/>
-                                    <field name="discount" invisible="display_type != False"/>
-                                    <field name="price_subtotal" readonly="1" invisible="display_type != False"/>
-                                    <field name="price_total" readonly="1" invisible="display_type != False"/>
+                                    <field name="quantity" optional="show" invisible="display_type != False"/>
+                                    <field name="product_uom_id" optional="show" invisible="display_type != False" groups="uom.group_uom"/>
+                                    <field name="unit_price" optional="show" invisible="display_type != False"/>
+                                    <field name="tax_ids" optional="show" widget="many2many_tags" invisible="display_type != False"/>
+                                    <field name="tax_amount" optional="hide" string="VAT" invisible="display_type != False" readonly="1"/>
+                                    <field name="discount" optional="show" invisible="display_type != False"/>
+                                    <field name="price_subtotal" optional="hide" readonly="1" invisible="display_type != False"/>
+                                    <field name="price_total" optional="show" readonly="1" invisible="display_type != False"/>
                                 </list>
                             </field>
                         </page>
+                        <page string="Terms and Conditions" name="terms">
+                            <field name="terms_and_conditions" placeholder="Terms and conditions..."/>
+                        </page>
                     </notebook>
-                    <table class="float-end">
-                        <tbody>
-                            <tr>
-                                <td class="o_td_label"><label for="amount_untaxed">Total Excl</label></td>
-                                <td><field name="amount_untaxed" widget="monetary" readonly="1"/></td>
-                            </tr>
-                            <tr>
-                                <td class="o_td_label"><label for="amount_tax">Total Tax</label></td>
-                                <td><field name="amount_tax" widget="monetary" readonly="1"/></td>
-                            </tr>
-                            <tr>
-                                <td class="o_td_label"><label for="amount_total">Total Incl</label></td>
-                                <td><field name="amount_total" widget="monetary" readonly="1"/></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <group class="oe_subtotal_footer oe_right" colspan="2" name="estimate_total">
+                        <field name="amount_untaxed" widget="monetary" string="Total Excl"/>
+                        <field name="amount_tax" widget="monetary" string="Total VAT"/>
+                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                            <label for="amount_total" string="Total Incl"/>
+                        </div>
+                        <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                    </group>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

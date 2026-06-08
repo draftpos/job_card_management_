@@ -43,11 +43,11 @@
                             </control>
                             <field name="display_type" column_invisible="True"/>
                             <field name="sequence" widget="handle"/>
-                            <field name="product_id" string="Product" required="not display_type" invisible="display_type != False"/>
+                            <field name="product_id" optional="show" string="Product" required="not display_type" invisible="display_type != False"/>
                             <field name="name" string="Section/Note" invisible="display_type == False"/>
-                            <field name="product_uom_id" string="UoM" required="not display_type" invisible="display_type != False" groups="uom.group_uom" width="80px"/>
-                            <field name="quantity" string="Quantity" invisible="display_type != False"/>
-                            <field name="buying_price" invisible="display_type != False or type == 'internal_transfer'"/>
+                            <field name="product_uom_id" optional="show" string="UoM" invisible="1" required="not display_type" groups="uom.group_uom" width="80px"/>
+                            <field name="quantity" optional="show" string="Quantity" invisible="display_type != False"/>
+                            <field name="buying_price" required="not display_type and type == 'purchase_order'" invisible="display_type != False or type == 'internal_transfer'"/>
                             <field name="selling_price" invisible="display_type != False or type == 'internal_transfer'"/>
                             <field name="profit" readonly="1" invisible="display_type != False or type == 'internal_transfer'"/>
                             <field name="markup_percent" readonly="1" invisible="display_type != False or type == 'internal_transfer'"/>
@@ -59,6 +59,7 @@
                         </list>
                     </field>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -83,4 +84,19 @@
         <field name="res_model">procurement</field>
         <field name="view_mode">list,form</field>
     </record>
+
+    <record id="view_procurement_zero_price_wizard" model="ir.ui.view">
+        <field name="name">procurement.zero.price.wizard.form</field>
+        <field name="model">procurement.zero.price.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Warning">
+                <p>Are you sure you want to set the buying price to zero for one or more products?</p>
+                <footer>
+                    <button string="Yes, Proceed" name="action_confirm" type="object" class="btn-primary"/>
+                    <button string="No, Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
 </odoo>

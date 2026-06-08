@@ -18,8 +18,8 @@ LINE_CATEGORY_SELECTION = [
 
 class Estimate(models.Model):
     _name = 'estimate'
-    _description = 'Estimate / Quote'
-    _inherit = ['job.card.backend.navigation.mixin']
+    _description = 'Quotation / Quote'
+    _inherit = ['job.card.backend.navigation.mixin', 'mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
 
     def _default_name(self):
@@ -56,6 +56,9 @@ class Estimate(models.Model):
         readonly=True,
     )
     vehicle_model = fields.Char(related='vehicle_id.model', string='Vehicle Model', readonly=True)
+    vehicle_make = fields.Char(related='vehicle_id.make', string='Vehicle Make', readonly=True)
+    vehicle_chassis_number = fields.Char(related='vehicle_id.chassis_number', string='Vehicle Chassis', readonly=True)
+    vehicle_year_of_manufacture = fields.Integer(related='vehicle_id.year_of_manufacture', string='Year of Manufacture', readonly=True)
     vehicle_display = fields.Char(
         string='Vehicle',
         compute='_compute_vehicle_display',
@@ -71,7 +74,11 @@ class Estimate(models.Model):
     has_job_card = fields.Boolean(string='Job Card Opened', default=False)
     job_card_id = fields.Many2one('job.card', string='Linked Job Card')
     sale_order_id = fields.Many2one('sale.order', string='Sales Order')
-    estimate_lines = fields.One2many('estimate.line', 'estimate_id', string='Lines')
+    terms_and_conditions = fields.Html(
+        string='Terms and Conditions',
+        default=lambda self: self.env['ir.config_parameter'].sudo().get_param('job_card_management.default_terms', '')
+    )
+    estimate_lines = fields.One2many('estimate.line', 'estimate_id', string='Lines', copy=True)
     parts_line_ids = fields.One2many(
         'estimate.line', 'estimate_id', string='Parts Lines',
         domain=[('line_category', '=', 'parts')],
@@ -354,7 +361,7 @@ class Estimate(models.Model):
 
 class EstimateLine(models.Model):
     _name = 'estimate.line'
-    _description = 'Estimate Line'
+    _description = 'Quotation Line'
     _order = 'sequence, id'
 
     estimate_id = fields.Many2one('estimate', string='Estimate', ondelete='cascade')
@@ -409,6 +416,7 @@ class EstimateLine(models.Model):
                             if key in taxes_data:
                                 taxes_data[key] = taxes_data[key] * (1 - line.discount / 100.0)
                     line.price_total = taxes_data.get('total_included', subtotal)
+                    line.price_subtotal = taxes_data.get('total_excluded', subtotal)
                     line.tax_amount = line.price_total - line.price_subtotal
                 else:
                     line.price_total = subtotal

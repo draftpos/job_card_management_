@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_job_card" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.job.card</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Job Card" string="Job Card" name="job_card_management" groups="base.group_system">
+                    <block title="General Settings" name="job_card_general_setting_container">
+                        <setting string="Default Terms" help="Default terms and conditions for quotations.">
+                            <field name="job_card_default_terms" class="w-100"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_job_card_configuration" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'module' : 'job_card_management', 'bin_size': False}</field>
+    </record>
+    
+    <menuitem id="menu_job_card_config_settings" name="Settings" parent="menu_job_card_configurations" sequence="0" action="action_job_card_configuration" groups="base.group_system"/>
+</odoo>

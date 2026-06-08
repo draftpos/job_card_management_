@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tax Groups -->
+        <record id="tax_group_vat" model="account.tax.group">
+            <field name="name">VAT</field>
+            <field name="country_id" ref="base.zw"/>
+        </record>
+        <record id="tax_group_exempt" model="account.tax.group">
+            <field name="name">EXEMPT</field>
+            <field name="country_id" ref="base.zw"/>
+        </record>
+
+        <!-- Sales VAT -->
+        <record id="tax_vat_sales_15_5" model="account.tax">
+            <field name="name">VAT</field>
+            <field name="description">VAT</field>
+            <field name="amount_type">percent</field>
+            <field name="amount">15.5</field>
+            <field name="type_tax_use">sale</field>
+            <field name="price_include" eval="True"/>
+            <field name="tax_group_id" ref="tax_group_vat"/>
+            <field name="country_id" ref="base.zw"/>
+        </record>
+
+        <!-- Purchases VAT -->
+        <record id="tax_vat_purchases_15_5" model="account.tax">
+            <field name="name">VAT</field>
+            <field name="description">VAT</field>
+            <field name="amount_type">percent</field>
+            <field name="amount">15.5</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="price_include" eval="True"/>
+            <field name="tax_group_id" ref="tax_group_vat"/>
+            <field name="country_id" ref="base.zw"/>
+        </record>
+
+        <!-- Sales Exempt -->
+        <record id="tax_exempt_sales_0" model="account.tax">
+            <field name="name">EXEMPT</field>
+            <field name="description">EXEMPT</field>
+            <field name="amount_type">percent</field>
+            <field name="amount">0.0</field>
+            <field name="type_tax_use">sale</field>
+            <field name="price_include" eval="True"/>
+            <field name="tax_group_id" ref="tax_group_exempt"/>
+            <field name="country_id" ref="base.zw"/>
+        </record>
+
+        <!-- Purchases Exempt -->
+        <record id="tax_exempt_purchases_0" model="account.tax">
+            <field name="name">EXEMPT</field>
+            <field name="description">EXEMPT</field>
+            <field name="amount_type">percent</field>
+            <field name="amount">0.0</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="price_include" eval="True"/>
+            <field name="tax_group_id" ref="tax_group_exempt"/>
+            <field name="country_id" ref="base.zw"/>
+        </record>
+    
+        <!-- Set Default Taxes for ALL Companies -->
+        <function model="res.company" name="write">
+            <value model="account.tax" eval="[obj().browse(ref('tax_vat_sales_15_5')).company_id.id]"/>
+            <value eval="{'account_sale_tax_id': ref('tax_vat_sales_15_5'), 'account_purchase_tax_id': ref('tax_vat_purchases_15_5')}"/>
+        </function>
+        <!-- Pre-set Fiscal Country for ALL Companies to avoid tax country mismatch -->
+        <function model="res.company" name="write">
+            <value model="account.tax" eval="[obj().browse(ref('tax_vat_sales_15_5')).company_id.id]"/>
+            <value eval="{'account_fiscal_country_id': ref('base.zw')}"/>
+        </function>
+    </data>
+</odoo>
