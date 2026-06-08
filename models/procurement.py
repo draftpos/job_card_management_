@@ -125,10 +125,8 @@ class Procurement(models.Model):
                     po_line_vals['analytic_distribution'] = {str(analytic_account.id): 100.0}
                 self.env['purchase.order.line'].create(po_line_vals)
             po.button_confirm()
-            # Automatically create draft supplier invoice only if a purchase journal exists
-            purchase_journal = self.env['account.journal'].search([('type', '=', 'purchase'), ('company_id', '=', self.env.company.id)], limit=1)
-            if purchase_journal:
-                po.action_create_invoice()
+            # Automatically create draft supplier invoice
+            po.action_create_invoice()
             for line in lines:
                 line.write({'purchase_order_created': True})
 
@@ -277,3 +275,21 @@ class ProcurementZeroPriceWizard(models.TransientModel):
     def action_confirm(self):
         # Proceed with PO creation
         return self.procurement_id.with_context(ignore_zero_price_warning=True).action_create_purchase_order()
+
+class PurchaseOrderInherit(models.Model):
+    _inherit = 'purchase.order'
+
+    def action_create_invoice(self):
+        # Auto-create purchase journal if missing to prevent "No journal could be found" errors
+        journal = self.env['account.journal'].search([
+            ('type', '=', 'purchase'), 
+            ('company_id', '=', self.env.company.id)
+        ], limit=1)
+        if not journal:
+            self.env['account.journal'].sudo().create({
+                'name': 'Vendor Bills',
+                'code': 'BILL',
+                'type': 'purchase',
+                'company_id': self.env.company.id,
+            })
+        return super().action_create_invoice()
