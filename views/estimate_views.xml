@@ -194,8 +194,6 @@
                 <field name="customer_id"/>
                 <field name="vehicle_reg_number"/>
                 <field name="create_uid" string="Sales Person"/>
-                <field name="vehicle_make" string="Vehicle Make"/>
-                <field name="vehicle_model" string="Vehicle Model"/>
                 <field name="create_date"/>
                 
                 <separator/>
