@@ -165,7 +165,7 @@
                             <field name="model_id" options="{'no_create': False}"/>
                             <field name="year_of_manufacture"/>
                             <field name="color"/>
-                            <field name="name" placeholder="Optional nickname"/>
+                            <field name="name" invisible="1"/>
                             <field name="chassis_number"/>
                             <field name="engine_number"/>
                         </group>

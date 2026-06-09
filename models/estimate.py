@@ -249,6 +249,7 @@ class Estimate(models.Model):
         job_card = self.env['job.card'].create({
             'estimate_id': self.id,
             'customer_id': self.customer_id.id,
+            'second_customer_id': self.insurance_company_id.id,
             'vehicle_id': self.vehicle_id.id,
             'start_date': today,
         })

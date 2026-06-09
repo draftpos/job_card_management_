@@ -23,6 +23,15 @@ class Vehicle(models.Model):
         required=True
     )
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super(Vehicle, self).default_get(fields_list)
+        if self.env.context.get('default_name'):
+            res['registration_number'] = self.env.context.get('default_name')
+            if 'name' in res:
+                res['name'] = False
+        return res
+
     def _compute_display_name(self):
         for vehicle in self:
             parts = [vehicle.registration_number]

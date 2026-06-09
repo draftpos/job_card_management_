@@ -243,16 +243,16 @@
                         <group string="Quotation Details">
                             <field name="name" readonly="1"/>
                             <field name="customer_id" readonly="state in (\'approved\', \'converted\')"/>
-                            <field name="insurance_company_id" readonly="state in (\'approved\', \'converted\')"/>
+                            <field name="insurance_company_id" readonly="state in (\'approved\', \'converted\')" context="{'default_customer_type': 'insurance'}"/>
                         </group>
                         <group string="Vehicle Details">
-                            <field name="vehicle_id" readonly="state in ('approved', 'converted')"
+                            <field name="vehicle_id" string="Vehicle REG Number" readonly="state in ('approved', 'converted')"
                                    context="{'default_customer_id': customer_id}"/>
                             <field name="vehicle_make" readonly="1"/>
                             <field name="vehicle_model" readonly="1"/>
                             <field name="vehicle_chassis_number" readonly="1"/>
-                            <field name="vehicle_reg_number" readonly="1"/>
                             <field name="vehicle_year_of_manufacture" readonly="1"/>
+                            <field name="vehicle_reg_number" invisible="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -439,7 +439,6 @@
                 <field name="insurance_company_id"/>
                 <field name="create_uid" string="Created By"/>
                 <field name="vehicle_reg_number"/>
-                <field name="insurance_company_id" optional="show"/>
                 <field name="amount_total"/>
                 <field name="create_uid" string="Sales Person"/>
                 <field name="state"/>
