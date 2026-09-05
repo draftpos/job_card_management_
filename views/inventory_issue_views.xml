@@ -10,11 +10,11 @@
                 <header>
                     <button name="action_populate_from_job_card" string="Populate from Job Card" type="object" class="btn-secondary" invisible="state != 'draft'"/>
                     <button name="action_confirm" string="Confirm" type="object" class="btn-primary" invisible="state != 'draft'"/>
-                    <button name="action_issue" string="Issue Inventory" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
-                    <button name="action_create_requisitions" string="Create Requisitions" type="object" class="btn-warning" invisible="state != 'confirmed'"/>
+                    <button name="action_issue" string="Issue Inventory" type="object" class="btn-primary" invisible="state not in ('confirmed', 'partially_issued')"/>
+                    <button name="action_create_requisitions" string="Create Requisitions" type="object" class="btn-warning" invisible="state not in ('confirmed', 'partially_issued')"/>
                     <button name="action_cancel" string="Cancel" type="object" invisible="state in ('issued', 'cancelled')"/>
                     <button name="action_reset_draft" string="Reset to Draft" type="object" invisible="state != 'cancelled'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,issued"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,partially_issued,issued"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -70,13 +70,13 @@
         <field name="name">job.inventory.issue.list</field>
         <field name="model">job.inventory.issue</field>
         <field name="arch" type="xml">
-            <list decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'" decoration-success="state == 'issued'">
+            <list decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'" decoration-warning="state == 'partially_issued'" decoration-success="state == 'issued'">
                 <field name="name"/>
                 <field name="job_card_id"/>
                 <field name="customer_id"/>
                 <field name="issue_date"/>
                 <field name="source_location_id"/>
-                <field name="state" widget="badge" decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'" decoration-success="state == 'issued'"/>
+                <field name="state" widget="badge" decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'" decoration-warning="state == 'partially_issued'" decoration-success="state == 'issued'"/>
             </list>
         </field>
     </record>
