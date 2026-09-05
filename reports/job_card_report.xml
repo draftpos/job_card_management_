@@ -174,54 +174,43 @@
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.basic_layout">
                     <div class="header">
-                        <div class="row mb-2">
+                        <div class="row mb-1">
                             <div class="col-12 text-center">
-                                <h2 style="font-weight: bold; text-transform: uppercase; color: #1a1a2e; margin: 0; letter-spacing: 1px; font-size: 24px;">
+                                <h2 style="font-weight: bold; text-transform: uppercase; color: #1a1a2e; margin: 0; letter-spacing: 1px; font-size: 22px;">
                                     PICK SLIP <span t-if="doc.name" t-field="doc.name"/>
                                 </h2>
                             </div>
                         </div>
-                        <t t-set="hide_company_details" t-value="request.env['ir.config_parameter'].sudo().get_param('job_card_management.hide_company_details_pick_slip', 'True') == 'True'"/>
-                        <div class="row align-items-center" style="border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; margin-bottom: 10px;">
-                            <div t-attf-class="{{ 'col-6' if not hide_company_details else 'col-12' }}">
-                                <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" style="max-height: 80px;" alt="Logo"/>
-                                <h3 t-else="" style="color: #1a1a2e; font-weight: bold;"><span t-field="res_company.name"/></h3>
-                            </div>
-                            <div class="col-6 text-end" style="font-size: 14px; color: #555;" t-if="not hide_company_details">
-                                <div style="font-weight: bold; color: #1a1a2e; font-size: 16px;"><span t-field="res_company.name"/></div>
-                                <div t-if="res_company.street"><span t-field="res_company.street"/></div>
-                                <div>
-                                    <t t-if="res_company.city"><span t-field="res_company.city"/></t>
-                                    <t t-if="res_company.country_id">, <span t-field="res_company.country_id.name"/></t>
-                                </div>
-                                <div t-if="res_company.phone">Phone: <span t-field="res_company.phone"/></div>
-                                <div t-if="res_company.email">Email: <span t-field="res_company.email"/></div>
+                        <div class="row align-items-center" style="border-bottom: 2px solid #1a1a2e; padding-bottom: 5px; margin-bottom: 5px;">
+                            <div class="col-12">
+                                <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" style="max-height: 60px;" alt="Logo"/>
+                                <h3 t-else="" style="color: #1a1a2e; font-weight: bold; margin: 0;"><span t-field="res_company.name"/></h3>
                             </div>
                         </div>
                     </div>
-                    <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; letter-spacing: 0.4px; color: #333; margin-top: 0px !important; padding-top: 30px !important;">
+                    <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.2; letter-spacing: 0.3px; color: #333; margin-top: 0px !important; padding-top: 15px !important;">
                         
-                        <div class="row mt-1 mb-3" style="margin-top: 0px !important; padding-top: 0px !important;">
+                        <div class="row mt-0 mb-2" style="margin-top: 0px !important; padding-top: 0px !important;">
                             <div class="col-6">
-                                <div t-if="doc.customer_id" style="font-size: 14px;">
+                                <div t-if="doc.customer_id" style="font-size: 13px; line-height: 1.2;">
                                     <strong>Customer:</strong><br/>
                                     <span t-field="doc.customer_id.name"/><br/>
                                     <t t-if="doc.customer_id.phone">Phone: <span t-field="doc.customer_id.phone"/><br/></t>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <table class="table table-sm table-borderless" style="border: none;">
+                                <table class="table table-sm table-borderless mb-0" style="border: none;">
                                     <tr>
-                                        <td style="border: none; padding: 4px 10px; font-weight: bold; font-size: 14px;">Date:</td>
-                                        <td class="text-end" style="border: none; padding: 4px 10px; font-size: 14px;"><span t-field="doc.create_date" t-options='{"widget": "date"}'/></td>
+                                        <td style="border: none; padding: 2px 8px; font-weight: bold; font-size: 13px;">Date:</td>
+                                        <td class="text-end" style="border: none; padding: 2px 8px; font-size: 13px;"><span t-field="doc.create_date" t-options='{"widget": "date"}'/></td>
                                     </tr>
                                     <tr t-if="doc.estimate_id">
-                                        <td style="border: none; padding: 4px 10px; font-weight: bold; font-size: 14px;">Estimate Ref:</td>
-                                        <td class="text-end" style="border: none; padding: 4px 10px; font-size: 14px;"><span t-field="doc.estimate_id.name"/></td>
+                                        <td style="border: none; padding: 2px 8px; font-weight: bold; font-size: 13px;">Estimate Ref:</td>
+                                        <td class="text-end" style="border: none; padding: 2px 8px; font-size: 13px;"><span t-field="doc.estimate_id.name"/></td>
                                     </tr>
                                     <tr t-if="doc.vehicle_id">
-                                        <td style="border: none; padding: 4px 10px; font-weight: bold; font-size: 14px;">Vehicle:</td>
-                                        <td class="text-end" style="border: none; padding: 4px 10px; font-size: 14px;"><span t-field="doc.vehicle_id.name"/> <t t-if="doc.vehicle_id.registration_number">(<span t-field="doc.vehicle_id.registration_number"/>)</t></td>
+                                        <td style="border: none; padding: 2px 8px; font-weight: bold; font-size: 13px;">Vehicle:</td>
+                                        <td class="text-end" style="border: none; padding: 2px 8px; font-size: 13px;"><span t-field="doc.vehicle_id.name"/> <t t-if="doc.vehicle_id.registration_number">(<span t-field="doc.vehicle_id.registration_number"/>)</t></td>
                                     </tr>
                                 </table>
                             </div>
@@ -230,32 +219,32 @@
                         <!-- Lines Table -->
                         <table class="table o_main_table table-borderless mb-0" id="pick_slip_table" style="border: none; width: 100%;">
                             <thead>
-                                <tr style="border-bottom: 3px solid #000 !important;">
-                                    <th name="th_description" class="text-start" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Products</th>
-                                    <th name="th_quantity" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Quantity</th>
-                                    <th name="th_uom" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">UoM</th>
+                                <tr style="border-bottom: 2px solid #000 !important;">
+                                    <th name="th_description" class="text-start" style="border: none; padding: 6px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px; text-transform: uppercase;">Products</th>
+                                    <th name="th_quantity" class="text-end" style="border: none; padding: 6px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px; text-transform: uppercase;">Quantity</th>
+                                    <th name="th_uom" class="text-end" style="border: none; padding: 6px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px; text-transform: uppercase;">UoM</th>
                                 </tr>
                             </thead>
                             <tbody class="pick_slip_tbody">
                                 <t t-foreach="doc.job_card_lines" t-as="line">
                                     <tr t-if="line.display_type == 'line_section'" class="o_line_section">
-                                        <td colspan="3" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
-                                            <span t-field="line.name"/>
+                                        <td colspan="3" style="border: none; background-color: #f2f3f5; padding: 6px 10px; font-weight: 700; font-size: 14px; color: #1a1a2e; letter-spacing: 0.4px;">
+                                             <span t-field="line.name"/>
                                         </td>
                                     </tr>
                                     <tr t-elif="line.display_type == 'line_note'" class="o_line_note">
-                                        <td colspan="3" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
+                                        <td colspan="3" style="border: none; padding: 4px 10px; font-style: italic; color: #777; font-size: 12px; letter-spacing: 0.2px;">
                                             <span t-field="line.name"/>
                                         </td>
                                     </tr>
                                     <tr t-else="">
-                                        <td style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
+                                        <td style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
                                             <span t-field="line.product_id.name"/>
                                         </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
+                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
                                             <span t-esc="'{:.2f}'.format(line.quantity)"/>
                                         </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
+                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
                                             <span t-field="line.product_uom_id.name"/>
                                         </td>
                                     </tr>
