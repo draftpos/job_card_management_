@@ -7,6 +7,7 @@ class JobConsumableIssue(models.Model):
     _description = 'Job Consumable Issue'
     _order = 'id desc'
     _rec_name = 'name'
+    _inherit = ['analytic.mixin']
 
     name = fields.Char(string='Reference', readonly=True, copy=False, default='New')
 
@@ -50,16 +51,12 @@ class JobConsumableIssue(models.Model):
         ('confirmed', 'Confirmed'),
         ('issued', 'Issued'),
         ('cancelled', 'Cancelled'),
-        ('cancelled', 'Cancelled')
     ], string='Status', default='draft')
 
     issue_line_ids = fields.One2many('job.consumable.issue.line', 'issue_id', string='Lines')
     stock_picking_id = fields.Many2one('stock.picking', string='Transfer', readonly=True)
     scrap_ids = fields.Many2many('stock.scrap', string='Scraps', readonly=True)
-    analytic_distribution = fields.Json(
-        string='Analytic Distribution',
-        compute='_compute_analytic_distribution', store=True, readonly=False
-    )
+    # analytic_distribution and analytic_precision are provided by analytic.mixin
     notes = fields.Text(string='Notes')
     issue_date = fields.Date(string='Issue Date', default=fields.Date.today)
 
@@ -85,6 +82,11 @@ class JobConsumableIssue(models.Model):
                 vals['name'] = self.env['ir.sequence'].next_by_code('consumable.issue') or _('New')
         return super().create(vals_list)
 
+    @api.onchange('job_card_id')
+    def _onchange_job_card_id(self):
+        if self.job_card_id and not self.issue_line_ids:
+            self.action_populate_from_job_card()
+
     def action_populate_from_job_card(self):
         self.ensure_one()
         if not self.job_card_id:
@@ -92,9 +94,15 @@ class JobConsumableIssue(models.Model):
         self.issue_line_ids.unlink()
         allow_service = self.env['ir.config_parameter'].sudo().get_param('job_card_management.allow_service_requisition', 'False') == 'True'
         lines_to_create = []
-        job_lines = self.job_card_id.consumables_line_ids.filtered(
+        job = self.job_card_id
+        all_consumable_lines = (job.consumables_line_ids | job.paint_line_ids | job.sundries_line_ids)
+        job_lines = all_consumable_lines.filtered(
             lambda l: l.display_type not in ('line_section', 'line_note') and l.product_id
         )
+        if not job_lines:
+            job_lines = job.parts_line_ids.filtered(
+                lambda l: l.display_type not in ('line_section', 'line_note') and l.product_id
+            )
         for line in job_lines:
             product = line.product_id
             is_service = product.type == 'service'
@@ -138,12 +146,29 @@ class JobConsumableIssue(models.Model):
         if not stockable_lines:
             raise UserError(_('No stockable items with issued quantity > 0.'))
 
+        # Check stock levels accurately before issuing
+        for line in stockable_lines:
+            quants = self.env['stock.quant'].search([
+                ('product_id', '=', line.product_id.id),
+                ('location_id', 'child_of', self.source_location_id.id),
+            ])
+            loc_qty = sum(quants.mapped('quantity'))
+            actual_stock = max(loc_qty, line.product_id.qty_available)
+            if line.issued_qty > actual_stock:
+                raise UserError(_(
+                    "Insufficient stock for '%s'. Requested issue: %s, Total available on hand: %s."
+                ) % (line.product_id.display_name, line.issued_qty, actual_stock))
+
         scrap_location = self.env['stock.location'].search([
-            ('scrap_location', '=', True),
+            ('usage', '=', 'inventory'),
             ('company_id', 'in', [self.env.company.id, False])
         ], limit=1)
         if not scrap_location:
-            raise UserError(_('No scrap location found.'))
+            scrap_location = self.env['stock.location'].search([
+                ('usage', '=', 'inventory')
+            ], limit=1)
+        if not scrap_location:
+            raise UserError(_('No scrap / inventory loss location found.'))
 
         scraps = self.env['stock.scrap']
         for line in stockable_lines:
@@ -203,11 +228,25 @@ class JobConsumableIssue(models.Model):
         job = self.job_card_id
         if not job:
             return
-        all_issues = self.search([('job_card_id', '=', job.id), ('state', '=', 'issued')])
-        if all_issues and all(i.all_issued for i in all_issues):
+        consumables_lines = job.consumables_line_ids.filtered(
+            lambda l: not l.display_type and l.product_id and l.product_id.type in ('product', 'consu')
+        )
+        if not consumables_lines:
             job.all_consumables_issued = True
-        else:
-            job.all_consumables_issued = False
+            return
+        issued_issues = self.search([('job_card_id', '=', job.id), ('state', '=', 'issued')])
+        all_done = True
+        for product in consumables_lines.mapped('product_id'):
+            req_qty = sum(consumables_lines.filtered(lambda l: l.product_id == product).mapped('quantity'))
+            issued_qty = sum(
+                issued_issues.mapped('issue_line_ids')
+                .filtered(lambda il: il.product_id == product)
+                .mapped('issued_qty')
+            )
+            if issued_qty < req_qty:
+                all_done = False
+                break
+        job.all_consumables_issued = all_done
 
     def action_create_requisitions(self):
         self.ensure_one()

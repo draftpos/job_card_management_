@@ -74,11 +74,13 @@ class Procurement(models.Model):
 
     def action_submit_for_approval(self):
         self.state = 'submitted_for_approval'
+        self.message_post(body=_("Requisition submitted for approval by %s.") % self.env.user.name)
 
     def action_approve_requisition(self):
         if not self.env.user.has_group('job_card_management.group_can_approve_procurement'):
             raise UserError(_('You are not allowed to approve requisitions.'))
         self.state = 'approved'
+        self.message_post(body=_("Requisition approved by %s.") % self.env.user.name)
 
     def action_reject_requisition(self):
         return {
@@ -130,12 +132,14 @@ class Procurement(models.Model):
                 vendor_lines[line.vendor_id.id].append(line)
 
         # Create Purchase Orders in Odoo
+        created_pos = []
         for vendor_id, lines in vendor_lines.items():
             vendor = self.env['customer'].browse(vendor_id)
             po = self.env['purchase.order'].create({
                 'partner_id': vendor.partner_id.id,
                 'origin': self.name,
             })
+            created_pos.append(f"{po.name} ({vendor.name or vendor.partner_id.name})")
             for line in lines:
                 po_line_vals = {
                     'order_id': po.id,
@@ -153,51 +157,51 @@ class Procurement(models.Model):
             for line in lines:
                 line.write({'purchase_order_created': True})
 
+        if created_pos:
+            self.message_post(body=_("Purchase Order(s) created by %s: %s") % (self.env.user.name, ", ".join(created_pos)))
+
         # Internal transfers (type = internal_transfer)
         for line in self.procurement_lines.filtered(lambda l: l.type == 'internal_transfer'):
             line.write({'internal_transfer_created': True})
 
     def _confirm_and_receive_pos(self):
         pos = self.env['purchase.order'].search([('origin', '=', self.name), ('state', 'in', ['draft', 'sent', 'to approve'])])
+        analytic_account = self.analytic_account_id or self.job_card_id.analytic_account_id
+        distribution = {str(analytic_account.id): 100.0} if analytic_account else False
         for po in pos:
             po.button_confirm()
-            
-            # Auto-receive (validate all pickings/GRVs)
-            for picking in po.picking_ids:
-                if picking.state not in ['done', 'cancel']:
-                    picking.action_assign()
+            if distribution:
+                for picking in po.picking_ids:
+                    if hasattr(picking, 'analytic_distribution'):
+                        picking.write({'analytic_distribution': distribution})
                     for move in picking.move_ids:
-                        move.quantity = move.product_uom_qty
-                    picking.button_validate()
-            
-            # Automatically create draft supplier invoice and POST it
-            po.action_create_invoice()
-            for invoice in po.invoice_ids:
-                if invoice.state == 'draft':
-                    invoice.action_post()
+                        if hasattr(move, 'analytic_distribution'):
+                            move.write({'analytic_distribution': distribution})
 
-    def action_create_submit_po(self):
-        if self.state != 'approved':
+    def action_create_po(self):
+        if self.state not in ['approved', 'po_rejected']:
             raise UserError(_('Requisition must be approved before creating purchase orders.'))
         self._generate_purchase_orders()
         self.state = 'pending_po_approval'
 
+    def action_create_submit_po(self):
+        return self.action_create_po()
+
     def action_create_approve_po(self):
-        if self.state != 'approved':
-            raise UserError(_('Requisition must be approved before creating purchase orders.'))
-        if not self.env.user.has_group('job_card_management.group_can_approve_procurement'):
-            raise UserError(_('You are not allowed to approve purchase orders.'))
-        self._generate_purchase_orders()
-        self._confirm_and_receive_pos()
-        self.state = 'purchase_order_created'
+        return self.action_create_po()
 
     def action_approve_po(self):
         if self.state != 'pending_po_approval':
             raise UserError(_('Requisition must be pending PO approval.'))
-        if not self.env.user.has_group('job_card_management.group_can_approve_procurement'):
+        if not (self.env.user.has_group('job_card_management.group_can_approve_purchase_order') or
+                self.env.user.has_group('job_card_management.group_can_approve_procurement') or
+                self.env.is_superuser()):
             raise UserError(_('You are not allowed to approve purchase orders.'))
         self._confirm_and_receive_pos()
         self.state = 'purchase_order_created'
+        pos = self.env['purchase.order'].search([('origin', '=', self.name)])
+        po_names = ", ".join(pos.mapped('name')) if pos else "linked POs"
+        self.message_post(body=_("Purchase Order(s) %s approved and confirmed by %s.") % (po_names, self.env.user.name))
 
     def action_view_purchase_orders(self):
         self.ensure_one()
@@ -261,8 +265,20 @@ class Procurement(models.Model):
         
         # Open GRV (Goods Receipt Vouchers) - stock pickings for incoming
         purchase_orders = self.env['purchase.order'].search([('origin', '=', self.name)])
-        picking_ids = purchase_orders.mapped('picking_ids').filtered(lambda p: p.picking_type_code == 'incoming').ids
+        pickings = purchase_orders.mapped('picking_ids').filtered(lambda p: p.picking_type_code == 'incoming')
+        analytic_account = self.analytic_account_id or self.job_card_id.analytic_account_id
+        if analytic_account:
+            distribution = {str(analytic_account.id): 100.0}
+            for picking in pickings:
+                if hasattr(picking, 'analytic_distribution') and not picking.analytic_distribution:
+                    picking.write({'analytic_distribution': distribution})
+                for move in picking.move_ids:
+                    if hasattr(move, 'analytic_distribution') and not move.analytic_distribution:
+                        move.write({'analytic_distribution': distribution})
+
+        picking_ids = pickings.ids
         if picking_ids:
+            self.message_post(body=_("Goods Receipt Voucher (GRV) accessed by %s.") % self.env.user.name)
             return {
                 'type': 'ir.actions.act_window',
                 'name': 'Goods Receipt Vouchers',

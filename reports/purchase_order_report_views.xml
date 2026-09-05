@@ -130,10 +130,15 @@
                         </div>
                         
                         <!-- Notes -->
-                        <div class="row mt-4" t-if="o.notes">
+                        <div class="row mt-3" t-if="o.notes">
                             <div class="col-12">
-                                <h5 style="color: #1a1a2e; font-weight: bold; border-bottom: 2px solid #1a1a2e; padding-bottom: 5px;">Notes</h5>
-                                <div style="font-size: 13px; color: #555; padding-top: 10px; line-height: 1.1;">
+                                <h5 style="color: #1a1a2e; font-weight: bold; border-bottom: 2px solid #1a1a2e; padding-bottom: 3px; font-size: 14px; margin-bottom: 5px;">Terms and Conditions</h5>
+                                <style>
+                                    .po_notes_content p { margin: 0 0 2px 0 !important; line-height: 1.15 !important; }
+                                    .po_notes_content ul, .po_notes_content ol { margin: 0 0 3px 0 !important; padding-left: 18px !important; }
+                                    .po_notes_content li { margin-bottom: 1px !important; line-height: 1.15 !important; }
+                                </style>
+                                <div class="po_notes_content" style="font-size: 12px; color: #444; padding-top: 3px; line-height: 1.15;">
                                     <span t-out="o.notes"/>
                                 </div>
                             </div>

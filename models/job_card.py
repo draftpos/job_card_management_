@@ -506,38 +506,56 @@ class JobCard(models.Model):
         for rec in self:
             rec.inventory_issue_count = len(rec.inventory_issue_ids.filtered(lambda i: i.state == 'issued'))
 
-    @api.depends('inventory_issue_ids.all_issued')
+    @api.depends('parts_line_ids', 'parts_line_ids.quantity', 'parts_line_ids.product_id',
+                 'consumables_line_ids', 'consumables_line_ids.quantity', 'consumables_line_ids.product_id',
+                 'paint_line_ids', 'paint_line_ids.quantity', 'paint_line_ids.product_id',
+                 'sundries_line_ids', 'sundries_line_ids.quantity', 'sundries_line_ids.product_id',
+                 'fittings_line_ids', 'fittings_line_ids.quantity', 'fittings_line_ids.product_id',
+                 'repairs_line_ids', 'repairs_line_ids.quantity', 'repairs_line_ids.product_id',
+                 'inventory_issue_ids.state', 'inventory_issue_ids.issue_line_ids.issued_qty')
     def _compute_all_inventory_issued(self):
         allow_service = self.env['ir.config_parameter'].sudo().get_param('job_card_management.allow_service_requisition', 'False') == 'True'
         for rec in self:
-            job_lines = rec.job_card_lines.filtered(
+            all_lines = (
+                rec.parts_line_ids |
+                rec.consumables_line_ids |
+                rec.paint_line_ids |
+                rec.sundries_line_ids |
+                rec.fittings_line_ids |
+                rec.repairs_line_ids
+            ).filtered(
                 lambda l: not l.display_type and l.product_id
             )
             
             if not allow_service:
-                job_lines = job_lines.filtered(lambda l: l.product_id.type in ('product', 'consu'))
+                all_lines = all_lines.filtered(lambda l: l.product_id.type in ('product', 'consu'))
                 
-            if not job_lines:
+            if not all_lines:
                 rec.all_inventory_issued = True
                 continue
 
+            active_issues = rec.inventory_issue_ids.filtered(lambda i: i.state in ('issued', 'partially_issued'))
+            completed_procurements = self.env['procurement'].search([
+                ('job_card_id', '=', rec.id),
+                ('state', '=', 'purchase_order_created')
+            ])
+
             all_issued = True
-            procurements = self.env['procurement'].search([('job_card_id', '=', rec.id)])
-            for product in job_lines.mapped('product_id'):
-                required_qty = sum(job_lines.filtered(lambda l: l.product_id == product).mapped('quantity'))
+            for product in all_lines.mapped('product_id'):
+                required_qty = sum(all_lines.filtered(lambda l: l.product_id == product).mapped('quantity'))
                 issued_qty = sum(
-                    rec.inventory_issue_ids.mapped('issue_line_ids')
+                    active_issues.mapped('issue_line_ids')
                     .filtered(lambda il: il.product_id == product)
                     .mapped('issued_qty')
                 )
                 
-                # Add internal transfer quantities from procurement
-                internal_transfer_qty = sum(
-                    procurements.mapped('procurement_lines')
-                    .filtered(lambda pl: pl.type == 'internal_transfer' and not pl.display_type and pl.product_id.id == product.id)
+                # Only count internal transfers that have actually been marked delivered
+                delivered_transfer_qty = sum(
+                    completed_procurements.mapped('procurement_lines')
+                    .filtered(lambda pl: pl.type == 'internal_transfer' and pl.receipt_status == 'delivered' and pl.product_id.id == product.id)
                     .mapped('quantity')
                 )
-                issued_qty += internal_transfer_qty
+                issued_qty += delivered_transfer_qty
                 
                 if issued_qty < required_qty:
                     all_issued = False
@@ -547,28 +565,66 @@ class JobCard(models.Model):
 
     def action_issue_inventory(self):
         self.ensure_one()
-        if not self.parts_line_ids:
-            raise UserError(_('There are no parts lines to issue.'))
+        all_lines = (
+            self.parts_line_ids |
+            self.consumables_line_ids |
+            self.paint_line_ids |
+            self.sundries_line_ids |
+            self.fittings_line_ids |
+            self.repairs_line_ids
+        ).filtered(lambda l: l.display_type not in ('line_section', 'line_note') and l.product_id)
+        if not all_lines:
+            raise UserError(_('There are no product lines to issue for this job card.'))
+
+        existing = self.inventory_issue_ids.filtered(lambda i: i.state in ('draft', 'confirmed', 'partially_issued'))[:1]
+        if existing:
+            existing._onchange_source_location()
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Issue Inventory'),
+                'res_model': 'job.inventory.issue',
+                'res_id': existing.id,
+                'view_mode': 'form',
+                'target': 'current',
+            }
+
+        issue = self.env['job.inventory.issue'].create({
+            'job_card_id': self.id,
+        })
+        issue.action_populate_from_job_card()
             
         return {
             'type': 'ir.actions.act_window',
             'name': _('Issue Inventory'),
             'res_model': 'job.inventory.issue',
+            'res_id': issue.id,
             'view_mode': 'form',
-            'context': {'default_job_card_id': self.id},
+            'target': 'current',
         }
 
     def action_issue_consumables(self):
         self.ensure_one()
-        if not self.consumables_line_ids:
+        all_lines = (
+            self.consumables_line_ids |
+            self.paint_line_ids |
+            self.sundries_line_ids |
+            self.parts_line_ids
+        ).filtered(lambda l: l.display_type not in ('line_section', 'line_note') and l.product_id)
+        if not all_lines:
             raise UserError(_('There are no consumable lines to issue.'))
+
+        issue = self.env['job.consumable.issue'].create({
+            'job_card_id': self.id,
+        })
+        issue.action_populate_from_job_card()
             
         return {
             'type': 'ir.actions.act_window',
             'name': _('Issue Consumables'),
             'res_model': 'job.consumable.issue',
+            'res_id': issue.id,
             'view_mode': 'form',
-            'context': {'default_job_card_id': self.id},
+            'target': 'current',
         }
             
     state = fields.Selection([
@@ -895,6 +951,7 @@ class JobCard(models.Model):
                     # Customer SO
                     customer_so = self.env['sale.order'].create({
                         'partner_id': rec.customer_id.partner_id.id,
+                        'user_id': self.env.user.id,
                         'origin': f"{rec.name} (Customer)",
                         'note': f"Customer portion of Job Card {rec.name}",
                     })
@@ -924,6 +981,7 @@ class JobCard(models.Model):
                     # Insurance SO
                     insurance_so = self.env['sale.order'].create({
                         'partner_id': rec.second_customer_id.partner_id.id,
+                        'user_id': customer_so.user_id.id or self.env.user.id,
                         'origin': f"{rec.name} (Insurance)",
                         'note': f"Insurance portion of Job Card {rec.name}",
                     })
@@ -944,6 +1002,7 @@ class JobCard(models.Model):
 
                     sale_order = self.env['sale.order'].create({
                         'partner_id': rec.customer_id.partner_id.id,
+                        'user_id': self.env.user.id,
                         'origin': rec.name,
                     })
                     rec.customer_sale_order_id = sale_order.id

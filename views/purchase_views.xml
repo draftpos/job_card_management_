@@ -39,11 +39,46 @@
             <xpath expr="//button[@name='button_approve']" position="attributes">
                 <attribute name="groups">job_card_management.group_can_approve_purchase_order</attribute>
             </xpath>
+            <xpath expr="//button[@id='bid_confirm']" position="attributes">
+                <attribute name="groups">job_card_management.group_can_approve_purchase_order</attribute>
+            </xpath>
+            <xpath expr="//button[@id='draft_confirm']" position="attributes">
+                <attribute name="groups">job_card_management.group_can_approve_purchase_order</attribute>
+            </xpath>
             
-            <!-- Add Custom Buttons -->
+            <!-- Add Custom Buttons and Ribbon -->
             <xpath expr="//header" position="inside">
+                <field name="has_done_picking" invisible="1"/>
+                <field name="has_pending_picking" invisible="1"/>
                 <button name="action_amend_supplier" string="Amend Supplier" type="object" invisible="state in ('done', 'cancel')"/>
+                <button name="action_return_to_supplier_before_grv" string="Return to Supplier (Pre-GRV)" type="object" invisible="state in ('done', 'cancel') or has_done_picking" confirm="Are you sure you want to return/cancel this order before receiving goods?"/>
+                <button name="action_return_to_supplier_after_grv" string="Return to Supplier (Post-GRV)" type="object" class="btn-warning" invisible="not has_done_picking or state == 'cancel'"/>
                 <button name="action_manual_close" string="Close PO" type="object" class="btn-danger" invisible="state in ('done', 'cancel')"/>
+            </xpath>
+
+            <xpath expr="//sheet" position="before">
+                <field name="is_amended" invisible="1"/>
+                <widget name="web_ribbon" title="Amended" bg_color="text-bg-warning" invisible="not is_amended"/>
+            </xpath>
+
+            <xpath expr="//sheet//group[1]" position="after">
+                <div class="alert alert-warning" role="alert" invisible="not is_amended" style="margin-bottom: 10px;">
+                    <strong>Note:</strong> This Purchase Order was created as an amendment to another supplier.
+                </div>
+                <div class="alert alert-danger" role="alert" invisible="not closing_reason" style="margin-bottom: 10px;">
+                    <strong>Closing Reason:</strong> <field name="closing_reason" readonly="1" class="oe_inline"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_purchase_order_tree_inherit_job_card" model="ir.ui.view">
+        <field name="name">purchase.order.tree.inherit.job.card</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="is_amended" string="Amended" widget="boolean_toggle" optional="show"/>
             </xpath>
         </field>
     </record>

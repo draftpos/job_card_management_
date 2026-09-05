@@ -10,9 +10,7 @@
                     <button name="action_approve_requisition" string="Approve Requisition" type="object" invisible="state not in ['submitted_for_approval']" groups="job_card_management.group_can_approve_procurement"/>
                     <button name="action_reject_requisition" string="Reject Requisition" type="object" invisible="state not in ['submitted_for_approval']" groups="job_card_management.group_can_approve_procurement"/>
                     
-                    <field name="is_procurement_approver" invisible="1"/>
-                    <button name="action_create_submit_po" string="Create &amp; Submit PO for Approval" type="object" invisible="state not in ['approved'] or is_procurement_approver"/>
-                    <button name="action_create_approve_po" string="Create &amp; Approve PO" type="object" invisible="state not in ['approved'] or not is_procurement_approver" groups="job_card_management.group_can_approve_purchase_order"/>
+                    <button name="action_create_po" string="Create Purchase Order" type="object" class="oe_highlight" invisible="state not in ['approved', 'po_rejected']"/>
                     
                     <button name="action_approve_po" string="Approve PO" type="object" invisible="state not in ['pending_po_approval']" groups="job_card_management.group_can_approve_purchase_order" class="oe_highlight"/>
                     <button name="action_reject_po" string="Reject PO" type="object" invisible="state not in ['pending_po_approval']" groups="job_card_management.group_can_approve_purchase_order"/>
@@ -67,8 +65,8 @@
                             <field name="internal_transfer_created"/>
                         </list>
                     </field>
+                    <chatter/>
                 </sheet>
-                <chatter/>
             </form>
         </field>
     </record>
