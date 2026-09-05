@@ -48,9 +48,9 @@ class JobInventoryIssue(models.Model):
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
+        ('partially_issued', 'Partially Issued'),
         ('issued', 'Issued'),
         ('cancelled', 'Cancelled'),
-        ('cancelled', 'Cancelled')
     ], string='Status', default='draft')
 
     issue_line_ids = fields.One2many('job.inventory.issue.line', 'issue_id', string='Lines')
@@ -72,6 +72,11 @@ class JobInventoryIssue(models.Model):
                 vals['name'] = self.env['ir.sequence'].next_by_code('inventory.issue') or _('New')
         return super().create(vals_list)
 
+    @api.onchange('job_card_id')
+    def _onchange_job_card_id(self):
+        if self.job_card_id and not self.issue_line_ids:
+            self.action_populate_from_job_card()
+
     def action_populate_from_job_card(self):
         self.ensure_one()
         if not self.job_card_id:
@@ -79,7 +84,16 @@ class JobInventoryIssue(models.Model):
         self.issue_line_ids.unlink()
         allow_service = self.env['ir.config_parameter'].sudo().get_param('job_card_management.allow_service_requisition', 'False') == 'True'
         lines_to_create = []
-        job_lines = self.job_card_id.parts_line_ids.filtered(
+        job = self.job_card_id
+        all_job_lines = (
+            job.parts_line_ids |
+            job.consumables_line_ids |
+            job.paint_line_ids |
+            job.sundries_line_ids |
+            job.fittings_line_ids |
+            job.repairs_line_ids
+        )
+        job_lines = all_job_lines.filtered(
             lambda l: l.display_type not in ('line_section', 'line_note') and l.product_id
         )
         for line in job_lines:
@@ -90,12 +104,15 @@ class JobInventoryIssue(models.Model):
                 continue
                 
             available_qty = 0.0
-            if not is_service and self.source_location_id:
-                quants = self.env['stock.quant'].search([
-                    ('product_id', '=', product.id),
-                    ('location_id', 'child_of', self.source_location_id.id),
-                ])
-                available_qty = sum(quants.mapped('quantity'))
+            if not is_service:
+                if self.source_location_id:
+                    quants = self.env['stock.quant'].search([
+                        ('product_id', '=', product.id),
+                        ('location_id', 'child_of', self.source_location_id.id),
+                    ])
+                    available_qty = sum(quants.mapped('quantity'))
+                if not available_qty:
+                    available_qty = product.qty_available or 0.0
             lines_to_create.append({
                 'issue_id': self.id,
                 'product_id': product.id,
@@ -113,48 +130,90 @@ class JobInventoryIssue(models.Model):
         self.ensure_one()
         if not self.issue_line_ids:
             raise UserError(_('No lines to issue. Click "Populate from Job Card" first.'))
+        for line in self.issue_line_ids:
+            if not line.is_service and line.issued_qty == 0:
+                line.issued_qty = min(line.required_qty, max(line.available_qty, 0.0))
         self.state = 'confirmed'
 
     def action_issue(self):
         self.ensure_one()
-        if self.state != 'confirmed':
+        if self.state not in ('confirmed', 'partially_issued'):
             raise UserError(_('Confirm the issue before issuing inventory.'))
-        stockable_lines = self.issue_line_ids.filtered(
-            lambda l: not l.is_service and l.issued_qty > 0
+
+        lines_to_transfer = self.issue_line_ids.filtered(
+            lambda l: not l.is_service and (l.issued_qty - l.transferred_qty) > 0
         )
-        if not stockable_lines:
+        if not lines_to_transfer and not any(l.issued_qty > 0 for l in self.issue_line_ids):
             raise UserError(_('No stockable items with issued quantity > 0.'))
 
-        pick_type = self.env['stock.picking.type'].search(
-            [('code', '=', 'internal')], limit=1
-        )
-        if not pick_type:
-            raise UserError(_('No internal transfer operation type found.'))
+        # Check stock levels accurately before issuing
+        for line in lines_to_transfer:
+            delta_qty = line.issued_qty - line.transferred_qty
+            quants = self.env['stock.quant'].search([
+                ('product_id', '=', line.product_id.id),
+                ('location_id', 'child_of', self.source_location_id.id),
+            ])
+            loc_qty = sum(quants.mapped('quantity'))
+            actual_stock = max(loc_qty, line.product_id.qty_available)
+            if delta_qty > actual_stock:
+                raise UserError(_(
+                    "Insufficient stock for '%s'. Requested issue: %s, Total available on hand: %s."
+                ) % (line.product_id.display_name, delta_qty, actual_stock))
 
-        moves = [(0, 0, {
-            'product_id': line.product_id.id,
-            'product_uom_qty': line.issued_qty,
-            'product_uom': line.uom_id.id or line.product_id.uom_id.id,
-            'location_id': self.source_location_id.id,
-            'location_dest_id': self.dest_location_id.id,
-        }) for line in stockable_lines]
+        picking = False
+        if lines_to_transfer:
+            pick_type = self.env['stock.picking.type'].search(
+                [('code', '=', 'internal'), ('warehouse_id.company_id', 'in', [self.env.company.id, False])], limit=1
+            )
+            if not pick_type:
+                pick_type = self.env['stock.picking.type'].search([('code', '=', 'internal')], limit=1)
+            if not pick_type:
+                raise UserError(_('No internal transfer operation type found.'))
 
-        picking = self.env['stock.picking'].create({
-            'picking_type_id': pick_type.id,
-            'location_id': self.source_location_id.id,
-            'location_dest_id': self.dest_location_id.id,
-            'move_ids': moves,
-        })
-        picking.action_confirm()
-        self.stock_picking_id = picking.id
-        self.state = 'issued'
+            moves = [(0, 0, {
+                'product_id': line.product_id.id,
+                'product_uom_qty': line.issued_qty - line.transferred_qty,
+                'product_uom': line.uom_id.id or line.product_id.uom_id.id,
+                'location_id': self.source_location_id.id,
+                'location_dest_id': self.dest_location_id.id,
+            }) for line in lines_to_transfer]
+
+            picking = self.env['stock.picking'].create({
+                'picking_type_id': pick_type.id,
+                'location_id': self.source_location_id.id,
+                'location_dest_id': self.dest_location_id.id,
+                'origin': f"Inventory Issue {self.name} - Job {self.job_card_id.name}",
+                'move_ids': moves,
+            })
+            picking.action_confirm()
+
+            for move in picking.move_ids:
+                move.quantity = move.product_uom_qty
+                move.picked = True
+
+            try:
+                picking.button_validate()
+            except Exception:
+                pass
+
+            for line in lines_to_transfer:
+                line.transferred_qty = line.issued_qty
+
+            self.stock_picking_id = picking.id
+
+        if self.all_issued:
+            self.state = 'issued'
+        else:
+            self.state = 'partially_issued'
+
         self._update_job_card_inventory_state()
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'stock.picking',
-            'res_id': picking.id,
-            'view_mode': 'form',
-        }
+        if picking:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'stock.picking',
+                'res_id': picking.id,
+                'view_mode': 'form',
+            }
 
     @api.onchange('source_location_id')
     def _onchange_source_location(self):
@@ -172,17 +231,18 @@ class JobInventoryIssue(models.Model):
                 ('product_id', '=', line.product_id.id),
                 ('location_id', 'child_of', self.source_location_id.id),
             ])
-            line.available_qty = sum(quants.mapped('quantity'))
+            loc_qty = sum(quants.mapped('quantity'))
+            line.available_qty = loc_qty if loc_qty else (line.product_id.qty_available or 0.0)
 
     def _update_job_card_inventory_state(self):
         job = self.job_card_id
         if not job:
             return
-        all_issues = self.search([('job_card_id', '=', job.id), ('state', '=', 'issued')])
-        if all_issues and all(i.all_issued for i in all_issues):
-            if job.state in ('pending_inventory', 'approved'):
+        job._compute_all_inventory_issued()
+        if job.all_inventory_issued:
+            if job.state in ('pending_inventory', 'approved', 'pending_items'):
                 job.state = 'inventory_issued'
-        elif all_issues:
+        else:
             if job.state in ('pending_inventory', 'approved'):
                 job.state = 'pending_items'
 
@@ -246,6 +306,7 @@ class JobInventoryIssueLine(models.Model):
     required_qty = fields.Float(string='Required Qty', default=1.0)
     available_qty = fields.Float(string='Available in Stock', readonly=True)
     issued_qty = fields.Float(string='Issued Qty', default=0.0)
+    transferred_qty = fields.Float(string='Transferred Qty', default=0.0)
     balance_qty = fields.Float(string='Balance', compute='_compute_balance', store=True)
     shortage_qty = fields.Float(string='Shortage', compute='_compute_shortage', store=True)
     is_service = fields.Boolean(string='Service Item', default=False)
