@@ -33,3 +33,5 @@ access_purchase_order_close_wizard,Purchase Order Close Wizard,model_purchase_or
 access_purchase_order_amend_wizard,Purchase Order Amend Wizard,model_purchase_order_amend_wizard,base.group_user,1,1,1,1
 access_job_consumable_issue,job.consumable.issue,model_job_consumable_issue,base.group_user,1,1,1,1
 access_job_consumable_issue_line,job.consumable.issue.line,model_job_consumable_issue_line,base.group_user,1,1,1,1
+access_consumable_issue_success_wizard,consumable.issue.success.wizard,model_consumable_issue_success_wizard,base.group_user,1,1,1,1
+access_procurement_reject_wizard,procurement.reject.wizard,model_procurement_reject_wizard,base.group_user,1,1,1,1

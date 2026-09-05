@@ -16,7 +16,7 @@
                     <button name="action_approve_job_card" string="Approve Job Card" type="object" invisible="state not in ['draft']"/>
                     
                     <!-- Approved state buttons -->
-                    <button name="action_issue_inventory" string="Issue Inventory" type="object" class="btn-primary" invisible="state not in ['in_progress', 'pending_inventory', 'pending_items', 'requisition_started'] or all_inventory_issued"/>
+                    <button name="action_issue_inventory" string="Issue Inventory" type="object" class="btn-primary" invisible="state in ['draft', 'completed', 'delivered'] or all_inventory_issued"/>
                     <button name="action_issue_consumables" string="Issue Consumables" type="object" class="btn-secondary" invisible="state not in ['in_progress', 'pending_inventory', 'pending_items'] or all_consumables_issued"/>
                     <button name="action_start_job" string="Start Job" type="object" class="btn-primary" invisible="state not in ['inventory_issued', 'requisition_started', 'pending_inventory']"/>
                     <button name="action_create_requisition" string="Requisition" type="object" invisible="state not in ['approved', 'pending_inventory']" class="btn-primary"/>
