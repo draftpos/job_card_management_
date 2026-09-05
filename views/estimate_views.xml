@@ -98,45 +98,125 @@
                         <!-- Lines Table -->
                         <table class="table o_main_table table-borderless mb-0" id="estimate_table" style="border: none; width: 100%;">
                             <thead>
-                                <tr style="border-bottom: 3px solid #000 !important;">
-                                    <th name="th_description" class="text-start" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Description</th>
-                                    <th name="th_quantity" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Quantity</th>
-                                    <th name="th_priceunit" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Unit Price</th>
-
-                                    <th name="th_tax_amount" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">VAT</th>
-                                    <th name="th_subtotal" class="text-end" style="border: none; padding: 16px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.6px; text-transform: uppercase;">Amount</th>
+                                <tr style="border-bottom: 2px solid #000 !important;">
+                                    <th name="th_description" class="text-start" style="border: none; padding: 8px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px; text-transform: uppercase;">Description</th>
+                                    <th name="th_quantity" class="text-end" style="border: none; padding: 8px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px; text-transform: uppercase;">Quantity</th>
+                                    <th name="th_priceunit" class="text-end" style="border: none; padding: 8px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px; text-transform: uppercase;">Unit Price</th>
+                                    <th name="th_tax_amount" class="text-end" style="border: none; padding: 8px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px; text-transform: uppercase;">VAT</th>
+                                    <th name="th_subtotal" class="text-end" style="border: none; padding: 8px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px; text-transform: uppercase;">Amount</th>
                                 </tr>
                             </thead>
                             <tbody class="estimate_tbody">
-                                <t t-foreach="doc.estimate_lines" t-as="line">
-                                    <tr t-if="line.display_type == 'line_section'" class="o_line_section">
-                                        <td colspan="5" style="border: none; background-color: #f2f3f5; padding: 14px 14px; font-weight: 700; font-size: 16px; color: #1a1a2e; letter-spacing: 0.5px;">
-                                            <span t-field="line.name"/>
+                                <!-- 1. Supply Parts (Itemized) -->
+                                <t t-set="parts_lines" t-value="doc.estimate_lines.filtered(lambda l: l.line_category == 'parts')"/>
+                                <t t-if="parts_lines">
+                                    <tr style="height: 16px;"><td colspan="5" style="border: none; padding: 0;"/></tr>
+                                    <tr class="o_line_section">
+                                        <td colspan="5" style="border: none; background-color: #f2f3f5; padding: 8px 10px; font-weight: 700; font-size: 14px; color: #1a1a2e; letter-spacing: 0.4px;">
+                                            Supply Parts
                                         </td>
                                     </tr>
-                                    <tr t-elif="line.display_type == 'line_note'" class="o_line_note">
-                                        <td colspan="5" style="border: none; padding: 12px 14px; font-style: italic; color: #777; font-size: 14px; letter-spacing: 0.3px;">
-                                            <span t-field="line.name"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-else="">
-                                        <td style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            <span t-field="line.product_id.name"/>
-                                        </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            <span t-esc="'{:.2f}'.format(line.quantity)"/>
-                                        </td>
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            $ <span t-esc="'{:.2f}'.format(line.unit_price)"/>
-                                        </td>
+                                    <t t-foreach="parts_lines" t-as="line">
+                                        <t t-if="line.display_type == 'line_section'">
+                                            <t t-if="(line.name or '').strip().lower() not in ['supply parts', 'parts']">
+                                                <tr style="height: 14px;"><td colspan="5" style="border: none; padding: 0;"/></tr>
+                                                <tr class="o_line_section">
+                                                    <td colspan="5" style="border: none; background-color: #f8f9fa; padding: 7px 10px; font-weight: 700; font-size: 13px; color: #1a1a2e; letter-spacing: 0.4px; border-left: 3px solid #1a1a2e;">
+                                                        <span t-field="line.name"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                        <t t-elif="line.display_type == 'line_note'">
+                                            <tr>
+                                                <td colspan="5" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 4px 10px; font-size: 12px; font-style: italic; color: #666;">
+                                                    <span t-field="line.name"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-else="">
+                                            <tr>
+                                                <td style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                    <span t-field="line.product_id.name"/>
+                                                </td>
+                                                <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                    <span t-esc="'{:.2f}'.format(line.quantity)"/>
+                                                </td>
+                                                <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                    $ <span t-esc="'{:.2f}'.format(line.unit_price)"/>
+                                                </td>
+                                                <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                    $ <span t-esc="'{:.2f}'.format(line.tax_amount)"/>
+                                                </td>
+                                                <td class="text-end o_price_total" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.3px;">
+                                                    $ <span t-esc="'{:.2f}'.format(line.price_total)"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </t>
 
-                                        <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; color: #333; letter-spacing: 0.4px;">
-                                            $ <span t-esc="'{:.2f}'.format(line.tax_amount)"/>
-                                        </td>
-                                        <td class="text-end o_price_total" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 14px 14px; font-size: 15px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.4px;">
-                                            $ <span t-esc="'{:.2f}'.format(line.price_total)"/>
-                                        </td>
-                                    </tr>
+                                <!-- 2. Other Categories as Single Consolidated Rows -->
+                                <tr t-if="parts_lines" style="height: 14px;"><td colspan="5" style="border: none; padding: 0;"/></tr>
+                                <t t-set="category_defs" t-value="[
+                                    ('repairs', 'Repair Works'),
+                                    ('paint', 'Paint Job'),
+                                    ('fittings', 'Fittings'),
+                                    ('sundries', 'Sundries'),
+                                    ('consumables', 'Consumables')
+                                ]"/>
+                                <t t-foreach="category_defs" t-as="cat">
+                                    <t t-set="cat_code" t-value="cat[0]"/>
+                                    <t t-set="cat_title" t-value="cat[1]"/>
+                                    <t t-set="cat_lines" t-value="doc.estimate_lines.filtered(lambda l: l.line_category == cat_code and l.display_type not in ('line_section', 'line_note'))"/>
+                                    <t t-if="cat_lines">
+                                        <t t-set="cat_qty" t-value="sum(cat_lines.mapped('quantity'))"/>
+                                        <t t-set="cat_subtotal" t-value="sum(cat_lines.mapped('price_subtotal'))"/>
+                                        <t t-set="cat_tax" t-value="sum(cat_lines.mapped('tax_amount'))"/>
+                                        <t t-set="cat_total" t-value="sum(cat_lines.mapped('price_total'))"/>
+                                        <t t-set="cat_unit_price" t-value="cat_subtotal / cat_qty if cat_qty else cat_subtotal"/>
+                                        <tr>
+                                            <td style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; font-weight: 600; color: #1a1a2e; letter-spacing: 0.3px;">
+                                                <span t-esc="cat_title"/>
+                                            </td>
+                                            <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                <span t-esc="'{:.2f}'.format(cat_qty)"/>
+                                            </td>
+                                            <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                $ <span t-esc="'{:.2f}'.format(cat_unit_price)"/>
+                                            </td>
+                                            <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                $ <span t-esc="'{:.2f}'.format(cat_tax)"/>
+                                            </td>
+                                            <td class="text-end o_price_total" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.3px;">
+                                                $ <span t-esc="'{:.2f}'.format(cat_total)"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+
+                                <!-- 3. Any uncategorized lines -->
+                                <t t-set="other_lines" t-value="doc.estimate_lines.filtered(lambda l: l.line_category not in ('parts', 'repairs', 'paint', 'fittings', 'sundries', 'consumables') and l.display_type not in ('line_section', 'line_note'))"/>
+                                <t t-if="other_lines">
+                                    <t t-foreach="other_lines" t-as="line">
+                                        <tr>
+                                            <td style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                <span t-field="line.product_id.name"/>
+                                            </td>
+                                            <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                <span t-esc="'{:.2f}'.format(line.quantity)"/>
+                                            </td>
+                                            <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                $ <span t-esc="'{:.2f}'.format(line.unit_price)"/>
+                                            </td>
+                                            <td class="text-end" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; color: #333; letter-spacing: 0.3px;">
+                                                $ <span t-esc="'{:.2f}'.format(line.tax_amount)"/>
+                                            </td>
+                                            <td class="text-end o_price_total" style="border: none; border-bottom: 1px solid #e0e0e0; padding: 6px 10px; font-size: 13px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.3px;">
+                                                $ <span t-esc="'{:.2f}'.format(line.price_total)"/>
+                                            </td>
+                                        </tr>
+                                    </t>
                                 </t>
                             </tbody>
                         </table>
@@ -145,32 +225,83 @@
                         <div class="row mt-3">
                             <div class="col-7"/>
                             <div class="col-5">
-                                <table class="table table-sm table-borderless" style="border: none; border-top: 3px solid #000;">
+                                <table class="table table-sm table-borderless" style="border: none; border-top: 2px solid #000;">
                                     <tr class="o_subtotal">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total Excl</td>
-                                        <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
+                                        <td style="border: none; padding: 6px 8px; font-size: 13px; color: #333; letter-spacing: 0.3px;">Total Excl</td>
+                                        <td class="text-end" style="border: none; padding: 6px 8px; font-size: 13px; color: #333;">
                                             $ <span t-esc="'{:.2f}'.format(doc.amount_untaxed)"/>
                                         </td>
                                     </tr>
                                     <tr class="o_taxes">
-                                        <td style="border: none; padding: 10px 12px; font-size: 15px; color: #333; letter-spacing: 0.4px;">Total VAT</td>
-                                        <td class="text-end" style="border: none; padding: 10px 12px; font-size: 15px; color: #333;">
+                                        <td style="border: none; padding: 6px 8px; font-size: 13px; color: #333; letter-spacing: 0.3px;">Total VAT</td>
+                                        <td class="text-end" style="border: none; padding: 6px 8px; font-size: 13px; color: #333;">
                                             $ <span t-esc="'{:.2f}'.format(doc.amount_tax)"/>
                                         </td>
                                     </tr>
                                     <tr class="o_total">
-                                        <td style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;"><strong>Total Incl</strong></td>
-                                        <td class="text-end" style="border: none; padding: 12px 12px; font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.5px;">
+                                        <td style="border: none; padding: 8px 8px; font-size: 15px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.4px;"><strong>Total Incl</strong></td>
+                                        <td class="text-end" style="border: none; padding: 8px 8px; font-size: 15px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.4px;">
                                             <strong>$ <span t-esc="'{:.2f}'.format(doc.amount_total)"/></strong>
                                         </td>
                                     </tr>
                                 </table>
                             </div>
                         </div>
-                        <div t-if="doc.terms_and_conditions" class="row mt-4">
-                            <div class="col-12" style="font-size: 13px; color: #555;">
-                                <strong>Terms and Conditions:</strong>
-                                <div style="margin-top: 5px; line-height: 1.1;">
+                        <div t-if="doc.terms_and_conditions" class="row mt-2" style="page-break-inside: auto;">
+                            <div class="col-12" style="color: #444;">
+                                <strong style="font-size: 11.5px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">Terms and Conditions:</strong>
+                                <style>
+                                    .estimate_terms_content {
+                                        font-size: 10px !important;
+                                        line-height: 1.25 !important;
+                                        color: #374151 !important;
+                                    }
+                                    .estimate_terms_content span,
+                                    .estimate_terms_content div {
+                                        font-size: 10px !important;
+                                        line-height: 1.25 !important;
+                                    }
+                                    .estimate_terms_content p {
+                                        margin: 0 0 3px 0 !important;
+                                        line-height: 1.25 !important;
+                                        font-size: 10px !important;
+                                    }
+                                    .estimate_terms_content strong,
+                                    .estimate_terms_content b {
+                                        color: #111827 !important;
+                                        font-weight: 700 !important;
+                                        font-size: 10px !important;
+                                    }
+                                    .estimate_terms_content h1,
+                                    .estimate_terms_content h2,
+                                    .estimate_terms_content h3,
+                                    .estimate_terms_content h4,
+                                    .estimate_terms_content h5,
+                                    .estimate_terms_content h6 {
+                                        margin: 5px 0 2px 0 !important;
+                                        font-size: 10.5px !important;
+                                        font-weight: 700 !important;
+                                        color: #111827 !important;
+                                    }
+                                    .estimate_terms_content ul,
+                                    .estimate_terms_content ol {
+                                        margin: 2px 0 4px 0 !important;
+                                        padding-left: 16px !important;
+                                    }
+                                    .estimate_terms_content li {
+                                        margin-bottom: 2px !important;
+                                        line-height: 1.25 !important;
+                                        font-size: 10px !important;
+                                    }
+                                    .estimate_terms_content li p {
+                                        margin: 0 !important;
+                                        padding: 0 !important;
+                                        display: inline !important;
+                                        line-height: 1.25 !important;
+                                        font-size: 10px !important;
+                                    }
+                                </style>
+                                <div class="estimate_terms_content" style="margin-top: 3px; line-height: 1.25;">
                                     <span t-field="doc.terms_and_conditions"/>
                                 </div>
                             </div>

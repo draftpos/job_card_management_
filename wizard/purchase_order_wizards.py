@@ -34,24 +34,36 @@ class PurchaseOrderAmendWizard(models.TransientModel):
         new_po = old_po.copy({
             'partner_id': self.new_partner_id.id,
             'is_amended': True,
-            'origin': old_po.name
+            'origin': old_po.name,
+            'state': 'draft',
         })
         
-        # 2. Cancel the old PO
+        # 2. Check if price on new PO is higher than old PO
+        price_higher = new_po.amount_total > old_po.amount_total
+        if price_higher:
+            new_po.state = 'to approve'
+            new_po.message_post(
+                body=_("Price increased from %s to %s with supplier %s. This PO requires manager approval.") % (
+                    old_po.amount_total, new_po.amount_total, self.new_partner_id.name
+                ),
+                subtype_xmlid='mail.mt_note'
+            )
+        
+        # 3. Cancel the old PO (auto-canceling vendor bills and pickings)
         old_po.closing_reason = _("Amended to new supplier %s. Reason: %s") % (self.new_partner_id.name, self.reason)
         old_po.button_cancel()
         old_po.message_post(
-            body=_("Supplier amended. This PO is cancelled and replaced by %s") % new_po._get_html_link(),
+            body=_("Supplier amended to %s. This PO is cancelled and replaced by %s") % (self.new_partner_id.name, new_po._get_html_link()),
             subtype_xmlid='mail.mt_note'
         )
         
-        # 3. Post a message on the new PO
+        # 4. Post message on the new PO
         new_po.message_post(
             body=_("This PO was generated as an amendment of %s. Reason: %s") % (old_po._get_html_link(), self.reason),
             subtype_xmlid='mail.mt_note'
         )
         
-        # 4. Redirect to the new PO
+        # 5. Redirect to the new PO
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'purchase.order',
